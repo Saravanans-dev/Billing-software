@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 
 // Security
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'https://free-frontend-u0kv.onrender.com', credentials: true }));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -53,6 +53,11 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/exports', exportRoutes);
 app.use('/api/settings', settingsRoutes);
+
+// Root redirect
+app.get('/', (_req, res) => {
+  res.redirect('/api/health');
+});
 
 // Health check
 app.get('/api/health', (_req, res) => {
