@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: boss-tech-billing-api
+    env: node
+    buildCommand: |
+      cd backend && npm install && npm run build
+    startCommand: node backend/dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        fromDatabase:
+          name: boss-tech-billing-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: boss-tech-billing-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: boss-tech-billing-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: boss-tech-billing-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: boss-tech-billing-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: "*"
+
+databases:
+  - name: boss-tech-billing-db
+    plan: free
+    databaseName: boss_tech_billing
