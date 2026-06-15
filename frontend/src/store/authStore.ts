@@ -11,9 +11,27 @@ interface AuthState {
   verifyAuth: () => Promise<void>;
 }
 
+const getStoredUser = (): User | null => {
+  try {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+  } catch {
+    localStorage.removeItem('user');
+    return null;
+  }
+};
+
+const getStoredToken = (): string | null => {
+  const t = localStorage.getItem('token');
+  if (t === 'undefined' || t === 'null') {
+    localStorage.removeItem('token');
+    return null;
+  }
+  return t;
+};
+
 export const useAuthStore = create<AuthState>((set) => ({
-  user: JSON.parse(localStorage.getItem('user') || 'null'),
-  token: localStorage.getItem('token'),
+  user: getStoredUser(),
+  token: getStoredToken(),
   loading: false,
 
   login: async (username, password) => {
