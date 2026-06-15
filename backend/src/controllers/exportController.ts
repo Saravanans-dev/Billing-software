@@ -149,7 +149,7 @@ export async function printInvoice(req: AuthRequest, res: Response) {
     let y = doc.y;
     items.rows.forEach((item: any, idx: number) => {
       x = 30;
-      const row = [idx + 1, item.product_name, item.quantity + ' ' + item.unit, item.rate.toFixed(2), item.discount_amount > 0 ? item.discount_amount.toFixed(2) : '-', item.gst_percentage + '%', item.amount.toFixed(2)];
+      const row = [idx + 1, item.product_name, item.quantity + ' ' + item.unit, Number(item.rate).toFixed(2), Number(item.discount_amount) > 0 ? Number(item.discount_amount).toFixed(2) : '-', item.gst_percentage + '%', Number(item.amount).toFixed(2)];
       row.forEach((val, i) => {
         doc.text(String(val), x, y, { width: colWidths[i], align: 'left' });
         x += colWidths[i];
@@ -159,11 +159,11 @@ export async function printInvoice(req: AuthRequest, res: Response) {
 
     doc.moveDown(0.5);
     doc.fontSize(8).font('Helvetica-Bold');
-    doc.text(`Subtotal: ${s.subtotal.toFixed(2)}`, { align: 'right' });
-    if (s.discount_amount > 0) doc.text(`Discount: -${s.discount_amount.toFixed(2)}`, { align: 'right' });
-    doc.text(`GST: ${s.gst_amount.toFixed(2)}`, { align: 'right' });
-    doc.text(`Round Off: ${s.round_off.toFixed(2)}`, { align: 'right' });
-    doc.fontSize(10).text(`Grand Total: ${s.grand_total.toFixed(2)}`, { align: 'right' });
+    doc.text(`Subtotal: ${Number(s.subtotal).toFixed(2)}`, { align: 'right' });
+    if (Number(s.discount_amount) > 0) doc.text(`Discount: -${Number(s.discount_amount).toFixed(2)}`, { align: 'right' });
+    doc.text(`GST: ${Number(s.gst_amount).toFixed(2)}`, { align: 'right' });
+    doc.text(`Round Off: ${Number(s.round_off).toFixed(2)}`, { align: 'right' });
+    doc.fontSize(10).text(`Grand Total: ${Number(s.grand_total).toFixed(2)}`, { align: 'right' });
     doc.moveDown(0.3);
 
     doc.fontSize(7).font('Helvetica');
