@@ -44,12 +44,6 @@ export async function createPurchase(req: AuthRequest, res: Response) {
     );
 
     for (const item of items) {
-      await client.query(
-        `INSERT INTO purchase_items (purchase_id, product_id, product_name, unit, quantity, rate, gst_percentage, gst_amount, amount)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
-        [purchaseResult.rows[0].id, item.product_id, item.product_name, item.unit, item.quantity, item.rate, item.gst_percentage, item.gst_amount, item.amount]
-      );
-
       if (item.product_id) {
         await client.query(
           `INSERT INTO products (id, product_name, category, unit, hsn_code, gst_percentage, purchase_rate, current_stock)
@@ -66,6 +60,12 @@ export async function createPurchase(req: AuthRequest, res: Response) {
           [item.product_id, purchaseResult.rows[0].id, item.quantity, item.rate, req.user?.id]
         );
       }
+
+      await client.query(
+        `INSERT INTO purchase_items (purchase_id, product_id, product_name, unit, quantity, rate, gst_percentage, gst_amount, amount)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [purchaseResult.rows[0].id, item.product_id, item.product_name, item.unit, item.quantity, item.rate, item.gst_percentage, item.gst_amount, item.amount]
+      );
     }
 
     await client.query('COMMIT');
