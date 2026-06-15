@@ -4,7 +4,7 @@ import {
   ChevronDown, Calculator, RotateCcw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
+import api, { BACKEND_URL } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
@@ -142,7 +142,7 @@ export function Billing() {
       });
       toast.success(`Bill ${data.bill_number} saved!`);
       if (print) {
-        window.open(`/api/exports/invoice/${data.id}/pdf`, '_blank');
+        window.open(`${BACKEND_URL}/api/exports/invoice/${data.id}/pdf`, '_blank');
       }
       resetBill();
     } catch (error: any) {

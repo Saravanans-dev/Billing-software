@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Upload, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
+import api, { BACKEND_URL } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
@@ -53,7 +53,7 @@ export function Products() {
     try { await api.delete(`/products/${id}`); toast.success('Product deleted'); loadProducts(); } catch { toast.error('Failed'); }
   };
 
-  const exportExcel = () => { window.open('/api/exports/products-excel', '_blank'); };
+  const exportExcel = () => { window.open(`${BACKEND_URL}/api/exports/products-excel`, '_blank'); };
 
   return (
     <div className="page-container">

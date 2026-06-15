@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Download, FileText, BarChart3, TrendingUp, Package, Users, Store, AlertTriangle, Receipt } from 'lucide-react';
-import api from '../services/api';
+import api, { BACKEND_URL } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { DataTable } from '../components/ui/DataTable';
 import { formatCurrency, formatDate } from '../lib/utils';
@@ -51,7 +51,7 @@ export function Reports() {
   };
 
   const exportExcel = () => {
-    window.open(`/api/exports/sales-excel?from=${fromDate}&to=${toDate}`, '_blank');
+    window.open(`${BACKEND_URL}/api/exports/sales-excel?from=${fromDate}&to=${toDate}`, '_blank');
   };
 
   const renderReportContent = () => {

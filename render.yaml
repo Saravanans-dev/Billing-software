@@ -1,10 +1,11 @@
 services:
-  - type: static_site
+  - type: web
+    runtime: static
     name: free-frontend
     repo: https://github.com/Saravanans-dev/Billing-software
     branch: main
     buildCommand: cd frontend && npm install --include=dev && npm run build
-    publishPath: frontend/dist
+    staticPublishPath: frontend/dist
     routes:
       - type: rewrite
         source: /*
