@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import { runMigrations } from './config/database';
 
 import authRoutes from './routes/auth';
 import customerRoutes from './routes/customers';
@@ -69,8 +70,10 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Boss Tech Billing API running on port ${PORT}`);
+runMigrations().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Boss Tech Billing API running on port ${PORT}`);
+  });
 });
 
 export default app;
