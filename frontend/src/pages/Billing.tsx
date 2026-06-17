@@ -240,7 +240,7 @@ export function Billing() {
                     className="pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 w-48"
                   />
                 </div>
-                <button onClick={() => setShowCustomerModal(true)} className="btn-ghost p-1.5">
+                <button type="button" onClick={() => setShowCustomerModal(true)} className="btn-ghost p-1.5">
                   <UserPlus className="w-4 h-4" />
                 </button>
               </div>
@@ -275,6 +275,7 @@ export function Billing() {
                     {products.filter(p => p.is_active !== false).map((p) => (
                       <button
                         key={p.id}
+                        type="button"
                         onClick={() => addItem(p)}
                         className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-center justify-between"
                       >
@@ -344,7 +345,7 @@ export function Billing() {
                         <td className="px-3 py-2 text-right">{item.gst_percentage}%</td>
                         <td className="px-3 py-2 text-right font-medium">{formatCurrency(item.amount)}</td>
                         <td className="px-3 py-2">
-                          <button onClick={() => removeItem(item.id)} className="p-1 text-red-400 hover:text-red-600">
+                          <button type="button" onClick={() => removeItem(item.id)} className="p-1 text-red-400 hover:text-red-600">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </td>
@@ -377,6 +378,7 @@ export function Billing() {
                   {['cash', 'upi', 'card', 'bank_transfer', 'credit'].map((mode) => (
                     <button
                       key={mode}
+                      type="button"
                       onClick={() => setPaymentMode(mode)}
                       className={`px-4 py-2 text-xs font-medium rounded-lg border transition-all ${
                         paymentMode === mode
@@ -428,13 +430,15 @@ export function Billing() {
                 <div className="flex gap-2 mb-2">
                   <button
                     onClick={() => setDiscountType('percentage')}
-                    className={`px-3 py-1 text-xs rounded ${discountType === 'percentage' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}
+                      type="button"
+                      className={`px-3 py-1 text-xs rounded ${discountType === 'percentage' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}
                   >
                     %
                   </button>
                   <button
                     onClick={() => setDiscountType('fixed')}
-                    className={`px-3 py-1 text-xs rounded ${discountType === 'fixed' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}
+                      type="button"
+                      className={`px-3 py-1 text-xs rounded ${discountType === 'fixed' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}
                   >
                     Fixed
                   </button>
