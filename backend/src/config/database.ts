@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS settings (
 
 CREATE TABLE IF NOT EXISTS company_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    company_name VARCHAR(200) NOT NULL DEFAULT 'Boss Tech Rice & Agro Pvt. Ltd.',
+    company_name VARCHAR(200) NOT NULL DEFAULT 'Student Xerox',
     address TEXT,
     mobile VARCHAR(20),
     email VARCHAR(200),
@@ -242,7 +242,7 @@ if (process.env.DATABASE_URL) {
   pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_NAME || 'boss_tech_billing',
+    database: process.env.DB_NAME || 'student_xerox_billing',
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     max: 20,
@@ -277,7 +277,7 @@ export async function runMigrations() {
       );
       console.log('Default admin user created.');
 
-      await client.query("INSERT INTO company_settings (company_name) VALUES ('Boss Tech Rice & Agro Pvt. Ltd.') ON CONFLICT DO NOTHING");
+      await client.query("INSERT INTO company_settings (company_name) VALUES ('Student Xerox') ON CONFLICT DO NOTHING");
       await client.query("INSERT INTO settings (setting_key, setting_value) VALUES ('financial_year', '2026-27') ON CONFLICT DO NOTHING");
     }
   } catch (error) {

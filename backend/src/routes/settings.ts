@@ -9,9 +9,9 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/company', getCompanySettings);
-router.put('/company', updateCompanySettings);
+router.put('/company', authorize('admin'), updateCompanySettings);
 router.get('/', getSettings);
-router.put('/:key', updateSetting);
+router.put('/:key', authorize('admin'), updateSetting);
 
 // User management
 router.get('/users', authorize('admin'), getUsers);

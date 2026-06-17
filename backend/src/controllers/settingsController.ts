@@ -7,7 +7,7 @@ export async function getCompanySettings(req: AuthRequest, res: Response) {
     const result = await pool.query('SELECT * FROM company_settings LIMIT 1');
     if (result.rows.length === 0) {
       const newSettings = await pool.query(
-        `INSERT INTO company_settings (company_name) VALUES ('Boss Tech Rice & Agro Pvt. Ltd.') RETURNING *`
+        `INSERT INTO company_settings (company_name) VALUES ('Student Xerox') RETURNING *`
       );
       return res.json(newSettings.rows[0]);
     }

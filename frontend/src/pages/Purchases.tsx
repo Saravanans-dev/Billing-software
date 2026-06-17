@@ -7,13 +7,14 @@ import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { DataTable } from '../components/ui/DataTable';
 import { formatCurrency, formatDate } from '../lib/utils';
+import type { Product, Supplier, PurchaseItem } from '../types';
 
 export function Purchases() {
   const [purchases, setPurchases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [suppliers, setSuppliers] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [supplierId, setSupplierId] = useState('');
   const [supplierName, setSupplierName] = useState('');
   const [supplierMobile, setSupplierMobile] = useState('');
@@ -32,7 +33,7 @@ export function Purchases() {
     try {
       const { data } = await api.get('/purchases?limit=100');
       setPurchases(data.purchases);
-    } catch {} finally { setLoading(false); }
+    } catch { toast.error('Failed to load purchases'); } finally { setLoading(false); }
   };
 
   const addItem = (product: any) => {

@@ -39,8 +39,8 @@ export function Login() {
             <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
               <Store className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900">Boss Tech</h1>
-            <p className="text-sm text-gray-500 mt-1">Rice & Agro Billing System</p>
+            <h1 className="text-xl font-bold text-gray-900">Student Xerox</h1>
+            <p className="text-sm text-gray-500 mt-1">Billing Software</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -108,7 +108,7 @@ export function Login() {
           </form>
 
           <p className="text-[10px] text-gray-400 text-center mt-6">
-            &copy; {new Date().getFullYear()} Boss Tech Rice & Agro Pvt. Ltd.
+            &copy; {new Date().getFullYear()} Student Xerox
           </p>
         </div>
       </div>

@@ -3,9 +3,9 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: boss-tech-billing-db
+    container_name: student-xerox-billing-db
     environment:
-      POSTGRES_DB: boss_tech_billing
+      POSTGRES_DB: student_xerox_billing
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
@@ -19,17 +19,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: boss-tech-billing-api
+    container_name: student-xerox-billing-api
     ports:
       - "5000:5000"
     environment:
       NODE_ENV: production
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: boss_tech_billing
+      DB_NAME: student_xerox_billing
       DB_USER: postgres
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      JWT_SECRET: ${JWT_SECRET:-boss-tech-billing-jwt-secret-key-2026}
+      JWT_SECRET: ${JWT_SECRET:-student-xerox-billing-jwt-secret-key-2026}
       CORS_ORIGIN: "*"
     depends_on:
       - postgres
@@ -39,7 +39,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: boss-tech-billing-frontend
+    container_name: student-xerox-billing-frontend
     ports:
       - "80:80"
     depends_on:

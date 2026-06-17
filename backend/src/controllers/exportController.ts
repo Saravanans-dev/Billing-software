@@ -119,7 +119,7 @@ export async function printInvoice(req: AuthRequest, res: Response) {
     const s = sale.rows[0];
     const c = company.rows[0] || {};
 
-    doc.fontSize(16).font('Helvetica-Bold').text(c.company_name || 'Boss Tech Rice & Agro Pvt. Ltd.', { align: 'center' });
+    doc.fontSize(16).font('Helvetica-Bold').text(c.company_name || 'Student Xerox', { align: 'center' });
     doc.fontSize(8).font('Helvetica').text(c.address || '', { align: 'center' });
     doc.fontSize(8).text(`GST: ${c.gst_number || ''} | PH: ${c.mobile || ''}`, { align: 'center' });
     doc.moveDown(0.5);

@@ -1,9 +1,9 @@
 {
-  "name": "boss-tech-billing",
+  "name": "student-xerox-billing",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Boss Tech Billing Software - Rice Wholesale & Retail Billing System",
+  "description": "Student Xerox Billing Software",
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -53,8 +53,8 @@
     "wait-on": "^7.2.0"
   },
   "build": {
-    "appId": "com.bosstech.billing",
-    "productName": "Boss Tech Billing",
+    "appId": "com.studentxerox.billing",
+    "productName": "Student Xerox Billing",
     "directories": {
       "output": "dist-electron"
     },

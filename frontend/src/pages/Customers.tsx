@@ -4,12 +4,13 @@ import toast from 'react-hot-toast';
 import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Modal } from '../components/ui/Modal';
 import { DataTable } from '../components/ui/DataTable';
+import { Modal } from '../components/ui/Modal';
 import { formatCurrency } from '../lib/utils';
+import type { Customer } from '../types';
 
 export function Customers() {
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);

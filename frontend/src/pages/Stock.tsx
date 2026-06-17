@@ -1,11 +1,26 @@
 import { useState, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../services/api';
 import { DataTable } from '../components/ui/DataTable';
 import { formatCurrency } from '../lib/utils';
 
+interface StockItem {
+  id: string;
+  product_name: string;
+  category: string;
+  unit: string;
+  current_stock: number;
+  minimum_stock: number;
+  purchase_rate: number;
+  wholesale_rate: number;
+  retail_rate: number;
+  stock_value: number;
+  stock_status: 'out_of_stock' | 'low_stock' | 'near_low' | 'healthy';
+}
+
 export function Stock() {
-  const [stock, setStock] = useState<any[]>([]);
+  const [stock, setStock] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,11 +32,11 @@ export function Stock() {
     try {
       const { data } = await api.get('/reports/stock');
       setStock(data);
-    } catch {} finally { setLoading(false); }
+    } catch { toast.error('Failed to load stock'); } finally { setLoading(false); }
   };
 
-  const lowStockCount = stock.filter((s: any) => s.stock_status === 'low_stock' || s.stock_status === 'out_of_stock').length;
-  const stockValue = stock.reduce((sum: number, s: any) => sum + parseFloat(s.stock_value || 0), 0);
+  const lowStockCount = stock.filter((s) => s.stock_status === 'low_stock' || s.stock_status === 'out_of_stock').length;
+  const stockValue = stock.reduce((sum, s) => sum + parseFloat(String(s.stock_value || 0)), 0);
 
   return (
     <div className="page-container">

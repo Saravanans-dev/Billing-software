@@ -58,6 +58,11 @@ export async function createSale(req: AuthRequest, res: Response) {
       );
 
       if (item.product_id) {
+        const stockCheck = await client.query('SELECT current_stock FROM products WHERE id = $1', [item.product_id]);
+        const currentStock = parseFloat(stockCheck.rows[0]?.current_stock) || 0;
+        if (currentStock < item.quantity) {
+          throw new Error(`Insufficient stock for ${item.product_name}: available ${currentStock}, required ${item.quantity}`);
+        }
         await client.query(
           'UPDATE products SET current_stock = current_stock - $1 WHERE id = $2',
           [item.quantity, item.product_id]

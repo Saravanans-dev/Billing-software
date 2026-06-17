@@ -28,7 +28,7 @@ export function Sidebar() {
             <Store className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-gray-900 leading-tight">Boss Tech</h1>
+            <h1 className="text-sm font-bold text-gray-900 leading-tight">Student Xerox</h1>
             <p className="text-[10px] text-gray-500">Billing Software</p>
           </div>
         </div>

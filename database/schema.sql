@@ -1,4 +1,4 @@
--- Boss Tech Billing Software - PostgreSQL Schema
+-- Student Xerox Billing Software - PostgreSQL Schema
 -- Rice Wholesale & Retail Billing System
 
 -- Enable UUID extension
@@ -193,7 +193,7 @@ CREATE TABLE settings (
 -- Company settings
 CREATE TABLE company_settings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_name VARCHAR(200) NOT NULL DEFAULT 'Boss Tech Rice & Agro Pvt. Ltd.',
+    company_name VARCHAR(200) NOT NULL DEFAULT 'Student Xerox',
     address TEXT,
     mobile VARCHAR(20),
     email VARCHAR(200),
@@ -249,7 +249,7 @@ INSERT INTO users (username, password_hash, full_name, role) VALUES
 ('admin', '$2b$10$8K1p/a0dL1LXMIgoEDFrwOfMQkfAjkMBcGmPmGqYQE4zVZnJmZbRq', 'Administrator', 'admin');
 
 -- Default company settings
-INSERT INTO company_settings (company_name) VALUES ('Boss Tech Rice & Agro Pvt. Ltd.');
+INSERT INTO company_settings (company_name) VALUES ('Student Xerox');
 
 -- Default settings
 INSERT INTO settings (setting_key, setting_value) VALUES

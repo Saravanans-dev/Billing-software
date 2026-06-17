@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Upload, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api, { BACKEND_URL } from '../services/api';
+import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Modal } from '../components/ui/Modal';
 import { DataTable } from '../components/ui/DataTable';
+import { Modal } from '../components/ui/Modal';
 import { formatCurrency } from '../lib/utils';
+import type { Product } from '../types';
 
 export function Products() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -24,14 +25,14 @@ export function Products() {
       const { data } = await api.get(`/products?search=${search}&page=${page}&limit=50`);
       setProducts(data.products);
       setTotal(data.total);
-    } catch { } finally { setLoading(false); }
+    } catch { toast.error('Failed to load products'); } finally { setLoading(false); }
   };
 
   useEffect(() => { loadProducts(); }, [search, page]);
 
   const openAdd = () => { setEditId(null); setForm({ product_name: '', category: '', unit: 'Kg', hsn_code: '', gst_percentage: 0, purchase_rate: 0, wholesale_rate: 0, retail_rate: 0, minimum_stock: 0, current_stock: 0, barcode: '' }); setShowModal(true); };
 
-  const openEdit = (p: any) => { setEditId(p.id); setForm(p); setShowModal(true); };
+  const openEdit = (p: Product) => { setEditId(p.id); setForm(p); setShowModal(true); };
 
   const handleSave = async () => {
     if (!form.product_name) { toast.error('Product name is required'); return; }

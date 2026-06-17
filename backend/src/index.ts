@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 
 // Security
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'https://free-frontend-u0kv.onrender.com', credentials: true }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -77,7 +77,7 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 
 runMigrations().then(() => {
   app.listen(PORT, () => {
-    console.log(`Boss Tech Billing API running on port ${PORT}`);
+    console.log(`Student Xerox Billing API running on port ${PORT}`);
   });
 });
 

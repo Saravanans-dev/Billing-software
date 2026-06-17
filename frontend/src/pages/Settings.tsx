@@ -4,11 +4,12 @@ import toast from 'react-hot-toast';
 import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import type { User, CompanySettings } from '../types';
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState('company');
-  const [company, setCompany] = useState<any>({});
-  const [users, setUsers] = useState<any[]>([]);
+  const [company, setCompany] = useState<CompanySettings>({} as CompanySettings);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export function Settings() {
       setCompany(data);
       const { data: usersData } = await api.get('/settings/users');
       setUsers(usersData);
-    } catch { }
+    } catch { toast.error('Failed to load settings'); }
   };
 
   const saveCompany = async () => {
@@ -29,7 +30,7 @@ export function Settings() {
     try {
       await api.put('/settings/company', company);
       toast.success('Settings saved');
-    } catch { toast.error('Failed'); } finally { setLoading(false); }
+    } catch { toast.error('Failed to save settings'); } finally { setLoading(false); }
   };
 
   const tabs = [

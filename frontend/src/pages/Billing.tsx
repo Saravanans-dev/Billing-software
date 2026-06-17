@@ -10,6 +10,7 @@ import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { formatCurrency } from '../lib/utils';
 import { useAuthStore } from '../store/authStore';
+import type { Product, Customer } from '../types';
 
 interface LineItem {
   id: string;
@@ -40,8 +41,8 @@ export function Billing() {
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [productSearch, setProductSearch] = useState('');
   const [showProductSearch, setShowProductSearch] = useState(false);
   const [newCustomer, setNewCustomer] = useState({ customer_name: '', mobile: '', address: '', gst_number: '' });
@@ -62,7 +63,7 @@ export function Billing() {
     }, 300);
   }, []);
 
-  const addItem = (product: any) => {
+  const addItem = (product: Product) => {
     const existing = items.find((i) => i.product_id === product.id);
     if (existing) {
       setItems(items.map((i) =>
@@ -151,7 +152,7 @@ export function Billing() {
       }
       resetBill();
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to save bill');
+      toast.error(error.response?.data?.error || error.message || 'Failed to save bill');
     } finally {
       setSaving(false);
     }
@@ -165,6 +166,7 @@ export function Billing() {
     setCustomerAddress('');
     setCustomerGst('');
     setDiscountValue(0);
+    setDiscountType('percentage');
     setPaymentMode('cash');
     setNotes('');
   };
@@ -185,7 +187,7 @@ export function Billing() {
     }
   };
 
-  const selectCustomer = (c: any) => {
+  const selectCustomer = (c: Customer) => {
     setCustomerId(c.id);
     setCustomerName(c.customer_name);
     setCustomerMobile(c.mobile || '');
@@ -230,7 +232,10 @@ export function Billing() {
                     value={customerSearch}
                     onChange={(e) => {
                       setCustomerSearch(e.target.value);
-                      api.get(`/customers?search=${e.target.value}&limit=10`).then(({ data }) => setCustomers(data.customers));
+                      clearTimeout(productSearchTimer.current);
+                      productSearchTimer.current = setTimeout(() => {
+                        api.get(`/customers?search=${e.target.value}&limit=10`).then(({ data }) => setCustomers(data.customers));
+                      }, 300);
                     }}
                     className="pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 w-48"
                   />
