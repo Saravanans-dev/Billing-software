@@ -6,15 +6,32 @@ import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
 import { numberToWords } from '../lib/numberToWords';
 
-const PAGE = { W: 595.28, H: 841.89, M: 30 };
+const PAGE = { W: 595.28, H: 841.89, M: 22 };
 const CW = PAGE.W - PAGE.M * 2;
+const C1 = '#1e3a5f';
+const C2 = '#2d6a9f';
+const BG = '#f8fafc';
+const BD = '#d1d9e6';
+const TX = '#1a202c';
+const TXM = '#64748b';
 
-function drawLine(doc: PDFKit.PDFDocument, y: number, x1 = PAGE.M, x2 = PAGE.W - PAGE.M, color = '#ccc') {
+function drawLine(doc: PDFKit.PDFDocument, y: number, x1 = PAGE.M, x2 = PAGE.W - PAGE.M, color = BD) {
   doc.moveTo(x1, y).lineTo(x2, y).strokeColor(color).lineWidth(0.5).stroke();
 }
 
-function drawHR(doc: PDFKit.PDFDocument, y: number, color = '#1a237e') {
-  doc.moveTo(PAGE.M, y).lineTo(PAGE.W - PAGE.M, y).strokeColor(color).lineWidth(1.5).stroke();
+function borderedBox(doc: PDFKit.PDFDocument, x: number, y: number, w: number, h: number, lineW = 0.5) {
+  doc.rect(x, y, w, h).lineWidth(lineW).strokeColor(BD).stroke();
+}
+
+function filledBox(doc: PDFKit.PDFDocument, x: number, y: number, w: number, h: number, color: string) {
+  doc.rect(x, y, w, h).fillColor(color).fill();
+  doc.fillColor('#000');
+}
+
+function sectionBox(doc: PDFKit.PDFDocument, x: number, y: number, w: number, h: number) {
+  borderedBox(doc, x, y, w, h);
+  filledBox(doc, x + 1, y + 1, w - 2, 14, BG);
+  drawLine(doc, y + 15, x + 1, x + w - 1);
 }
 
 // ---- Excel exports unchanged ----
@@ -145,186 +162,244 @@ export async function printInvoice(req: AuthRequest, res: Response) {
 
     const totalQty = items.rows.reduce((sum: number, it: any) => sum + Number(it.quantity), 0);
     const grandTotal = Number(s.grand_total) || 0;
-    const navy = '#1a237e';
-    const gray = '#888';
+    const storeName = String(c.company_name || 'STUDENT XEROX').toUpperCase();
 
-    // ════════════════════ HEADER ════════════════════
-    doc.fontSize(26).font('Helvetica-Bold').fillColor(navy).text(String(c.company_name || 'STUDENT XEROX'), { align: 'center' });
-    drawHR(doc, doc.y + 2, navy);
-    doc.moveDown(0.2);
+    // ════════════════════ HEADER SECTION ════════════════════
+    // Left: Company info
+    const hLeftW = CW * 0.58;
+    const hRightW = CW * 0.38;
+    const hY = doc.y;
 
-    doc.fontSize(8).font('Helvetica').fillColor(gray);
-    const addr = [c.address, c.mobile ? `Ph: ${c.mobile}` : '', c.email ? `Email: ${c.email}` : ''].filter(Boolean).join('  |  ');
-    if (addr) doc.text(addr, { align: 'center' });
-    if (c.gst_number) doc.text(`GSTIN: ${c.gst_number}`, { align: 'center' });
-    doc.moveDown(0.3);
-
-    doc.fontSize(10).font('Helvetica-Bold').fillColor(navy);
-    doc.text('TAX INVOICE', { align: 'center' });
-    doc.moveDown(0.15);
-
-    // ════════════════════ INFO SECTION ════════════════════
-    drawLine(doc, doc.y);
-    doc.moveDown(0.3);
-
-    const infoFont = (size: number) => doc.fontSize(size).font('Helvetica').fillColor('#333');
-    // Bill details - left
-    const infoY = doc.y;
-    infoFont(8);
-    doc.text(`Invoice No: ${s.bill_number || ''}`, PAGE.M, infoY, { width: CW * 0.45 });
-    doc.text(`Date: ${s.bill_date ? new Date(s.bill_date).toLocaleDateString('en-IN') : ''}`, PAGE.M, infoY + 10, { width: CW * 0.45 });
-    doc.text(`Time: ${s.bill_time ? s.bill_time.toString().slice(0, 5) : ''}`, PAGE.M, infoY + 20, { width: CW * 0.45 });
-
-    // Customer details - right
-    const cx = PAGE.M + CW * 0.55;
-    doc.text(`Customer: ${s.customer_name || 'Walk-In'}`, cx, infoY, { width: CW * 0.45 });
-    doc.text(`Mobile: ${s.customer_mobile || '-'}`, cx, infoY + 10, { width: CW * 0.45 });
-    doc.text(`Address: ${s.customer_address || '-'}`, cx, infoY + 20, { width: CW * 0.45 });
-
-    doc.y = infoY + 34;
-
-    // ════════════════════ TABLE ════════════════════
-    drawLine(doc, doc.y);
-    doc.moveDown(0.2);
-
-    const colDefs = [
-      { key: '#', w: 20, align: 'center' as const },
-      { key: 'Particulars', w: 145, align: 'left' as const },
-      { key: 'Qty', w: 40, align: 'center' as const },
-      { key: 'Rate', w: 55, align: 'right' as const },
-      { key: 'Disc', w: 45, align: 'right' as const },
-      { key: 'GST', w: 45, align: 'center' as const },
-      { key: 'Amount', w: 55, align: 'right' as const },
-    ];
-    const totalW = colDefs.reduce((s, c) => s + c.w, 0);
-    let tbX = PAGE.M + (CW - totalW) / 2;
-
-    // Table header
-    doc.rect(tbX, doc.y, totalW, 16).fillColor(navy).fill();
-    doc.fillColor('#fff').fontSize(7.5).font('Helvetica-Bold');
-    let hx = tbX;
-    colDefs.forEach((col) => { doc.text(col.key, hx, doc.y + 4, { width: col.w, align: col.align }); hx += col.w; });
-    doc.y += 18;
+    // --- LEFT: Logo + Company ---
+    // Logo circle
+    const logoSize = 42;
+    const logoX = PAGE.M;
+    const logoY = hY + 2;
+    doc.circle(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2).fillColor(C1).fill();
+    doc.fillColor('#fff').fontSize(11).font('Helvetica-Bold');
+    doc.text('SX', logoX + (logoSize - 20) / 2, logoY + 13, { width: 20, align: 'center' });
     doc.fillColor('#000');
 
+    // Company name
+    const nameX = logoX + logoSize + 10;
+    doc.fontSize(16).font('Helvetica-Bold').fillColor(C1);
+    doc.text(storeName, nameX, hY, { width: hLeftW - logoSize - 10 });
+
+    // Tagline / address
+    const addrY = doc.y + 2;
+    doc.fontSize(7).font('Helvetica').fillColor(TXM);
+    const lines: string[] = [];
+    if (c.address) lines.push(c.address);
+    if (c.mobile) lines.push(`Phone: ${c.mobile}`);
+    if (c.email) lines.push(`Email: ${c.email}`);
+    if (c.gst_number) lines.push(`GSTIN: ${c.gst_number}`);
+    lines.forEach((ln, i) => doc.text(ln, nameX, addrY + i * 10, { width: hLeftW - logoSize - 10 }));
+
+    const leftBottom = addrY + lines.length * 10 + 4;
+
+    // --- RIGHT: Invoice Details Box ---
+    const invBoxX = PAGE.M + CW - hRightW;
+    const invBoxY = hY;
+    const invBoxH = 60;
+    const invHeaderH = 16;
+
+    // Box border
+    borderedBox(doc, invBoxX, invBoxY, hRightW, invBoxH);
+    // Header
+    filledBox(doc, invBoxX + 1, invBoxY + 1, hRightW - 2, invHeaderH - 2, C1);
+    doc.fillColor('#fff').fontSize(7).font('Helvetica-Bold');
+    doc.text('INVOICE', invBoxX, invBoxY + 3, { width: hRightW, align: 'center' });
+    doc.fillColor(TX).fontSize(7.5).font('Helvetica');
+
+    const invInfoY = invBoxY + invHeaderH + 4;
+    doc.text(`Invoice No   :  ${s.bill_number || ''}`, invBoxX + 8, invInfoY);
+    doc.text(`Date              :  ${s.bill_date ? new Date(s.bill_date).toLocaleDateString('en-IN') : ''}`, invBoxX + 8, invInfoY + 12);
+    doc.text(`Time              :  ${s.bill_time ? s.bill_time.toString().slice(0, 5) : ''}`, invBoxX + 8, invInfoY + 24);
+    doc.fillColor('#000');
+
+    doc.y = Math.max(leftBottom, invBoxY + invBoxH + 6);
+
+    // ════════════════════ CUSTOMER SECTION ════════════════════
+    const custH = 44;
+    const custY = doc.y;
+    sectionBox(doc, PAGE.M, custY, CW, custH);
+    doc.fontSize(6.5).font('Helvetica-Bold').fillColor(C1);
+    doc.text('BILL TO', PAGE.M + 6, custY + 3);
+    doc.fontSize(7.5).font('Helvetica').fillColor(TX);
+    const custName = s.customer_name || 'Walk-In Customer';
+    doc.text(`Name     :  ${custName}`, PAGE.M + 6, custY + 18);
+    doc.text(`Mobile    :  ${s.customer_mobile || '-'}`, PAGE.M + 6, custY + 29);
+    doc.text(`Address :  ${s.customer_address || '-'}`, PAGE.M + CW / 2 + 6, custY + 18);
+    doc.text(`GST        :  ${s.customer_gst || '-'}`, PAGE.M + CW / 2 + 6, custY + 29);
+    doc.y = custY + custH + 10;
+
+    // ════════════════════ PRODUCT TABLE ════════════════════
+    const cols = [
+      { key: '#', w: 20, align: 'center' as const },
+      { key: 'Product', w: 220, align: 'left' as const },
+      { key: 'Qty', w: 30, align: 'center' as const },
+      { key: 'Unit', w: 34, align: 'center' as const },
+      { key: 'Rate', w: 52, align: 'right' as const },
+      { key: 'Disc', w: 48, align: 'right' as const },
+      { key: 'GST', w: 44, align: 'center' as const },
+      { key: 'Amount', w: 53, align: 'right' as const },
+    ];
+    const tableW = cols.reduce((s, c) => s + c.w, 0);
+    const tbX = PAGE.M + (CW - tableW) / 2;
+
+    // Table header
+    const thH = 17;
+    filledBox(doc, tbX, doc.y, tableW, thH, C1);
+    doc.fillColor('#fff').fontSize(6.5).font('Helvetica-Bold');
+    let cx = tbX;
+    cols.forEach((col) => {
+      doc.text(col.key, cx, doc.y + 4.5, { width: col.w, align: col.align });
+      cx += col.w;
+    });
+    doc.y += thH + 1;
+    doc.fillColor(TX);
+
     // Table rows
-    const rowH = 14;
+    const rowH = 15;
     items.rows.forEach((item: any, idx: number) => {
       const y0 = doc.y;
+      const gstPct = Number(item.gst_percentage) || 0;
+      const disc = Number(item.discount_amount) || 0;
       const cells = [
         String(idx + 1),
         String(item.product_name),
-        `${Number(item.quantity)} ${item.unit}`,
+        String(Number(item.quantity)),
+        String(item.unit || 'Nos'),
         '₹' + Number(item.rate).toFixed(2),
-        Number(item.discount_amount) > 0 ? '₹' + Number(item.discount_amount).toFixed(2) : '-',
-        Number(item.gst_percentage) > 0 ? Number(item.gst_percentage) + '%' : '-',
+        disc > 0 ? '₹' + disc.toFixed(2) : '-',
+        gstPct > 0 ? gstPct + '%' : '-',
         '₹' + Number(item.amount).toFixed(2),
       ];
-      if (idx % 2 === 0) { doc.rect(tbX, y0, totalW, rowH).fillColor('#f5f5f5').fill(); doc.fillColor('#000'); }
-      hx = tbX;
+      if (idx % 2 === 0) { doc.rect(tbX, y0, tableW, rowH).fillColor('#f1f5f9').fill(); doc.fillColor(TX); }
+      cx = tbX;
       cells.forEach((val, i) => {
-        doc.fontSize(7).font('Helvetica').text(val, hx, y0 + 3, { width: colDefs[i].w, align: colDefs[i].align });
-        hx += colDefs[i].w;
+        doc.fontSize(6.5).font('Helvetica').text(val, cx, y0 + 4, { width: cols[i].w, align: cols[i].align });
+        cx += cols[i].w;
       });
       doc.y = y0 + rowH;
     });
 
-    // Bottom line
-    doc.rect(tbX, doc.y, totalW, 0.5).fillColor(navy).fill();
+    // Bottom border
+    drawLine(doc, doc.y);
+    doc.y += 3;
+
+    // ════════════════════ SUMMARY TWO-COLUMN ════════════════════
+    // Left: Amount in Words
+    const sumW = CW * 0.47;
+    const sumH = 68;
+
+    const amtY = doc.y;
+    const amtX = PAGE.M;
+
+    sectionBox(doc, amtX, amtY, sumW, sumH);
+    doc.fontSize(6.5).font('Helvetica-Bold').fillColor(C1);
+    doc.text('AMOUNT IN WORDS', amtX + 6, amtY + 3);
+    doc.fontSize(7.5).font('Helvetica').fillColor(TX);
+    doc.text(numberToWords(grandTotal), amtX + 6, amtY + 20, { width: sumW - 12 });
     doc.fillColor('#000');
-    doc.moveDown(0.3);
 
-    // ════════════════════ SUMMARY & TOTALS ════════════════════
-    const sumW = Math.min(260, CW);
-    const sumX = PAGE.M + (CW - sumW) / 2;
+    // Right: Summary
+    const sumX = PAGE.M + CW - sumW;
+    sectionBox(doc, sumX, amtY, sumW, sumH);
+    doc.fontSize(6.5).font('Helvetica-Bold').fillColor(C1);
+    doc.text('SUMMARY', sumX + 6, amtY + 3);
 
-    const sumLines: { label: string; value: string }[] = [];
-    sumLines.push({ label: 'Subtotal', value: '₹' + Number(s.subtotal).toFixed(2) });
-    if (Number(s.discount_amount) > 0) sumLines.push({ label: 'Discount', value: '-₹' + Number(s.discount_amount).toFixed(2) });
-    if (Number(s.gst_amount) > 0) sumLines.push({ label: 'GST', value: '₹' + Number(s.gst_amount).toFixed(2) });
-    if (Number(s.round_off) !== 0) sumLines.push({ label: 'Round Off', value: Number(s.round_off).toFixed(2) });
+    const sumItems: { label: string; value: string }[] = [
+      { label: 'Subtotal', value: '₹' + Number(s.subtotal).toFixed(2) },
+    ];
+    if (Number(s.discount_amount) > 0) sumItems.push({ label: 'Discount', value: '-₹' + Number(s.discount_amount).toFixed(2) });
+    if (Number(s.gst_amount) > 0) sumItems.push({ label: 'GST', value: '₹' + Number(s.gst_amount).toFixed(2) });
+    if (Number(s.round_off) !== 0) sumItems.push({ label: 'Round Off', value: Number(s.round_off).toFixed(2) });
 
-    // Summary as bordered box with GT highlighted
-    let sy = doc.y;
-    doc.rect(sumX, sy, sumW, sumLines.length * 14 + 24).lineWidth(0.5).strokeColor(navy).stroke();
-    sumLines.forEach((ln, i) => {
-      doc.fontSize(8).font('Helvetica').fillColor('#333');
-      doc.text(ln.label, sumX + 8, sy + 5 + i * 14, { width: sumW - 100 });
-      doc.text(ln.value, sumX + sumW - 90, sy + 5 + i * 14, { width: 82, align: 'right' });
+    const siStartY = amtY + 17;
+    doc.fontSize(7.5).font('Helvetica').fillColor(TX);
+    sumItems.forEach((si, i) => {
+      doc.text(si.label, sumX + 6, siStartY + i * 13);
+      doc.text(si.value, sumX + sumW - 56, siStartY + i * 13, { width: 50, align: 'right' });
     });
-    const gtY = sy + sumLines.length * 14 + 2;
-    doc.rect(sumX + 1, gtY, sumW - 2, 20).fillColor(navy).fill();
-    doc.fillColor('#fff').fontSize(11).font('Helvetica-Bold');
-    doc.text('Grand Total', sumX + 8, gtY + 5, { width: sumW - 100 });
-    doc.text('₹' + grandTotal.toFixed(2), sumX + sumW - 90, gtY + 5, { width: 82, align: 'right' });
+
+    // Grand Total
+    const gtY2 = amtY + sumH - 21;
+    filledBox(doc, sumX + 1, gtY2, sumW - 2, 19, C1);
+    doc.fillColor('#fff').fontSize(10).font('Helvetica-Bold');
+    doc.text('Grand Total', sumX + 6, gtY2 + 4.5);
+    doc.text('₹' + grandTotal.toFixed(2), sumX + sumW - 56, gtY2 + 4.5, { width: 50, align: 'right' });
     doc.fillColor('#000');
-    doc.y = gtY + 24;
 
-    // ════════════════════ AMOUNT IN WORDS ════════════════════
-    drawLine(doc, doc.y);
-    doc.moveDown(0.3);
-    doc.fontSize(7.5).font('Helvetica-Bold').fillColor(navy);
-    doc.text('Amount in Words:', { align: 'center' });
-    doc.fontSize(8).font('Helvetica').fillColor('#333');
-    doc.text(numberToWords(grandTotal), { align: 'center' });
-    doc.moveDown(0.3);
-    drawLine(doc, doc.y);
-    doc.moveDown(0.3);
+    doc.y = amtY + sumH + 10;
 
-    // ════════════════════ QR CODE ════════════════════
+    // ════════════════════ PAYMENT & QR ════════════════════
+    const payH = 66;
+    const payY = doc.y;
+    const payHalf = (CW - 10) / 2;
+
+    // Payment
+    sectionBox(doc, PAGE.M, payY, payHalf, payH);
+    doc.fontSize(6.5).font('Helvetica-Bold').fillColor(C1);
+    doc.text('PAYMENT DETAILS', PAGE.M + 6, payY + 3);
+    doc.fontSize(7.5).font('Helvetica').fillColor(TX);
+    doc.text(`Payment Mode  :  ${(s.payment_mode || 'CASH').toUpperCase()}`, PAGE.M + 6, payY + 18);
+    doc.text(`Total Items      :  ${items.rows.length}`, PAGE.M + 6, payY + 29);
+    doc.text(`Total Qty         :  ${totalQty}`, PAGE.M + 6, payY + 40);
+    doc.text(`Cashier            :  ${s.user_name || '-'}`, PAGE.M + 6, payY + 51);
+
+    // QR
+    const qrX = PAGE.M + payHalf + 10;
+    sectionBox(doc, qrX, payY, payHalf, payH);
+    doc.fontSize(6.5).font('Helvetica-Bold').fillColor(C1);
+    doc.text('SCAN TO PAY', qrX, payY + 3, { width: payHalf, align: 'center' });
+
     const upiId = footerSettings['upi_id'] || 'store@upi';
-    const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(String(c.company_name || 'Student Xerox'))}&am=${grandTotal.toFixed(2)}&tn=${s.bill_number || 'Bill'}`;
+    const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(String(c.company_name || ''))}&am=${grandTotal.toFixed(2)}&tn=${s.bill_number || 'Bill'}`;
     try {
-      const qrBuf: Buffer = await QRCode.toBuffer(upiLink, { width: 80, margin: 1, color: { dark: navy, light: '#fff' } });
-      const qrImgSize = 55;
-      const qrX = sumX + (sumW - qrImgSize) / 2;
-      doc.image(qrBuf, qrX, doc.y, { width: qrImgSize, height: qrImgSize });
-      doc.y += qrImgSize + 2;
-      doc.fontSize(6).font('Helvetica').fillColor(gray);
-      doc.text('Scan to Pay (UPI)', { align: 'center' });
-      doc.moveDown(0.15);
-      doc.fontSize(5.5).font('Helvetica').fillColor('#aaa');
-      doc.text(upiId, { align: 'center' });
+      const qrBuf: Buffer = await QRCode.toBuffer(upiLink, { width: 90, margin: 1, color: { dark: C1, light: '#fff' } });
+      const qrSize = 38;
+      const qrImgX = qrX + (payHalf - qrSize) / 2;
+      doc.image(qrBuf, qrImgX, payY + 16, { width: qrSize, height: qrSize });
     } catch (_) { /* skip */ }
+    doc.fontSize(6).font('Helvetica').fillColor(TXM);
+    doc.text(upiId, qrX, payY + 56, { width: payHalf, align: 'center' });
     doc.fillColor('#000');
-    doc.moveDown(0.3);
-    drawLine(doc, doc.y);
-    doc.moveDown(0.3);
 
-    // ════════════════════ PAYMENT INFO ════════════════════
-    doc.fontSize(8).font('Helvetica').fillColor('#333');
-    doc.text(`Payment Mode: ${(s.payment_mode || 'CASH').toUpperCase()}  |  Items: ${items.rows.length}  |  Qty: ${totalQty}`, { align: 'center' });
-    doc.text(`Cashier: ${s.user_name || '-'}`, { align: 'center' });
-    doc.moveDown(0.3);
-    drawHR(doc, doc.y, navy);
-    doc.moveDown(0.5);
+    doc.y = payY + payH + 10;
 
     // ════════════════════ SIGNATURES ════════════════════
     const signY = doc.y;
-    const signColW = 150;
-    const signColsX = PAGE.M + (CW - signColW * 3 - 20) / 2;
-    ['Authorized Signature', 'Customer Signature', 'Store Seal'].forEach((label, i) => {
-      const sx = signColsX + i * (signColW + 10);
-      doc.fontSize(7).font('Helvetica').fillColor(gray);
-      doc.text(label, sx, signY, { width: signColW, align: 'center' });
-    });
-    doc.y = signY + 18;
+    const signW = (CW - 20) / 3;
+    const signStartX = PAGE.M + (CW - (signW * 3 + 20)) / 2;
 
-    // ════════════════════ FOOTER ════════════════════
-    drawLine(doc, doc.y + 2);
-    doc.moveDown(0.4);
-    doc.fontSize(7).font('Helvetica-Bold').fillColor(navy);
-    doc.text('TERMS & CONDITIONS', { align: 'center' });
-    doc.moveDown(0.1);
-    doc.fontSize(6.5).font('Helvetica').fillColor(gray);
-    doc.text(footerSettings['terms_conditions'] || 'Goods once sold will not be taken back.', { align: 'center' });
-    doc.text(footerSettings['return_policy'] || 'No returns after 7 days.', { align: 'center' });
-    doc.moveDown(0.4);
-    doc.fontSize(8).font('Helvetica-Bold').fillColor(navy);
-    doc.text(footerSettings['thank_you_message'] || 'Thank you! Visit again.', { align: 'center' });
-    doc.moveDown(0.1);
+    ['AUTHORIZED SIGNATURE', 'CUSTOMER SIGNATURE', 'STORE SEAL'].forEach((label, i) => {
+      const sx = signStartX + i * (signW + 10);
+      borderedBox(doc, sx, signY, signW, 28);
+      doc.fontSize(6).font('Helvetica').fillColor(TXM);
+      doc.text(label, sx, signY + 10, { width: signW, align: 'center' });
+    });
+    doc.fillColor('#000');
+    doc.y = signY + 32;
+
+    // ════════════════════ FOOTER BOX ════════════════════
+    const ftrH = 46;
+    const ftrY = doc.y;
+    sectionBox(doc, PAGE.M, ftrY, CW, ftrH);
+    doc.fontSize(6.5).font('Helvetica-Bold').fillColor(C1);
+    doc.text('TERMS & CONDITIONS', PAGE.M + 6, ftrY + 3);
+    doc.fontSize(7).font('Helvetica').fillColor(TXM);
+    doc.text(footerSettings['terms_conditions'] || 'Goods once sold will not be taken back.', PAGE.M + 6, ftrY + 17, { width: CW - 12 });
+    doc.text(footerSettings['return_policy'] || 'No returns after 7 days.', PAGE.M + 6, ftrY + 27, { width: CW - 12 });
+    doc.fillColor(C1).fontSize(7.5).font('Helvetica-Bold');
+    doc.text(footerSettings['thank_you_message'] || 'Thank you! Visit again.', PAGE.M + 6, ftrY + 37, { width: CW - 12 });
+    doc.fillColor('#000');
+    doc.y = ftrY + ftrH + 6;
+
+    // Bottom note
     doc.fontSize(6).font('Helvetica').fillColor('#aaa');
-    doc.text('— This is a computer-generated invoice —', { align: 'center' });
+    doc.text('This is a computer-generated invoice', { align: 'center' });
+
     doc.end();
   } catch (error: any) {
     console.error('PDF generation error:', error);
