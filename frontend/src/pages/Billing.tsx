@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search, Plus, Trash2, Printer, Download, Save, X, UserPlus,
   ChevronDown, Calculator, RotateCcw
@@ -27,6 +28,7 @@ interface LineItem {
 }
 
 export function Billing() {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const [customerSearch, setCustomerSearch] = useState('');
   const [customerId, setCustomerId] = useState('');
@@ -147,7 +149,13 @@ export function Billing() {
         payment_mode: paymentMode,
         notes,
       });
-      toast.success(`Bill ${data.bill_number} saved!`);
+      toast.success(`Bill ${data.bill_number} saved!`, {
+        duration: 5000,
+        action: {
+          label: 'View Bills',
+          onClick: () => navigate('/reports'),
+        },
+      });
       if (print) {
         window.open(`${BACKEND_URL}/api/exports/invoice/${data.id}/pdf`, '_blank');
       }
