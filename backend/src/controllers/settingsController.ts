@@ -19,20 +19,21 @@ export async function getCompanySettings(req: AuthRequest, res: Response) {
 
 export async function updateCompanySettings(req: AuthRequest, res: Response) {
   try {
-    const { company_name, address, mobile, email, gst_number, gst, gstin } = req.body;
-    const name = company_name || '';
-    // Simple inline update for essential fields
+    const { company_name } = req.body;
+    if (!company_name) {
+      return res.status(400).json({ error: 'company_name is required', received: req.body });
+    }
     const existing = await pool.query('SELECT id FROM company_settings LIMIT 1');
     if (existing.rows.length === 0) {
-      await pool.query('INSERT INTO company_settings (company_name) VALUES ($1)', [name]);
+      await pool.query('INSERT INTO company_settings (company_name) VALUES ($1)', [company_name]);
     } else {
-      await pool.query('UPDATE company_settings SET company_name=$1, updated_at=CURRENT_TIMESTAMP WHERE id=$2', [name, existing.rows[0].id]);
+      await pool.query('UPDATE company_settings SET company_name=$1, updated_at=CURRENT_TIMESTAMP WHERE id=$2', [company_name, existing.rows[0].id]);
     }
     const result = await pool.query('SELECT * FROM company_settings LIMIT 1');
     res.json(result.rows[0]);
   } catch (error: any) {
-    console.error('Update company error:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Update company error:', error.message, error.stack);
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
 
