@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import { ThermalReceipt } from '../components/invoice/ThermalReceipt';
@@ -11,6 +11,9 @@ export function ReceiptPrint() {
   const [company, setCompany] = useState<CompanySettings | null>(null);
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem('token');
+  if (!token) return <Navigate to="/login" replace />;
 
   useEffect(() => {
     if (!id) return;
@@ -52,7 +55,7 @@ export function ReceiptPrint() {
 
   return (
     <div>
-      <div style={{ textAlign: 'center', padding: '10px', fontFamily: 'monospace' }}>
+      <div className="no-print" style={{ textAlign: 'center', padding: '10px', fontFamily: 'monospace' }}>
         <button
           onClick={() => window.print()}
           style={{

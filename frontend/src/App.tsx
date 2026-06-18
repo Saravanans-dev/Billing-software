@@ -57,8 +57,8 @@ function App() {
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="receipt/:id" element={<ReceiptPrint />} />
         </Route>
+        <Route path="receipt/:id" element={<ReceiptPrint />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
