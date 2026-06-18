@@ -78,31 +78,35 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             {company.company_name?.toUpperCase() || 'STUDENT XEROX'}
           </div>
           <div className="text-gray-700" style={{ fontSize: '8px', lineHeight: '1.4' }}>
-            {company.address && <div>{company.address}</div>}
-            <div>
+            {company.address && <span>{company.address}</span>}
+            <br />
+            <span>
               {company.mobile && <span>Ph: {company.mobile}</span>}
               {company.email && <span> | Email: {company.email}</span>}
-            </div>
-            {company.gst_number && <div>GSTIN: {company.gst_number}</div>}
+            </span>
+            <br />
+            {company.gst_number && <span>GSTIN: {company.gst_number}</span>}
           </div>
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px dashed #000', margin: '2mm 0' }} />
 
         {/* ═══════════ INVOICE & CUSTOMER DETAILS ═══════════ */}
-        <div className="flex justify-between" style={{ fontSize: '8px' }}>
-          <div style={{ width: '48%' }}>
-            <div><span style={{ fontWeight: 700 }}>Invoice No:</span> {sale.bill_number}</div>
-            <div><span style={{ fontWeight: 700 }}>Date:</span> {formatDate(sale.bill_date)}</div>
-            <div><span style={{ fontWeight: 700 }}>Time:</span> {formatTime(sale.bill_time)}</div>
-            <div><span style={{ fontWeight: 700 }}>Cashier ID:</span> {sale.user_id?.slice(0, 8) || '-'}</div>
-            <div><span style={{ fontWeight: 700 }}>Cashier:</span> {sale.user_name || '-'}</div>
+        <div style={{ fontSize: '8px' }}>
+          <div className="flex justify-between">
+            <span><span style={{ fontWeight: 700 }}>Invoice No:</span> {sale.bill_number}</span>
+            <span style={{ textAlign: 'right' }}><span style={{ fontWeight: 700 }}>Customer ID:</span> {sale.customer_id?.slice(0, 8) || '-'}</span>
           </div>
-          <div style={{ width: '48%' }}>
-            <div><span style={{ fontWeight: 700 }}>Customer ID:</span> {sale.customer_id?.slice(0, 8) || '-'}</div>
-            <div><span style={{ fontWeight: 700 }}>Customer:</span> {sale.customer_name || 'Walk-In Customer'}</div>
-            <div><span style={{ fontWeight: 700 }}>Mobile:</span> {sale.customer_mobile || '-'}</div>
+          <div className="flex justify-between">
+            <span><span style={{ fontWeight: 700 }}>Date:</span> {formatDate(sale.bill_date)}</span>
+            <span style={{ textAlign: 'right' }}><span style={{ fontWeight: 700 }}>Customer:</span> {sale.customer_name || 'Walk-In Customer'}</span>
           </div>
+          <div className="flex justify-between">
+            <span><span style={{ fontWeight: 700 }}>Time:</span> {formatTime(sale.bill_time)}</span>
+            <span style={{ textAlign: 'right' }}><span style={{ fontWeight: 700 }}>Mobile:</span> {sale.customer_mobile || '-'}</span>
+          </div>
+          <div><span style={{ fontWeight: 700 }}>Cashier ID:</span> {sale.user_id?.slice(0, 8) || '-'}</div>
+          <div><span style={{ fontWeight: 700 }}>Cashier:</span> {sale.user_name || '-'}</div>
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px dashed #000', margin: '2mm 0' }} />
