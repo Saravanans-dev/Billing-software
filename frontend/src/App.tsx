@@ -12,6 +12,7 @@ import { Customers } from './pages/Customers';
 import { Suppliers } from './pages/Suppliers';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
+import { ReceiptPrint } from './pages/ReceiptPrint';
 import { useEffect } from 'react';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -56,6 +57,7 @@ function App() {
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="receipt/:id" element={<ReceiptPrint />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
