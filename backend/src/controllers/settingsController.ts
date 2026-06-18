@@ -19,20 +19,19 @@ export async function getCompanySettings(req: AuthRequest, res: Response) {
 
 export async function updateCompanySettings(req: AuthRequest, res: Response) {
   try {
-    const existing = await pool.query('SELECT * FROM company_settings LIMIT 1');
-    const current = existing.rows[0] || {};
-    const fields = ['company_name','address','mobile','email','gst_number','pan_number','logo_url','financial_year_start','financial_year_end','thermal_printer','a5_printer','auto_backup_enabled','backup_frequency'];
-    const merged: any = {};
-    fields.forEach(f => { merged[f] = req.body[f] !== undefined ? req.body[f] : current[f]; });
-    const result = await pool.query(
-      `UPDATE company_settings SET company_name=$1, address=$2, mobile=$3, email=$4, gst_number=$5, pan_number=$6, 
-       logo_url=$7, financial_year_start=$8, financial_year_end=$9, thermal_printer=$10, a5_printer=$11, 
-       auto_backup_enabled=$12, backup_frequency=$13, updated_at=CURRENT_TIMESTAMP WHERE id=(SELECT id FROM company_settings LIMIT 1) RETURNING *`,
-      fields.map(f => merged[f])
-    );
-    res.json(result.rows[0] || { message: 'Settings updated' });
+    const { company_name, address, mobile, email, gst_number, gst, gstin } = req.body;
+    const name = company_name || '';
+    // Simple inline update for essential fields
+    const existing = await pool.query('SELECT id FROM company_settings LIMIT 1');
+    if (existing.rows.length === 0) {
+      await pool.query('INSERT INTO company_settings (company_name) VALUES ($1)', [name]);
+    } else {
+      await pool.query('UPDATE company_settings SET company_name=$1, updated_at=CURRENT_TIMESTAMP WHERE id=$2', [name, existing.rows[0].id]);
+    }
+    const result = await pool.query('SELECT * FROM company_settings LIMIT 1');
+    res.json(result.rows[0]);
   } catch (error: any) {
-    console.error('Update company error:', error);
+    console.error('Update company error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
