@@ -5,8 +5,8 @@ services:
     env: node
     repo: https://github.com/Saravanans-dev/Billing-software
     branch: main
-    buildCommand: cd backend && npm install && npm run build
-    startCommand: cd backend && node dist/index.js
+    buildCommand: cd backend && npm install --include=dev && npm run build
+    startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
