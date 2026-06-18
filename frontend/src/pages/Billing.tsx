@@ -157,7 +157,10 @@ export function Billing() {
         },
       });
       if (print) {
-        window.open(`/receipt/${data.id}`, '_blank');
+        api.get(`/exports/invoice/${data.id}/pdf`, { responseType: 'blob' }).then((res) => {
+          const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+          window.open(url, '_blank');
+        }).catch(() => toast.error('Failed to load PDF'));
       }
       resetBill();
     } catch (error: any) {
