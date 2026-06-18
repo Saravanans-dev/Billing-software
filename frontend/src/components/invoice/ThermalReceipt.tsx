@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { numberToWords } from '../../lib/numberToWords';
 import { formatCurrency } from '../../lib/utils';
@@ -11,7 +11,6 @@ interface ThermalReceiptProps {
 }
 
 export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps) {
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const [qrDataUrl, setQrDataUrl] = useState('');
 
   const items = sale.items || [];
@@ -25,7 +24,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     : '';
 
   useEffect(() => {
-    if (upiLink && qrCanvasRef.current) {
+    if (upiLink) {
       QRCode.toDataURL(upiLink, {
         width: 140,
         margin: 1,
@@ -277,7 +276,13 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           </div>
         </div>
         <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-          <img src={qrDataUrl} alt="UPI QR" style={{width:'35mm', height:'35mm'}} />
+          {qrDataUrl ? (
+            <img src={qrDataUrl} alt="UPI QR" style={{width:'35mm', height:'35mm'}} />
+          ) : (
+            <div style={{width:'35mm', height:'35mm', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'7px', color:'#999', border:'1px dashed #ccc'}}>
+              Loading QR...
+            </div>
+          )}
           <div style={{fontSize:'7px', marginTop:'0.5mm'}}>Scan & Pay (UPI)</div>
         </div>
       </div>
