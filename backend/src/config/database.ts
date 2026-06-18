@@ -230,9 +230,23 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at);
 
 let pool: Pool;
 
+function getExternalConnectionString(internalUrl: string): string {
+  // Detect internal Render DB hostname (dpg-xxx without domain)
+  // e.g., postgresql://user:pass@dpg-xxx/free_billing
+  // → postgresql://user:pass@dpg-xxx.oregon-postgres.render.com:5432/free_billing
+  const match = internalUrl.match(/@(dpg-[a-z0-9]+)\/(.+)/);
+  if (match) {
+    return internalUrl.replace(
+      `@${match[1]}/${match[2]}`,
+      `@${match[1]}.oregon-postgres.render.com:5432/${match[2]}`
+    );
+  }
+  return internalUrl;
+}
+
 if (process.env.DATABASE_URL) {
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: getExternalConnectionString(process.env.DATABASE_URL),
     ssl: { rejectUnauthorized: false },
     max: 20,
     idleTimeoutMillis: 30000,
