@@ -236,7 +236,7 @@ if (process.env.DATABASE_URL) {
     ssl: { rejectUnauthorized: false },
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 10000,
   });
 } else {
   pool = new Pool({
@@ -247,7 +247,7 @@ if (process.env.DATABASE_URL) {
     password: process.env.DB_PASSWORD || 'postgres',
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 10000,
   });
 }
 

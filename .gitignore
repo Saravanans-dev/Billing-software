@@ -7,3 +7,4 @@ dist-electron/
 uploads/
 .DS_Store
 Thumbs.db
+check_db.js

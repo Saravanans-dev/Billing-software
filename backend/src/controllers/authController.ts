@@ -51,7 +51,7 @@ export async function login(req: Request, res: Response) {
     });
   } catch (error: any) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error', message: error.message, stack: error.stack?.split('\n').slice(0, 3).join('\n') });
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 
