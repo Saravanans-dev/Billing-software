@@ -37,19 +37,20 @@ export function Purchases() {
   };
 
   const addItem = (product: any) => {
-    setItems([...items, {
-      id: crypto.randomUUID(),
-      product_id: product.id,
-      product_name: product.product_name,
-      category: product.category,
-      unit: product.unit || 'Kg',
-      hsn_code: product.hsn_code,
-      quantity: 1,
-      rate: product.purchase_rate || 0,
-      gst_percentage: parseFloat(product.gst_percentage) || 0,
-      gst_amount: 0,
-      amount: product.purchase_rate || 0,
-    }]);
+      const rate = parseFloat(product.purchase_rate) || 0;
+      setItems([...items, {
+        id: crypto.randomUUID(),
+        product_id: product.id,
+        product_name: product.product_name,
+        category: product.category,
+        unit: product.unit || 'Kg',
+        hsn_code: product.hsn_code,
+        quantity: 1,
+        rate,
+        gst_percentage: parseFloat(product.gst_percentage) || 0,
+        gst_amount: 0,
+        amount: rate,
+      }]);
   };
 
   const updateItem = (id: string, field: string, value: number) => {

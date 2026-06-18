@@ -70,18 +70,19 @@ export function Billing() {
         i.product_id === product.id ? { ...i, quantity: i.quantity + 1, amount: (i.quantity + 1) * i.rate } : i
       ));
     } else {
+      const rate = parseFloat(product.wholesale_rate) || parseFloat(product.retail_rate) || 0;
       setItems([...items, {
         id: crypto.randomUUID(),
         product_id: product.id,
         product_name: product.product_name,
         unit: product.unit || 'Kg',
         quantity: 1,
-        rate: product.wholesale_rate || product.retail_rate || 0,
+        rate,
         discount_percentage: 0,
         discount_amount: 0,
         gst_percentage: parseFloat(product.gst_percentage) || 0,
         gst_amount: 0,
-        amount: product.wholesale_rate || product.retail_rate || 0,
+        amount: rate,
       }]);
     }
     setShowProductSearch(false);
@@ -280,7 +281,7 @@ export function Billing() {
                         className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-center justify-between"
                       >
                         <span className="font-medium">{p.product_name}</span>
-                        <span className="text-gray-500">{(p.wholesale_rate || p.retail_rate || 0).toFixed(2)}</span>
+                        <span className="text-gray-500">{(parseFloat(p.wholesale_rate) || parseFloat(p.retail_rate) || 0).toFixed(2)}</span>
                       </button>
                     ))}
                     {products.length === 0 && (
