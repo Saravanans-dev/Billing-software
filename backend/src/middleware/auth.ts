@@ -18,7 +18,10 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'student-xerox-billing-jwt-secret-key-2026', { algorithms: ['HS256'] }) as any;
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] }) as any;
     req.user = decoded;
     next();
   } catch (error) {

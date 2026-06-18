@@ -24,7 +24,12 @@ const PORT = process.env.PORT || 5000;
 
 // Security
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
+const corsOrigin = process.env.CORS_ORIGIN;
+if (corsOrigin) {
+  app.use(cors({ origin: corsOrigin, credentials: true }));
+} else {
+  app.use(cors({ origin: '*', credentials: true }));
+}
 
 // Rate limiting
 const limiter = rateLimit({
