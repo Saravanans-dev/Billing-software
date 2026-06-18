@@ -11,7 +11,13 @@ export async function getCompanySettings(req: AuthRequest, res: Response) {
       );
       return res.json(newSettings.rows[0]);
     }
-    res.json(result.rows[0]);
+    const data = result.rows[0];
+    // Ensure company_name is set
+    if (!data.company_name) {
+      await pool.query('UPDATE company_settings SET company_name=$1 WHERE id=$2', ['Student Xerox', data.id]);
+      data.company_name = 'Student Xerox';
+    }
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -19,15 +25,18 @@ export async function getCompanySettings(req: AuthRequest, res: Response) {
 
 export async function updateCompanySettings(req: AuthRequest, res: Response) {
   try {
-    const { company_name } = req.body;
-    if (!company_name) {
-      return res.status(400).json({ error: 'company_name is required', received: req.body });
-    }
     const existing = await pool.query('SELECT id FROM company_settings LIMIT 1');
-    if (existing.rows.length === 0) {
-      await pool.query('INSERT INTO company_settings (company_name) VALUES ($1)', [company_name]);
+    const id = existing.rows[0]?.id;
+    if (!id) {
+      await pool.query('INSERT INTO company_settings (company_name) VALUES ($1)', [req.body.company_name || 'Student Xerox']);
     } else {
-      await pool.query('UPDATE company_settings SET company_name=$1, updated_at=CURRENT_TIMESTAMP WHERE id=$2', [company_name, existing.rows[0].id]);
+      const fields = ['company_name', 'address', 'mobile', 'email', 'gst_number', 'pan_number'];
+      const updates = fields.filter(f => req.body[f] !== undefined).map((f, i) => `${f}=$${i + 1}`);
+      if (updates.length > 0) {
+        const vals = fields.filter(f => req.body[f] !== undefined).map(f => req.body[f]);
+        vals.push(id);
+        await pool.query(`UPDATE company_settings SET ${updates.join(', ')}, updated_at=CURRENT_TIMESTAMP WHERE id=$${vals.length}`, vals);
+      }
     }
     const result = await pool.query('SELECT * FROM company_settings LIMIT 1');
     res.json(result.rows[0]);
