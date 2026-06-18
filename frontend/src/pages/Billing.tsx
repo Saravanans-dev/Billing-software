@@ -5,7 +5,7 @@ import {
   ChevronDown, Calculator, RotateCcw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api, { BACKEND_URL } from '../services/api';
+import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
@@ -157,7 +157,10 @@ export function Billing() {
         },
       });
       if (print) {
-        window.open(`${BACKEND_URL}/api/exports/invoice/${data.id}/pdf`, '_blank');
+        api.get(`/exports/invoice/${data.id}/pdf`, { responseType: 'blob' }).then((res) => {
+          const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+          window.open(url, '_blank');
+        }).catch(() => toast.error('Failed to load PDF'));
       }
       resetBill();
     } catch (error: any) {

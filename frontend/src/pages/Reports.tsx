@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Download, FileText, BarChart3, TrendingUp, Package, Users, Store, AlertTriangle, Receipt } from 'lucide-react';
-import api, { BACKEND_URL } from '../services/api';
+import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { DataTable } from '../components/ui/DataTable';
 import { formatCurrency, formatDate } from '../lib/utils';
@@ -43,15 +43,28 @@ export function Reports() {
       }
 
       const { data: result } = await api.get(endpoint, { params });
-      setData(Array.isArray(result) ? result : [result]);
+      // Handle grouped responses like { value: [...], Count: N }
+      const rows = result?.value ?? result;
+      setData(Array.isArray(rows) ? rows : [rows]);
     } catch (error) {
       console.error('Report error:', error);
       setData([]);
     } finally { setLoading(false); }
   };
 
-  const exportExcel = () => {
-    window.open(`${BACKEND_URL}/api/exports/sales-excel?from=${fromDate}&to=${toDate}`, '_blank');
+  useEffect(() => { loadReport(); }, [activeReport]);
+
+  const exportExcel = async () => {
+    try {
+      const res = await api.get('/exports/sales-excel', {
+        params: { from: fromDate, to: toDate },
+        responseType: 'blob',
+      });
+      const url = URL.createObjectURL(new Blob([res.data]));
+      window.open(url, '_blank');
+    } catch {
+      // ignore
+    }
   };
 
   const renderReportContent = () => {
