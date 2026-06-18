@@ -24,7 +24,12 @@ const PORT = process.env.PORT || 5000;
 
 // Security
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
+const corsOrigin = process.env.CORS_ORIGIN;
+if (corsOrigin) {
+  app.use(cors({ origin: corsOrigin, credentials: true }));
+} else {
+  app.use(cors({ origin: '*', credentials: true }));
+}
 
 // Rate limiting
 const limiter = rateLimit({
@@ -75,9 +80,10 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json({ error: 'Internal server error' });
 });
 
-runMigrations().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Student Xerox Billing API running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Student Xerox Billing API running on port ${PORT}`);
+  runMigrations().catch((err) => {
+    console.error('Migration failed, server still running:', err);
   });
 });
 
