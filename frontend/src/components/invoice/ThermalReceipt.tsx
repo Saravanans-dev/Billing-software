@@ -16,7 +16,6 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const items = sale.items || [];
   const grandTotal = Number(sale.grand_total) || 0;
   const subtotal = Number(sale.subtotal) || 0;
-  const discountAmount = Number(sale.discount_amount) || 0;
   const upiId = settings['upi_id'] || '';
 
   const upiLink = upiId
@@ -116,7 +115,8 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           <div>Cashier ID: {cashierId}</div>
           <div>Cashier: {cashierName}</div>
           <div>Customer Name: {sale.customer_name || 'Walk-In'}</div>
-          <div>Customer Mobile Number: {sale.customer_mobile || '-'}</div>
+          <div>Customer ID: {sale.customer_id ? sale.customer_id.slice(0, 8) : '-'}</div>
+          <div>Mobile Number: {sale.customer_mobile || '-'}</div>
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '1mm 0' }} />
@@ -159,30 +159,10 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             <span>Sub Total</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
-          {discountAmount > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-              <span>Discount</span>
-              <span>-{formatCurrency(discountAmount)}</span>
-            </div>
-          )}
-        </div>
-
-        {/* ═══════════ GRAND TOTAL ═══════════ */}
-        <div
-          style={{
-            background: '#000',
-            color: '#fff',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            fontWeight: 900,
-            fontSize: '12px',
-            padding: '1.2mm 2mm',
-            marginBottom: '1.5mm',
-          }}
-        >
-          <span>GRAND TOTAL</span>
-          <span>₹ {Math.round(grandTotal).toFixed(2)}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0', fontWeight: 900, fontSize: '10px', borderTop: '1px solid #000', paddingTop: '0.5mm', marginTop: '0.3mm' }}>
+            <span>Grand Total</span>
+            <span>{formatCurrency(grandTotal)}</span>
+          </div>
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
