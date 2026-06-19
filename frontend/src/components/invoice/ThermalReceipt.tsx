@@ -32,237 +32,326 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   useEffect(() => {
     if (upiLink) {
       QRCode.toDataURL(upiLink, {
-        width: 160,
+        width: 150,
         margin: 1,
         color: { dark: '#000000', light: '#ffffff' },
       }).then(setQrDataUrl).catch(() => {});
     }
   }, [upiLink]);
 
-  const fd = (d: string) => {
+  const formatDate = (d: string) => {
     if (!d) return '';
     return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
-  const ft = (t: string) => {
+  const formatTime = (t: string) => {
     if (!t) return '';
     return t.toString().slice(0, 5);
   };
 
-  const bc = sale.bill_number?.replace(/[^A-Za-z0-9]/g, '') || '';
-
   return (
     <div>
       <style>{`
-        .inv-wrap {
-          max-width: 780px; margin: 24px auto; background: #fff;
-          border-radius: 6px;
-          box-shadow: 0 1px 8px rgba(0,0,0,0.05);
-          border: 1px solid #e2e2ec;
-          padding: 24px 28px;
-          font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-          color: #1e1e2a; font-size: 13px; line-height: 1.5;
-          -webkit-font-smoothing: antialiased;
-        }
+        @page { size: 80mm auto; margin: 0; }
         @media print {
-          body { margin: 0; padding: 0; background: #fff; }
+          body { margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none !important; }
-          .inv-wrap { box-shadow: none !important; border: 1px solid #ccc !important; margin: 0 auto; }
         }
-        .inv-hdr { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #d8d8e4; margin-bottom: 14px; }
-        .inv-hdr-logo { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; }
-        .inv-hdr-logo-pl { width: 48px; height: 48px; background: #f2f2f8; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #aaa; flex-shrink: 0; }
-        .inv-hdr-info { flex: 1; }
-        .inv-hdr-name { font-size: 17px; font-weight: 800; color: #1a1a2e; letter-spacing: 0.2px; }
-        .inv-hdr-detail { font-size: 11px; color: #555; line-height: 1.5; margin-top: 1px; }
-        .inv-title { text-align: center; margin-bottom: 14px; }
-        .inv-title span { display: inline-block; font-size: 14px; font-weight: 700; letter-spacing: 1.2px; padding: 2px 20px; border-bottom: 2px solid #1a1a2e; color: #1a1a2e; }
-        .inv-row { display: flex; gap: 14px; margin-bottom: 14px; }
-        .inv-box { flex: 1; background: #f7f8fc; border-radius: 5px; padding: 10px 13px; font-size: 11.5px; line-height: 1.8; border: 1px solid #e8e8f0; }
-        .inv-box-title { font-weight: 700; font-size: 11px; color: #1a1a2e; padding-bottom: 3px; border-bottom: 1px solid #ddd; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
-        .inv-tbl { width: 100%; border-collapse: collapse; margin-bottom: 4px; font-size: 11.5px; }
-        .inv-tbl thead tr th:first-child { border-radius: 4px 0 0 0; }
-        .inv-tbl thead tr th:last-child { border-radius: 0 4px 0 0; }
-        .inv-tbl th { background: #1a1a2e; color: #fff; padding: 8px 6px; font-weight: 600; font-size: 10px; letter-spacing: 0.3px; white-space: nowrap; text-transform: uppercase; }
-        .inv-tbl td { padding: 6px; border-bottom: 1px solid #e8e8ef; font-size: 11.5px; }
-        .inv-tbl tbody tr:nth-child(even) td { background: #fafafd; }
-        .inv-tbl .c { text-align: center; }
-        .inv-tbl .r { text-align: right; }
-        .inv-count { display: flex; justify-content: flex-end; gap: 12px; font-size: 11px; color: #555; padding: 2px 0 7px; }
-        .inv-sum { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-        .inv-sum table { width: 280px; font-size: 11.5px; line-height: 1.85; }
-        .inv-sum td { padding: 2px 0; }
-        .inv-sum .l { text-align: left; color: #444; }
-        .inv-sum .r { text-align: right; font-weight: 600; }
-        .inv-gt { background: #1a1a2e; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-radius: 4px; font-weight: 800; font-size: 14px; margin-bottom: 5px; letter-spacing: 0.2px; }
-        .inv-words { text-align: center; font-size: 11px; padding: 4px 0 8px; color: #444; }
-        .inv-words strong { display: block; font-weight: 700; text-transform: uppercase; color: #1a1a2e; margin-top: 1px; font-size: 11px; }
-        .inv-two { display: flex; gap: 14px; margin: 10px 0; }
-        .inv-two-box { flex: 1; border: 1px solid #e2e2ec; border-radius: 5px; padding: 10px 13px; font-size: 11.5px; line-height: 1.95; }
-        .inv-two-box-title { font-weight: 700; font-size: 11px; color: #1a1a2e; padding-bottom: 3px; border-bottom: 1px solid #ddd; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
-        .inv-two-box .fr { display: flex; justify-content: space-between; border-bottom: 1px dotted #eee; padding: 1px 0; }
-        .inv-two-box .fr:last-child { border-bottom: none; }
-        .inv-two-box .fr span:last-child { font-weight: 600; }
-        .inv-bq { display: flex; gap: 14px; align-items: flex-start; margin: 10px 0; }
-        .inv-bq-box { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px; border: 1px solid #e2e2ec; border-radius: 5px; background: #fafafc; }
-        .inv-bq-box .lbl { font-size: 10px; font-weight: 700; color: #555; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
-        .inv-bc { font-family: 'Courier New', monospace; font-size: 22px; font-weight: 700; letter-spacing: 2.5px; line-height: 1; color: #000; margin-bottom: 2px; }
-        .inv-bc-txt { font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: #555; }
-        .inv-terms { font-size: 10.5px; color: #666; line-height: 1.6; padding: 8px 0; border-top: 1px solid #e2e2ec; margin-bottom: 6px; }
-        .inv-foot { text-align: center; border-top: 1px solid #d8d8e4; padding-top: 10px; }
-        .inv-foot .t1 { font-weight: 800; font-size: 12px; letter-spacing: 0.6px; color: #1a1a2e; }
-        .inv-foot .t2 { font-weight: 700; font-size: 11px; color: #555; margin-top: 2px; }
-        .inv-foot .t3 { font-size: 10px; color: #999; margin-top: 1px; }
+        .receipt-table { width: 100%; border-collapse: collapse; font-size: 7.5px; }
+        .receipt-table th {
+          padding: 1.2mm 0.8mm;
+          font-weight: 700;
+          text-align: left;
+          border-bottom: 1px solid #000;
+          border-top: 1px solid #000;
+          font-size: 7px;
+          white-space: nowrap;
+        }
+        .receipt-table td {
+          padding: 0.6mm 0.8mm;
+          font-size: 7.5px;
+          border-bottom: 1px dotted #ddd;
+        }
+        .receipt-table tr:last-child td { border-bottom: none; }
+        .receipt-table .amt { text-align: right; padding-right: 0.3mm; }
+        .receipt-table .ctr { text-align: center; }
       `}</style>
-
-      <div className="inv-wrap">
-        {/* HEADER */}
-        <div className="inv-hdr">
-          {company.logo_url ? (
-            <img className="inv-hdr-logo" src={`${BACKEND_URL}${company.logo_url}`} alt="Logo" />
-          ) : (
-            <div className="inv-hdr-logo-pl">Logo</div>
+      <div
+        className="mx-auto bg-white text-black"
+        style={{
+          width: '80mm',
+          maxWidth: '80mm',
+          fontFamily: "'Courier New', 'Consolas', monospace",
+          fontSize: '9px',
+          lineHeight: '1.3',
+          padding: '2mm 2.5mm',
+        }}
+      >
+        {/* ═══════════ HEADER ═══════════ */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5mm' }}>
+          {company.logo_url && (
+            <div style={{ flexShrink: 0, marginRight: '2mm' }}>
+              <img
+                src={`${BACKEND_URL}${company.logo_url}`}
+                alt="Logo"
+                style={{ width: '12mm', height: '12mm', objectFit: 'contain' }}
+              />
+            </div>
           )}
-          <div className="inv-hdr-info">
-            <div className="inv-hdr-name">{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-            <div className="inv-hdr-detail">
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontSize: '14px', fontWeight: 900, letterSpacing: '0.5px', marginBottom: '0.3mm' }}>
+              {company.company_name?.toUpperCase() || 'STUDENT XEROX'}
+            </div>
+            <div style={{ fontSize: '6.5px', lineHeight: '1.3', color: '#444' }}>
               <div>{company.address || 'Therikiyur, Ayyampalayam, Trichy - 621005'}</div>
-              <div>Phone: {company.mobile || '9876543210'}{company.gst_number ? ` | GSTIN: ${company.gst_number}` : ''}{company.email ? ` | Email: ${company.email}` : ''}</div>
+              <div>Phone: {company.mobile || '9876543210'} {company.gst_number ? `| GSTIN: ${company.gst_number}` : ''}</div>
+              {company.email && <div>Email: {company.email}</div>}
             </div>
           </div>
         </div>
 
-        {/* TITLE */}
-        <div className="inv-title"><span>TAX INVOICE</span></div>
+        <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '1mm 0' }} />
 
-        {/* INVOICE & CUSTOMER */}
-        <div className="inv-row">
-          <div className="inv-box">
-            <div className="inv-box-title">INVOICE</div>
-            <div><strong>Invoice No:</strong> {sale.bill_number}</div>
-            <div><strong>Date:</strong> {fd(sale.bill_date)}</div>
-            <div><strong>Time:</strong> {ft(sale.bill_time)}</div>
-            <div><strong>Cashier ID:</strong> {sale.user_id?.slice(0, 8) || '-'}</div>
-            <div><strong>Cashier:</strong> {sale.user_name || '-'}</div>
+        {/* ═══════════ INVOICE DETAILS ═══════════ */}
+        <div style={{ fontSize: '7.5px', lineHeight: '1.5', marginBottom: '1.5mm' }}>
+          <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 800, marginBottom: '0.5mm', letterSpacing: '1px' }}>
+            {sale.bill_number}
           </div>
-          <div className="inv-box">
-            <div className="inv-box-title">CUSTOMER</div>
-            <div><strong>Customer ID:</strong> {sale.customer_id?.slice(0, 8) || 'WALK-IN'}</div>
-            <div><strong>Name:</strong> {sale.customer_name || 'Walk-In Customer'}</div>
-            <div><strong>Mobile:</strong> {sale.customer_mobile || '-'}</div>
-          </div>
+          <table style={{ width: '100%' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <div><strong>Date:</strong> {formatDate(sale.bill_date)} &nbsp; <strong>Time:</strong> {formatTime(sale.bill_time)}</div>
+                  <div><strong>Cashier:</strong> {sale.user_name || '-'}</div>
+                </td>
+                <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'right' }}>
+                  <div><strong>Customer:</strong> {sale.customer_name || 'Walk-In'}</div>
+                  <div><strong>Mobile:</strong> {sale.customer_mobile || '-'}</div>
+                  {sale.customer_gst && <div><strong>GST:</strong> {sale.customer_gst}</div>}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        {/* ITEMS TABLE */}
-        <table className="inv-tbl">
+        <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '1mm 0' }} />
+
+        {/* ═══════════ ITEMS TABLE ═══════════ */}
+        <table className="receipt-table" style={{ marginBottom: '0.5mm' }}>
           <thead>
             <tr>
-              <th style={{ width: '30px' }} className="c">#</th>
-              <th>Item Name</th>
-              <th style={{ width: '55px' }} className="c">Unit</th>
-              <th style={{ width: '48px' }} className="c">Qty</th>
-              <th style={{ width: '80px' }} className="r">Rate</th>
-              <th style={{ width: '55px' }} className="c">Disc%</th>
-              <th style={{ width: '95px' }} className="r">Amount</th>
+              <th style={{ width: '5mm', textAlign: 'center' }}>#</th>
+              <th>Item</th>
+              <th style={{ width: '5mm', textAlign: 'center' }}>Qty</th>
+              <th style={{ width: '11mm', textAlign: 'right' }}>Rate</th>
+              <th style={{ width: '5mm', textAlign: 'center' }}>Disc%</th>
+              <th style={{ width: '12mm', textAlign: 'right' }}>Amount</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, idx) => (
               <tr key={item.id || idx}>
-                <td className="c" style={{ color: '#888' }}>{idx + 1}</td>
+                <td className="ctr">{idx + 1}</td>
                 <td>{item.product_name}</td>
-                <td className="c">{item.unit || '-'}</td>
-                <td className="c">{Number(item.quantity)}</td>
-                <td className="r">{Number(item.rate).toFixed(2)}</td>
-                <td className="c">{Number(item.discount_percentage) > 0 ? Number(item.discount_percentage).toFixed(1) : '-'}</td>
-                <td className="r" style={{ fontWeight: 600 }}>{Number(item.amount).toFixed(2)}</td>
+                <td className="ctr">{Number(item.quantity)}{item.unit ? `/${item.unit}` : ''}</td>
+                <td className="amt">{Number(item.rate).toFixed(2)}</td>
+                <td className="ctr">
+                  {Number(item.discount_percentage) > 0 ? Number(item.discount_percentage).toFixed(1) : '-'}
+                </td>
+                <td className="amt">{Number(item.amount).toFixed(2)}</td>
               </tr>
             ))}
-            {items.length === 0 && (
-              <tr><td colSpan={7} style={{ padding: '24px', textAlign: 'center', color: '#999' }}>No items</td></tr>
-            )}
           </tbody>
         </table>
 
-        <div className="inv-count">
-          <span><strong>Items Count:</strong> {items.length}</span>
-          <span><strong>Total Quantity:</strong> {totalQty}</span>
+        {/* ═══════════ ITEMS COUNT ═══════════ */}
+        <div style={{ fontSize: '7px', textAlign: 'right', marginBottom: '1mm', color: '#555' }}>
+          Items: {items.length} &nbsp;|&nbsp; Total Qty: {totalQty}
         </div>
 
-        {/* SUMMARY */}
-        <div className="inv-sum">
-          <table>
-            <tbody>
-              <tr><td className="l">Sub Total</td><td className="r">{formatCurrency(subtotal)}</td></tr>
-              {discountAmount > 0 && <tr><td className="l">Discount</td><td className="r" style={{ color: '#e53935' }}>-{formatCurrency(discountAmount)}</td></tr>}
-              {cgst > 0 && <tr><td className="l">CGST ({((gstTotal / 2 / subtotal) * 100).toFixed(2)}%)</td><td className="r">{formatCurrency(cgst)}</td></tr>}
-              {sgst > 0 && <tr><td className="l">SGST ({((gstTotal / 2 / subtotal) * 100).toFixed(2)}%)</td><td className="r">{formatCurrency(sgst)}</td></tr>}
-              {roundOff !== 0 && <tr><td className="l">Round Off</td><td className="r">{roundOff.toFixed(2)}</td></tr>}
-            </tbody>
-          </table>
-        </div>
+        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
 
-        <div className="inv-gt">
-          <span>Grand Total</span>
-          <span>{formatCurrency(Math.round(grandTotal))}</span>
-        </div>
-
-        <div className="inv-words">
-          Amount In Words:
-          <strong>{numberToWords(Math.round(grandTotal))} ONLY</strong>
-        </div>
-
-        {/* PAYMENT & BANK */}
-        <div className="inv-two">
-          <div className="inv-two-box">
-            <div className="inv-two-box-title">PAYMENT INFORMATION</div>
-            <div className="fr"><span>Payment Method</span><span>{(sale.payment_mode || 'CASH').toUpperCase()}</span></div>
-            <div className="fr"><span>Received Amount</span><span>{formatCurrency(Math.round(grandTotal))}</span></div>
-            <div className="fr"><span>Balance Amount</span><span>{formatCurrency(0)}</span></div>
-            <div className="fr"><span>Reference Number</span><span>{sale.bill_number || '-'}</span></div>
+        {/* ═══════════ SUMMARY ═══════════ */}
+        <div style={{ fontSize: '8px', lineHeight: '1.6', marginBottom: '1mm' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Sub Total</span>
+            <span>{formatCurrency(subtotal)}</span>
           </div>
-          <div className="inv-two-box">
-            <div className="inv-two-box-title">BANK DETAILS</div>
-            <div className="fr"><span>Bank Name</span><span>{settings['bank_name'] || '-'}</span></div>
-            <div className="fr"><span>Account Name</span><span>{settings['account_name'] || '-'}</span></div>
-            <div className="fr"><span>Account Number</span><span>{settings['account_number'] || '-'}</span></div>
-            <div className="fr"><span>IFSC Code</span><span>{settings['ifsc_code'] || '-'}</span></div>
-            <div className="fr"><span>UPI ID</span><span>{upiId || '-'}</span></div>
+          {discountAmount > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+              <span>Discount</span>
+              <span>-{formatCurrency(discountAmount)}</span>
+            </div>
+          )}
+          {cgst > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+              <span>CGST @ {((gstTotal / 2 / subtotal) * 100).toFixed(2)}%</span>
+              <span>{formatCurrency(cgst)}</span>
+            </div>
+          )}
+          {sgst > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+              <span>SGST @ {((gstTotal / 2 / subtotal) * 100).toFixed(2)}%</span>
+              <span>{formatCurrency(sgst)}</span>
+            </div>
+          )}
+          {roundOff !== 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+              <span>Round Off</span>
+              <span>{roundOff.toFixed(2)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* ═══════════ GRAND TOTAL ═══════════ */}
+        <div
+          style={{
+            background: '#000',
+            color: '#fff',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontWeight: 900,
+            fontSize: '12px',
+            padding: '1.2mm 2mm',
+            marginBottom: '1.5mm',
+          }}
+        >
+          <span>GRAND TOTAL</span>
+          <span>₹ {Math.round(grandTotal).toFixed(2)}</span>
+        </div>
+
+        {/* ═══════════ AMOUNT IN WORDS ═══════════ */}
+        <div style={{ fontSize: '7px', lineHeight: '1.4', marginBottom: '1.5mm', textAlign: 'center' }}>
+          <span style={{ fontWeight: 700 }}>Amount In Words:</span>
+          <div style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '6.5px', marginTop: '0.3mm' }}>
+            {numberToWords(Math.round(grandTotal))} ONLY
           </div>
         </div>
 
-        {/* BARCODE & QR */}
-        <div className="inv-bq">
-          <div className="inv-bq-box">
-            <div className="lbl">Invoice Barcode</div>
-            <div className="inv-bc">{bc}</div>
-            <div className="inv-bc-txt">{bc}</div>
+        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
+
+        {/* ═══════════ PAYMENT INFORMATION ═══════════ */}
+        <div style={{ fontSize: '7px', lineHeight: '1.5', marginBottom: '1.5mm' }}>
+          <div style={{ fontWeight: 700, fontSize: '7.5px', marginBottom: '0.5mm' }}>
+            PAYMENT DETAILS
           </div>
-          <div className="inv-bq-box">
-            <div className="lbl">Scan & Pay (UPI)</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Mode</span>
+            <span style={{ fontWeight: 600 }}>{(sale.payment_mode || 'CASH').toUpperCase()}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Amount Paid</span>
+            <span style={{ fontWeight: 600 }}>₹ {Math.round(grandTotal).toFixed(2)}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Reference</span>
+            <span style={{ fontWeight: 600 }}>{sale.bill_number || '-'}</span>
+          </div>
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
+
+        {/* ═══════════ BANK DETAILS ═══════════ */}
+        {(settings['bank_name'] || settings['account_number'] || upiId) && (
+          <div style={{ fontSize: '7px', lineHeight: '1.5', marginBottom: '1.5mm' }}>
+            <div style={{ fontWeight: 700, fontSize: '7.5px', marginBottom: '0.5mm' }}>
+              BANK DETAILS
+            </div>
+            <table style={{ width: '100%' }}>
+              <tbody>
+                {settings['bank_name'] && settings['account_number'] && (
+                  <tr>
+                    <td style={{ width: '50%', padding: '0.2mm 0' }}>
+                      <strong>Bank:</strong> {settings['bank_name']}
+                    </td>
+                    <td style={{ width: '50%', padding: '0.2mm 0', textAlign: 'right' }}>
+                      <strong>A/c:</strong> {settings['account_number']}
+                    </td>
+                  </tr>
+                )}
+                {settings['account_name'] && (
+                  <tr>
+                    <td style={{ padding: '0.2mm 0' }}>
+                      <strong>Name:</strong> {settings['account_name']}
+                    </td>
+                    {settings['ifsc_code'] && (
+                      <td style={{ padding: '0.2mm 0', textAlign: 'right' }}>
+                        <strong>IFSC:</strong> {settings['ifsc_code']}
+                      </td>
+                    )}
+                  </tr>
+                )}
+                {upiId && (
+                  <tr>
+                    <td colSpan={2} style={{ padding: '0.2mm 0' }}>
+                      <strong>UPI:</strong> {upiId}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
+
+        {/* ═══════════ QR CODE ═══════════ */}
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5mm 0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ fontSize: '7px', fontWeight: 600, marginBottom: '0.8mm' }}>Scan & Pay (UPI)</div>
             {qrDataUrl ? (
-              <img src={qrDataUrl} alt="QR" style={{ width: '110px', height: '110px' }} />
+              <img src={qrDataUrl} alt="UPI QR" style={{ width: '30mm', height: '30mm' }} />
             ) : (
-              <div style={{ width: '110px', height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', color: '#999', border: '1px dashed #ccc', borderRadius: '6px' }}>
+              <div
+                style={{
+                  width: '30mm',
+                  height: '30mm',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '7px',
+                  color: '#999',
+                  border: '1px dashed #ccc',
+                }}
+              >
                 UPI QR
               </div>
             )}
+
           </div>
         </div>
 
-        {/* TERMS */}
-        <div className="inv-terms">
-          <strong>Terms &amp; Conditions:</strong><br />
-          1. Goods once sold cannot be returned.<br />
-          2. Please retain this receipt for future reference.<br />
-          3. Thank you for choosing {company.company_name || 'Student Xerox'}.
+        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
+
+        {/* ═══════════ TERMS & CONTACT ═══════════ */}
+        <div style={{ fontSize: '6.5px', lineHeight: '1.5', marginBottom: '1.5mm', color: '#444', textAlign: 'center' }}>
+          <div style={{ fontWeight: 700, fontSize: '7px', marginBottom: '0.3mm' }}>Terms:</div>
+          <div>1. Goods once sold cannot be returned.</div>
+          <div>2. Please retain this receipt for future reference.</div>
         </div>
 
-        {/* FOOTER */}
-        <div className="inv-foot">
-          <div className="t1">THANK YOU VISIT AGAIN!</div>
-          <div className="t2">{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-          <div className="t3">Fast Service &bull; Quality Printing</div>
+        <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '1mm 0' }} />
+
+        {/* ═══════════ FOOTER ═══════════ */}
+        <div style={{ textAlign: 'center', marginTop: '1.5mm', marginBottom: '2mm' }}>
+          <div style={{ fontWeight: 900, fontSize: '10px', letterSpacing: '1px', marginBottom: '0.5mm' }}>
+            THANK YOU VISIT AGAIN!
+          </div>
+          <div style={{ fontWeight: 700, fontSize: '7px' }}>
+            {company.company_name?.toUpperCase() || 'STUDENT XEROX'}
+          </div>
+          <div style={{ fontSize: '6.5px', color: '#666', marginTop: '0.3mm' }}>
+            WhatsApp: {settings['whatsapp'] || company.mobile || '9876543210'} &nbsp;|&nbsp; Email: {settings['receipt_email'] || company.email || '-'}
+          </div>
+          {settings['instagram'] && (
+            <div style={{ fontSize: '6.5px', color: '#666' }}>
+              Instagram: {settings['instagram']}
+            </div>
+          )}
+          <div style={{ fontSize: '6px', color: '#999', marginTop: '0.5mm' }}>
+            Fast Service • Quality Printing • Best Prices
+          </div>
         </div>
       </div>
     </div>
