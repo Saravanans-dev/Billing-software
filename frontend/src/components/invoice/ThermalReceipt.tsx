@@ -19,7 +19,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const upiId = settings['upi_id'] || '';
 
   const upiLink = upiId
-    ? `upi://pay?pa=${upiId}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&tn=${sale.bill_number || 'Bill'}`
+    ? `upi://pay?pa=${upiId}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&tn=${sale.bill_number || ''}`
     : '';
 
   useEffect(() => {
@@ -89,11 +89,11 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         {/* ═══════════ HEADER ═══════════ */}
         <div style={{ textAlign: 'center', marginBottom: '3mm' }}>
           <div style={{ fontSize: '24px', fontWeight: 900, letterSpacing: '1px', marginBottom: '0.5mm' }}>
-            {company.company_name?.toUpperCase() || 'STUDENT XEROX'}
+            {company.company_name?.toUpperCase()}
           </div>
           <div style={{ fontSize: '11px', lineHeight: '1.5', color: '#444' }}>
-            <div>{company.address || 'Therikiyur, Ayyampalayam, Trichy - 621005'}</div>
-            <div>Ph: {company.mobile || '9876543210'}</div>
+            <div>{company.address}</div>
+            <div>Ph: {company.mobile}</div>
           </div>
         </div>
 
@@ -111,7 +111,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
                   <div>Cashier: {cashierName}</div>
                 </td>
                 <td style={{ width: '50%', verticalAlign: 'top' }}>
-                  <div>Customer Name: {sale.customer_name || 'Walk-In'}</div>
+                  <div>Customer Name: {sale.customer_name || '-'}</div>
                   <div>Mobile Number: {sale.customer_mobile || '-'}</div>
                 </td>
               </tr>
@@ -181,7 +181,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
                 <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '1mm' }}>PAYMENT INFO</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
                   <span>Payment Method</span>
-                  <span style={{ fontWeight: 600 }}>{(sale.payment_mode || 'CASH').toUpperCase()}</span>
+                  <span style={{ fontWeight: 600 }}>{(sale.payment_mode || '-').toUpperCase()}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
                   <span>Received Amount</span>
@@ -228,7 +228,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
               <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'center', paddingRight: '2mm' }}>
                 <div style={{ fontSize: '10px', fontWeight: 600, marginBottom: '0.5mm' }}>Barcode</div>
                 <div style={{ fontFamily: "'Courier New', monospace", fontSize: '14px', letterSpacing: '1px', fontWeight: 600 }}>
-                  {barcodeChars || 'N/A'}
+                  {barcodeChars || '-'}
                 </div>
               </td>
               <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'center', paddingLeft: '2mm' }}>
@@ -253,7 +253,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             THANK YOU VISIT AGAIN!
           </div>
           <div style={{ fontWeight: 700, fontSize: '12px', color: '#333' }}>
-            {company.company_name?.toUpperCase() || 'STUDENT XEROX'}
+            {company.company_name?.toUpperCase()}
           </div>
         </div>
       </div>
