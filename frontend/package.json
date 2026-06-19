@@ -8,9 +8,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:prod": "cross-env VITE_API_URL=https://free-backend-8c4h.onrender.com vite build --mode electron",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron:build": "npm run build && electron-builder"
+    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && cross-env ELECTRON_DEV=true electron .\"",
+    "electron:build": "npm run build:prod && node scripts/generate-icon.mjs && electron-builder",
+    "electron:build:local": "cross-env VITE_API_URL=http://localhost:5000 vite build --mode electron && node scripts/generate-icon.mjs && electron-builder",
+    "generate-icon": "node scripts/generate-icon.mjs"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -46,6 +49,7 @@
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
     "electron": "^31.0.0",
     "electron-builder": "^24.13.3",
     "postcss": "^8.4.38",
@@ -57,20 +61,41 @@
   "build": {
     "appId": "com.studentxerox.billing",
     "productName": "Student Xerox Billing",
+    "copyright": "Copyright © Student Xerox",
     "directories": {
       "output": "dist-electron"
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "public/icon.png"
     ],
+    "extraResources": [],
     "win": {
-      "target": "nsis",
-      "icon": "public/icon.ico"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/icon.png",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Student Xerox Billing",
+      "installerIcon": "public/icon.png",
+      "uninstallerIcon": "public/icon.png",
+      "installerHeaderIcon": "public/icon.png",
+      "displayLanguageSelector": false,
+      "menuCategory": true,
+      "runAfterFinish": true
     }
   }
 }
