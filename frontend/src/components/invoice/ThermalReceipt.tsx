@@ -16,6 +16,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const items = sale.items || [];
   const grandTotal = Number(sale.grand_total) || 0;
   const subtotal = Number(sale.subtotal) || 0;
+  const discountAmount = Number(sale.discount_amount) || 0;
   const upiId = settings['upi_id'] || '';
 
   const upiLink = upiId
@@ -110,23 +111,12 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
         {/* ═══════════ INVOICE DETAILS ═══════════ */}
         <div style={{ fontSize: '7.5px', lineHeight: '1.6', marginBottom: '1.5mm' }}>
-          <table style={{ width: '100%' }}>
-            <tbody>
-              <tr>
-                <td style={{ width: '50%', verticalAlign: 'top' }}>
-                  <div>Invoice No: {billNum}</div>
-                  <div>Date: {formatDate(sale.bill_date)} &nbsp; Time: {formatTime(sale.bill_time)}</div>
-                  <div>Cashier ID: {cashierId}</div>
-                  <div>Cashier: {cashierName}</div>
-                </td>
-                <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'right' }}>
-                  <div>Customer Name: {sale.customer_name || 'Walk-In'}</div>
-                  <div>Customer ID: {sale.customer_id ? sale.customer_id.slice(0, 8) : '-'}</div>
-                  <div>Mobile Number: {sale.customer_mobile || '-'}</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div>Invoice No: {billNum}</div>
+          <div>Date: {formatDate(sale.bill_date)} &nbsp; Time: {formatTime(sale.bill_time)}</div>
+          <div>Cashier ID: {cashierId}</div>
+          <div>Cashier: {cashierName}</div>
+          <div>Customer Name: {sale.customer_name || 'Walk-In'}</div>
+          <div>Mobile Number: {sale.customer_mobile || '-'}</div>
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '1mm 0' }} />
@@ -169,6 +159,12 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             <span>Sub Total</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
+          {discountAmount > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+              <span>Discount</span>
+              <span>-{formatCurrency(discountAmount)}</span>
+            </div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0', fontWeight: 900, fontSize: '10px', borderTop: '1px solid #000', paddingTop: '0.5mm', marginTop: '0.3mm' }}>
             <span>Grand Total</span>
             <span>{formatCurrency(grandTotal)}</span>
@@ -177,79 +173,90 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
         <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
 
-        {/* ═══════════ BOTTOM: LEFT (BARCODE + QR) | RIGHT (PAYMENT + BANK) ═══════════ */}
-        <table style={{ width: '100%', marginBottom: '1.5mm' }}>
-          <tbody>
-            <tr>
-              <td style={{ width: '50%', verticalAlign: 'top', paddingRight: '1mm' }}>
-                {/* ═════ BARCODE ═════ */}
-                <div style={{ textAlign: 'center', marginBottom: '1.5mm' }}>
-                  <div style={{ fontSize: '6px', fontWeight: 600, marginBottom: '0.3mm' }}>Barcode</div>
-                  <div style={{ fontFamily: "'Courier New', monospace", fontSize: '9px', letterSpacing: '0.5px', fontWeight: 600 }}>
-                    {barcodeChars || 'N/A'}
-                  </div>
-                </div>
-                {/* ═════ QR CODE ═════ */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{ fontSize: '6px', fontWeight: 600, marginBottom: '0.5mm' }}>QR Code</div>
-                  {qrDataUrl ? (
-                    <img src={qrDataUrl} alt="UPI QR" style={{ width: '25mm', height: '25mm' }} />
-                  ) : (
-                    <div style={{ width: '25mm', height: '25mm', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '6px', color: '#999', border: '1px dashed #ccc' }}>
-                      UPI QR
-                    </div>
-                  )}
-                </div>
-              </td>
-              <td style={{ width: '50%', verticalAlign: 'top', paddingLeft: '1mm' }}>
-                {/* ═════ PAYMENT INFORMATION ═════ */}
-                <div style={{ fontSize: '6.5px', lineHeight: '1.5', marginBottom: '1.5mm' }}>
-                  <div style={{ fontWeight: 700, fontSize: '7px', marginBottom: '0.3mm' }}>
-                    PAYMENT INFORMATION
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-                    <span>Payment Method</span>
-                    <span style={{ fontWeight: 600 }}>{(sale.payment_mode || 'CASH').toUpperCase()}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-                    <span>Received Amount</span>
-                    <span style={{ fontWeight: 600 }}>{formatCurrency(grandTotal)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-                    <span>Balance Amount</span>
-                    <span style={{ fontWeight: 600 }}>{formatCurrency(0)}</span>
-                  </div>
-                </div>
-                {/* ═════ BANK DETAILS ═════ */}
-                <div style={{ fontSize: '6.5px', lineHeight: '1.5' }}>
-                  <div style={{ fontWeight: 700, fontSize: '7px', marginBottom: '0.3mm' }}>
-                    BANK DETAILS
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-                    <span>Bank Name</span>
-                    <span>{settings['bank_name'] || '-'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-                    <span>Account Name</span>
-                    <span>{settings['account_name'] || '-'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-                    <span>Account Number</span>
-                    <span>{settings['account_number'] || '-'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-                    <span>IFSC Code</span>
-                    <span>{settings['ifsc_code'] || '-'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
-                    <span>UPI ID</span>
-                    <span>{upiId || '-'}</span>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {/* ═══════════ PAYMENT INFORMATION ═══════════ */}
+        <div style={{ fontSize: '7px', lineHeight: '1.6', marginBottom: '1.5mm' }}>
+          <div style={{ fontWeight: 700, fontSize: '7.5px', marginBottom: '0.5mm' }}>
+            PAYMENT INFORMATION
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Payment Method</span>
+            <span style={{ fontWeight: 600 }}>{(sale.payment_mode || 'CASH').toUpperCase()}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Received Amount</span>
+            <span style={{ fontWeight: 600 }}>{formatCurrency(grandTotal)}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Balance Amount</span>
+            <span style={{ fontWeight: 600 }}>{formatCurrency(0)}</span>
+          </div>
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
+
+        {/* ═══════════ BANK DETAILS ═══════════ */}
+        <div style={{ fontSize: '7px', lineHeight: '1.6', marginBottom: '1.5mm' }}>
+          <div style={{ fontWeight: 700, fontSize: '7.5px', marginBottom: '0.5mm' }}>
+            BANK DETAILS
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Bank Name</span>
+            <span>{settings['bank_name'] || '-'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Account Name</span>
+            <span>{settings['account_name'] || '-'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>Account Number</span>
+            <span>{settings['account_number'] || '-'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>IFSC Code</span>
+            <span>{settings['ifsc_code'] || '-'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.2mm 0' }}>
+            <span>UPI ID</span>
+            <span>{upiId || '-'}</span>
+          </div>
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
+
+        {/* ═══════════ BARCODE ═══════════ */}
+        <div style={{ textAlign: 'center', margin: '1mm 0' }}>
+          <div style={{ fontSize: '6px', fontWeight: 600, marginBottom: '0.3mm' }}>Barcode</div>
+          <div style={{ fontFamily: "'Courier New', monospace", fontSize: '9px', letterSpacing: '0.5px', fontWeight: 600 }}>
+            {barcodeChars || 'N/A'}
+          </div>
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
+
+        {/* ═══════════ QR CODE ═══════════ */}
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5mm 0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ fontSize: '7px', fontWeight: 600, marginBottom: '0.8mm' }}>QR Code</div>
+            {qrDataUrl ? (
+              <img src={qrDataUrl} alt="UPI QR" style={{ width: '28mm', height: '28mm' }} />
+            ) : (
+              <div
+                style={{
+                  width: '28mm',
+                  height: '28mm',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '7px',
+                  color: '#999',
+                  border: '1px dashed #ccc',
+                }}
+              >
+                UPI QR
+              </div>
+            )}
+          </div>
+        </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '1mm 0' }} />
 
