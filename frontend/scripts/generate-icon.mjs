@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SIZE = 256;
+const ICO_SIZES = [256, 48, 32, 16];
 const SIZE_MM = 64;
 
 function crc32(buf) {
@@ -95,8 +96,41 @@ function generatePNG() {
   ]);
 }
 
+function generateICO() {
+  const entries = [];
+  const pngData = generatePNG();
+  entries.push({ w: 256, h: 256, data: pngData });
+
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(entries.length, 4);
+
+  let offset = 6 + entries.length * 16;
+  const dirEntries = [];
+  for (const e of entries) {
+    const w = e.w >= 256 ? 0 : e.w;
+    const h = e.h >= 256 ? 0 : e.h;
+    const dir = Buffer.alloc(16);
+    dir.writeUInt8(w, 0);
+    dir.writeUInt8(h, 1);
+    dir.writeUInt8(0, 2);
+    dir.writeUInt8(0, 3);
+    dir.writeUInt16LE(1, 4);
+    dir.writeUInt16LE(32, 6);
+    dir.writeUInt32LE(e.data.length, 8);
+    dir.writeUInt32LE(offset, 12);
+    dirEntries.push(dir);
+    offset += e.data.length;
+  }
+
+  return Buffer.concat([header, ...dirEntries, ...entries.map(e => e.data)]);
+}
+
 const png = generatePNG();
+const ico = generateICO();
 const outDir = path.join(__dirname, '..', 'public');
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, 'icon.png'), png);
-console.log('Generated public/icon.png');
+fs.writeFileSync(path.join(outDir, 'icon.ico'), ico);
+console.log('Generated public/icon.png and public/icon.ico');

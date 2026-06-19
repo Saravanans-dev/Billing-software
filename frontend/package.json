@@ -2,6 +2,7 @@
   "name": "student-xerox-billing",
   "private": true,
   "version": "1.0.0",
+  "author": "Student Xerox",
   "type": "module",
   "description": "Student Xerox Billing Software",
   "main": "electron/main.js",
@@ -80,8 +81,9 @@
           ]
         }
       ],
-      "icon": "public/icon.png",
-      "artifactName": "${productName}-Setup-${version}.${ext}"
+      "icon": "public/icon.ico",
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "sign": null
     },
     "nsis": {
       "oneClick": false,
@@ -90,9 +92,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Student Xerox Billing",
-      "installerIcon": "public/icon.png",
-      "uninstallerIcon": "public/icon.png",
-      "installerHeaderIcon": "public/icon.png",
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico",
+      "installerHeaderIcon": "public/icon.ico",
       "displayLanguageSelector": false,
       "menuCategory": true,
       "runAfterFinish": true

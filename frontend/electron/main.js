@@ -1,7 +1,9 @@
-const {
-  app, BrowserWindow, ipcMain, Menu, screen, globalShortcut,
-} = require('electron');
-const path = require('path');
+import { app, BrowserWindow, ipcMain, Menu, screen, globalShortcut, dialog } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 let mainWindow;
 let barcodeBuffer = '';
@@ -41,7 +43,6 @@ function createMenu() {
         {
           label: 'About Student Xerox Billing',
           click: () => {
-            const { dialog } = require('electron');
             dialog.showMessageBox(mainWindow, {
               type: 'info',
               title: 'About',
@@ -72,7 +73,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
+      webSecurity: false,
     },
     icon: path.join(__dirname, '..', 'public', 'icon.png'),
     show: false,
