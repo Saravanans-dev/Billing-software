@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Receipt, Package, ShoppingCart, Warehouse,
-  Users, BarChart3, Settings, LogOut, Store, Database,
+  Users, BarChart3, Settings, LogOut, Store,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
@@ -15,7 +15,6 @@ const menuItems = [
   { path: '/suppliers', label: 'Suppliers', icon: Store },
   { path: '/reports', label: 'Reports', icon: BarChart3 },
   { path: '/settings', label: 'Settings', icon: Settings },
-  { path: '/admin-data', label: 'Admin Data', icon: Database },
 ];
 
 export function Sidebar() {
