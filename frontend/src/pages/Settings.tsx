@@ -46,7 +46,7 @@ export function Settings() {
     setLoading(true);
     try {
       await api.put('/settings/company', company);
-      const keys = ['upi_id', 'whatsapp', 'instagram', 'bank_name', 'account_name', 'account_number', 'ifsc_code', 'receipt_email'];
+      const keys = ['upi_id', 'whatsapp', 'instagram', 'bank_name', 'account_name', 'account_number', 'ifsc_code', 'receipt_email', 'website'];
       for (const k of keys) {
         if (appSettings[k] !== undefined) {
           await saveAppSetting(k, appSettings[k] || '');
@@ -138,6 +138,7 @@ export function Settings() {
                       <Input label="UPI ID" value={appSettings['upi_id'] || ''} onChange={(e) => setAppSettings({ ...appSettings, upi_id: e.target.value })} placeholder="example@upi" />
                       <Input label="WhatsApp Number" value={appSettings['whatsapp'] || ''} onChange={(e) => setAppSettings({ ...appSettings, whatsapp: e.target.value })} placeholder="+91XXXXXXXXXX" />
                       <Input label="Instagram Handle" value={appSettings['instagram'] || ''} onChange={(e) => setAppSettings({ ...appSettings, instagram: e.target.value })} placeholder="@username" />
+                      <Input label="Website" value={appSettings['website'] || ''} onChange={(e) => setAppSettings({ ...appSettings, website: e.target.value })} placeholder="www.example.com" />
                       <Input label="Receipt Email" value={appSettings['receipt_email'] || ''} onChange={(e) => setAppSettings({ ...appSettings, receipt_email: e.target.value })} placeholder="store@example.com" />
                     </div>
                     <h4 className="text-sm font-semibold text-gray-800 mt-4 mb-3">Bank Details</h4>
