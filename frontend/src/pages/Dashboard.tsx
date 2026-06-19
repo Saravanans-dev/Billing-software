@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  TrendingUp, Users, Package, DollarSign, AlertTriangle,
+  TrendingUp, Users, Package, IndianRupee, AlertTriangle,
   Receipt, ShoppingCart, Plus
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
@@ -44,11 +44,11 @@ export function Dashboard() {
 
   const statCards = [
     { label: "Today's Sales", value: formatCurrency(stats?.todaySales?.total || 0), sub: `${stats?.todaySales?.count || 0} bills`, icon: TrendingUp, color: 'text-blue-600 bg-blue-50' },
-    { label: 'Monthly Sales', value: formatCurrency(stats?.monthlySales?.total || 0), sub: `${stats?.monthlySales?.count || 0} bills`, icon: DollarSign, color: 'text-green-600 bg-green-50' },
+    { label: 'Monthly Sales', value: formatCurrency(stats?.monthlySales?.total || 0), sub: `${stats?.monthlySales?.count || 0} bills`, icon: IndianRupee, color: 'text-green-600 bg-green-50' },
     { label: 'Yearly Sales', value: formatCurrency(stats?.yearlySales?.total || 0), sub: `${stats?.yearlySales?.count || 0} bills`, icon: TrendingUp, color: 'text-purple-600 bg-purple-50' },
     { label: 'Total Customers', value: String(stats?.totalCustomers || 0), sub: 'active customers', icon: Users, color: 'text-orange-600 bg-orange-50' },
     { label: 'Total Products', value: String(stats?.totalProducts || 0), sub: 'active products', icon: Package, color: 'text-indigo-600 bg-indigo-50' },
-    { label: 'Stock Value', value: formatCurrency(stats?.stockValue || 0), sub: 'current inventory', icon: DollarSign, color: 'text-teal-600 bg-teal-50' },
+    { label: 'Stock Value', value: formatCurrency(stats?.stockValue || 0), sub: 'current inventory', icon: IndianRupee, color: 'text-teal-600 bg-teal-50' },
     { label: 'Pending Payments', value: formatCurrency(stats?.pendingPayments || 0), sub: 'outstanding amount', icon: AlertTriangle, color: 'text-red-600 bg-red-50' },
     { label: 'Low Stock', value: String(stats?.lowStockProducts || 0), sub: 'products need attention', icon: AlertTriangle, color: 'text-yellow-600 bg-yellow-50' },
   ];

@@ -1,13 +1,13 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, Receipt, Package, ShoppingCart, Warehouse,
+  LayoutDashboard, IndianRupee, Package, ShoppingCart, Warehouse,
   Users, BarChart3, Settings, LogOut, Store,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 const menuItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/billing', label: 'Billing', icon: Receipt },
+  { path: '/billing', label: 'Billing', icon: IndianRupee },
   { path: '/products', label: 'Products', icon: Package },
   { path: '/purchases', label: 'Purchases', icon: ShoppingCart },
   { path: '/stock', label: 'Stock', icon: Warehouse },

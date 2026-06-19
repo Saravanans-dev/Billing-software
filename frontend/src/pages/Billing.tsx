@@ -98,12 +98,9 @@ export function Billing() {
       if (field === 'quantity' || field === 'rate') {
         updated.amount = updated.quantity * updated.rate;
       }
-      if (updated.gst_percentage > 0) {
-        updated.gst_amount = (updated.amount * updated.gst_percentage) / 100;
-      }
-      if (updated.discount_percentage > 0) {
-        updated.discount_amount = (updated.amount * updated.discount_percentage) / 100;
-      }
+      updated.discount_amount = (updated.amount * updated.discount_percentage) / 100;
+      const netAmount = updated.amount - updated.discount_amount;
+      updated.gst_amount = (netAmount * updated.gst_percentage) / 100;
       return updated;
     }));
   };
@@ -115,10 +112,10 @@ export function Billing() {
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, i) => sum + i.amount, 0);
     const totalDiscount = items.reduce((sum, i) => sum + i.discount_amount, 0);
-    const discountAmount = discountType === 'percentage' ? (subtotal * discountValue) / 100 : discountValue;
-    const taxableAmount = subtotal - discountAmount - totalDiscount;
+    const taxableAmount = subtotal - totalDiscount;
+    const discountAmount = discountType === 'percentage' ? (taxableAmount * discountValue) / 100 : discountValue;
     const gstAmount = items.reduce((sum, i) => sum + i.gst_amount, 0);
-    const grandTotal = taxableAmount + gstAmount;
+    const grandTotal = taxableAmount + gstAmount - discountAmount;
     const roundOff = Math.round(grandTotal) - grandTotal;
     return { subtotal, discountAmount, taxableAmount, gstAmount, grandTotal, roundOff };
   };
