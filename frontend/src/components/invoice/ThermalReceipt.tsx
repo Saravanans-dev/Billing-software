@@ -58,60 +58,62 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           max-width: 780px;
           margin: 24px auto;
           background: #fff;
-          border-radius: 10px;
-          box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-          border: 1px solid #e8e8ef;
-          padding: 32px 36px;
+          border-radius: 8px;
+          box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+          border: 1px solid #e0e0ea;
+          padding: 28px 32px;
           font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-          color: #1a1a2e;
+          color: #1e1e2a;
           font-size: 13px;
           line-height: 1.5;
         }
         @media print {
           body { margin: 0; padding: 0; background: #fff; }
           .no-print { display: none !important; }
-          .inv-wrap { box-shadow: none !important; border: 1px solid #ddd !important; margin: 0 auto; }
+          .inv-wrap { box-shadow: none !important; border: 1px solid #ccc !important; margin: 0 auto; }
         }
-        .inv-hdr { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid #1a1a2e; margin-bottom: 18px; }
-        .inv-hdr-logo { width: 56px; height: 56px; object-fit: contain; border-radius: 6px; flex-shrink: 0; }
-        .inv-hdr-logo-pl { width: 56px; height: 56px; background: #f0f0f5; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999; flex-shrink: 0; }
+        .inv-hdr { display: flex; align-items: center; gap: 14px; padding-bottom: 14px; border-bottom: 1.5px solid #d0d0da; margin-bottom: 16px; }
+        .inv-hdr-logo { width: 52px; height: 52px; object-fit: contain; flex-shrink: 0; }
+        .inv-hdr-logo-pl { width: 52px; height: 52px; background: #f2f2f8; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; flex-shrink: 0; }
         .inv-hdr-info { flex: 1; }
-        .inv-hdr-name { font-size: 20px; font-weight: 900; color: #1a1a2e; }
-        .inv-hdr-detail { font-size: 12px; color: #555; line-height: 1.6; }
-        .inv-title { text-align: center; margin-bottom: 20px; }
-        .inv-title span { display: inline-block; font-size: 16px; font-weight: 800; letter-spacing: 2px; padding: 4px 28px; border-bottom: 3px double #1a1a2e; color: #1a1a2e; }
-        .inv-row { display: flex; gap: 18px; margin-bottom: 18px; }
-        .inv-box { flex: 1; background: #f8f9fc; border-radius: 8px; padding: 14px 16px; font-size: 12px; line-height: 1.9; }
-        .inv-box-title { font-weight: 700; font-size: 12px; color: #1a1a2e; padding-bottom: 4px; border-bottom: 1px solid #e0e0e8; margin-bottom: 4px; }
-        .inv-tbl { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 12px; }
-        .inv-tbl th { background: #1a1a2e; color: #fff; padding: 10px 8px; font-weight: 600; font-size: 11px; letter-spacing: 0.3px; white-space: nowrap; }
-        .inv-tbl td { padding: 8px; border-bottom: 1px solid #eee; font-size: 12px; }
+        .inv-hdr-name { font-size: 18px; font-weight: 800; color: #1a1a2e; letter-spacing: 0.3px; }
+        .inv-hdr-detail { font-size: 11.5px; color: #555; line-height: 1.55; margin-top: 1px; }
+        .inv-title { text-align: center; margin-bottom: 16px; }
+        .inv-title span { display: inline-block; font-size: 15px; font-weight: 700; letter-spacing: 1.5px; padding: 3px 24px; border-bottom: 2px solid #1a1a2e; color: #1a1a2e; }
+        .inv-row { display: flex; gap: 16px; margin-bottom: 16px; }
+        .inv-box { flex: 1; background: #f7f8fc; border-radius: 6px; padding: 12px 14px; font-size: 12px; line-height: 1.85; border: 1px solid #eaeaef; }
+        .inv-box-title { font-weight: 700; font-size: 11.5px; color: #1a1a2e; padding-bottom: 3px; border-bottom: 1px solid #ddd; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .inv-tbl { width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 12px; }
+        .inv-tbl th { background: #1a1a2e; color: #fff; padding: 9px 7px; font-weight: 600; font-size: 10.5px; letter-spacing: 0.3px; white-space: nowrap; text-transform: uppercase; }
+        .inv-tbl td { padding: 7px; border-bottom: 1px solid #e8e8ef; font-size: 12px; }
+        .inv-tbl tbody tr:hover td { background: #f8f8fc; }
         .inv-tbl .c { text-align: center; }
         .inv-tbl .r { text-align: right; }
-        .inv-count { display: flex; justify-content: flex-end; gap: 16px; font-size: 12px; color: #555; padding: 2px 0 10px; }
-        .inv-sum { display: flex; justify-content: flex-end; margin-bottom: 12px; }
-        .inv-sum table { width: 320px; font-size: 12px; line-height: 2; }
+        .inv-count { display: flex; justify-content: flex-end; gap: 14px; font-size: 11.5px; color: #555; padding: 2px 0 8px; }
+        .inv-sum { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+        .inv-sum table { width: 300px; font-size: 12px; line-height: 1.9; }
         .inv-sum td { padding: 2px 0; }
         .inv-sum .l { text-align: left; color: #444; }
         .inv-sum .r { text-align: right; font-weight: 600; }
-        .inv-gt { background: #1a1a2e; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-radius: 6px; font-weight: 900; font-size: 16px; margin-bottom: 8px; }
-        .inv-words { text-align: center; font-size: 12px; padding: 6px 0 12px; color: #444; }
-        .inv-words strong { display: block; font-weight: 700; text-transform: uppercase; color: #1a1a2e; margin-top: 2px; }
-        .inv-two { display: flex; gap: 18px; margin: 14px 0; }
-        .inv-two-box { flex: 1; border: 1px solid #e0e0e8; border-radius: 8px; padding: 14px 16px; font-size: 12px; line-height: 2.1; }
-        .inv-two-box-title { font-weight: 700; font-size: 12px; color: #1a1a2e; padding-bottom: 4px; border-bottom: 1px solid #e0e0e8; margin-bottom: 4px; }
-        .inv-two-box .fr { display: flex; justify-content: space-between; }
+        .inv-gt { background: #1a1a2e; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 11px 18px; border-radius: 4px; font-weight: 800; font-size: 15px; margin-bottom: 6px; letter-spacing: 0.3px; }
+        .inv-words { text-align: center; font-size: 11.5px; padding: 5px 0 10px; color: #444; }
+        .inv-words strong { display: block; font-weight: 700; text-transform: uppercase; color: #1a1a2e; margin-top: 2px; font-size: 12px; }
+        .inv-two { display: flex; gap: 16px; margin: 12px 0; }
+        .inv-two-box { flex: 1; border: 1px solid #e0e0ea; border-radius: 6px; padding: 12px 14px; font-size: 12px; line-height: 2; }
+        .inv-two-box-title { font-weight: 700; font-size: 11.5px; color: #1a1a2e; padding-bottom: 3px; border-bottom: 1px solid #ddd; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .inv-two-box .fr { display: flex; justify-content: space-between; border-bottom: 1px dotted #eee; }
+        .inv-two-box .fr:last-child { border-bottom: none; }
         .inv-two-box .fr span:last-child { font-weight: 600; }
-        .inv-bq { display: flex; gap: 18px; align-items: flex-start; margin: 14px 0; }
-        .inv-bq-box { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px; border: 1px solid #e0e0e8; border-radius: 8px; }
-        .inv-bq-box .lbl { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 8px; }
-        .inv-bc { font-family: 'Courier New', monospace; font-size: 26px; font-weight: 700; letter-spacing: 3px; line-height: 1; color: #000; margin-bottom: 2px; }
-        .inv-bc-txt { font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #555; }
-        .inv-terms { font-size: 11px; color: #666; line-height: 1.7; padding: 12px 0; border-top: 1px solid #e0e0e8; margin-bottom: 10px; }
-        .inv-foot { text-align: center; border-top: 2px solid #1a1a2e; padding-top: 14px; }
-        .inv-foot .t1 { font-weight: 900; font-size: 14px; letter-spacing: 1px; color: #1a1a2e; }
-        .inv-foot .t2 { font-weight: 700; font-size: 12px; color: #555; margin-top: 2px; }
-        .inv-foot .t3 { font-size: 11px; color: #999; margin-top: 2px; }
+        .inv-bq { display: flex; gap: 16px; align-items: flex-start; margin: 12px 0; }
+        .inv-bq-box { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px; border: 1px solid #e0e0ea; border-radius: 6px; background: #fafafc; }
+        .inv-bq-box .lbl { font-size: 10.5px; font-weight: 700; color: #555; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .inv-bc { font-family: 'Courier New', monospace; font-size: 24px; font-weight: 700; letter-spacing: 2.5px; line-height: 1; color: #000; margin-bottom: 2px; }
+        .inv-bc-txt { font-size: 10.5px; font-weight: 600; letter-spacing: 0.8px; color: #555; }
+        .inv-terms { font-size: 11px; color: #666; line-height: 1.65; padding: 10px 0; border-top: 1px solid #e0e0ea; margin-bottom: 8px; }
+        .inv-foot { text-align: center; border-top: 1.5px solid #d0d0da; padding-top: 12px; }
+        .inv-foot .t1 { font-weight: 800; font-size: 13px; letter-spacing: 0.8px; color: #1a1a2e; }
+        .inv-foot .t2 { font-weight: 700; font-size: 11.5px; color: #555; margin-top: 2px; }
+        .inv-foot .t3 { font-size: 10.5px; color: #999; margin-top: 2px; }
       `}</style>
 
       <div className="inv-wrap">
