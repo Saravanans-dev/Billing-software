@@ -9,6 +9,7 @@ import type { User, CompanySettings } from '../types';
 export function Settings() {
   const [activeTab, setActiveTab] = useState('company');
   const [company, setCompany] = useState<CompanySettings>({} as CompanySettings);
+  const [appSettings, setAppSettings] = useState<Record<string, string>>({});
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -20,6 +21,8 @@ export function Settings() {
     try {
       const { data } = await api.get('/settings/company');
       setCompany(data);
+      const { data: settingsData } = await api.get('/settings');
+      setAppSettings(settingsData);
       const { data: usersData } = await api.get('/settings/users');
       setUsers(usersData);
     } catch { toast.error('Failed to load settings'); }
@@ -30,6 +33,26 @@ export function Settings() {
     try {
       await api.put('/settings/company', company);
       toast.success('Settings saved');
+    } catch { toast.error('Failed to save settings'); } finally { setLoading(false); }
+  };
+
+  const saveAppSetting = async (key: string, value: string) => {
+    try {
+      await api.put('/settings', { key, value });
+    } catch { throw new Error(`Failed to save ${key}`); }
+  };
+
+  const saveAllSettings = async () => {
+    setLoading(true);
+    try {
+      await api.put('/settings/company', company);
+      const keys = ['upi_id', 'whatsapp', 'instagram', 'bank_name', 'account_name', 'account_number', 'ifsc_code', 'receipt_email'];
+      for (const k of keys) {
+        if (appSettings[k] !== undefined) {
+          await saveAppSetting(k, appSettings[k] || '');
+        }
+      }
+      toast.success('All settings saved');
     } catch { toast.error('Failed to save settings'); } finally { setLoading(false); }
   };
 
@@ -109,8 +132,24 @@ export function Settings() {
                       <Input label="Address" value={company.address || ''} onChange={(e) => setCompany({ ...company, address: e.target.value })} />
                     </div>
                   </div>
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="text-sm font-semibold text-gray-800 mb-3">Receipt Settings</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input label="UPI ID" value={appSettings['upi_id'] || ''} onChange={(e) => setAppSettings({ ...appSettings, upi_id: e.target.value })} placeholder="example@upi" />
+                      <Input label="WhatsApp Number" value={appSettings['whatsapp'] || ''} onChange={(e) => setAppSettings({ ...appSettings, whatsapp: e.target.value })} placeholder="+91XXXXXXXXXX" />
+                      <Input label="Instagram Handle" value={appSettings['instagram'] || ''} onChange={(e) => setAppSettings({ ...appSettings, instagram: e.target.value })} placeholder="@username" />
+                      <Input label="Receipt Email" value={appSettings['receipt_email'] || ''} onChange={(e) => setAppSettings({ ...appSettings, receipt_email: e.target.value })} placeholder="store@example.com" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-800 mt-4 mb-3">Bank Details</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input label="Bank Name" value={appSettings['bank_name'] || ''} onChange={(e) => setAppSettings({ ...appSettings, bank_name: e.target.value })} />
+                      <Input label="Account Name" value={appSettings['account_name'] || ''} onChange={(e) => setAppSettings({ ...appSettings, account_name: e.target.value })} />
+                      <Input label="Account Number" value={appSettings['account_number'] || ''} onChange={(e) => setAppSettings({ ...appSettings, account_number: e.target.value })} />
+                      <Input label="IFSC Code" value={appSettings['ifsc_code'] || ''} onChange={(e) => setAppSettings({ ...appSettings, ifsc_code: e.target.value })} />
+                    </div>
+                  </div>
                   <div className="flex justify-end">
-                    <Button onClick={saveCompany} loading={loading}><Save className="w-4 h-4" /> Save</Button>
+                    <Button onClick={saveAllSettings} loading={loading}><Save className="w-4 h-4" /> Save</Button>
                   </div>
                 </div>
               )}
