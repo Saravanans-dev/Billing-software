@@ -30,7 +30,7 @@ export async function updateCompanySettings(req: AuthRequest, res: Response) {
     if (!id) {
       await pool.query('INSERT INTO company_settings (company_name) VALUES ($1)', [req.body.company_name || 'Student Xerox']);
     } else {
-      const fields = ['company_name', 'address', 'mobile', 'email', 'gst_number', 'pan_number'];
+      const fields = ['company_name', 'address', 'mobile', 'email', 'gst_number', 'pan_number', 'logo_url', 'thermal_printer', 'a5_printer', 'financial_year_start', 'financial_year_end', 'auto_backup_enabled', 'backup_frequency'];
       const updates = fields.filter(f => req.body[f] !== undefined).map((f, i) => `${f}=$${i + 1}`);
       if (updates.length > 0) {
         const vals = fields.filter(f => req.body[f] !== undefined).map(f => req.body[f]);

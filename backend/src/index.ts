@@ -16,6 +16,7 @@ import dashboardRoutes from './routes/dashboard';
 import reportRoutes from './routes/reports';
 import exportRoutes from './routes/exports';
 import settingsRoutes from './routes/settings';
+import uploadRoutes from './routes/upload';
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/exports', exportRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Root redirect
 app.get('/', (_req, res) => {

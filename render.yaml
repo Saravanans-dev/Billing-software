@@ -23,6 +23,10 @@ services:
         fromDatabase:
           name: free-db
           property: connectionString
+    disk:
+      name: uploads
+      mountPath: /app/backend/uploads
+      sizeGB: 1
 
   # ===== Frontend Static Site =====
   - type: web

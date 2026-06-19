@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const RENDER_URL = 'https://free-frontend-u0kv.onrender.com';
+
 let mainWindow;
 let barcodeBuffer = '';
 let barcodeTimer = null;
@@ -81,14 +83,7 @@ function createWindow() {
     autoHideMenuBar: false,
   });
 
-  const isDev = process.env.ELECTRON_DEV === 'true' || process.argv.includes('--dev');
-
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
-  }
+  mainWindow.loadURL(RENDER_URL);
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { formatCurrency } from '../../lib/utils';
+import { BACKEND_URL } from '../../services/api';
 import type { Sale, SaleItem, CompanySettings } from '../../types';
 
 interface ThermalReceiptProps {
@@ -95,7 +96,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         <div style={{ textAlign: 'center', marginBottom: '2.5mm' }}>
           {company.logo_url && (
             <img
-              src={company.logo_url}
+              src={`${BACKEND_URL}${company.logo_url}`}
               alt="Logo"
               style={{ maxWidth: '45mm', maxHeight: '14mm', margin: '0 auto 1mm', objectFit: 'contain' }}
               crossOrigin="anonymous"

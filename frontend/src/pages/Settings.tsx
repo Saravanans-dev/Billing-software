@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Save, Building2, Printer, Shield, Database } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Save, Building2, Printer, Shield, Database, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
+import api, { BACKEND_URL } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import type { User, CompanySettings } from '../types';
@@ -72,14 +72,43 @@ export function Settings() {
             <div className="card-body">
               {activeTab === 'company' && (
                 <div className="space-y-4 max-w-2xl">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input label="Company Name" value={company.company_name || ''} onChange={(e) => setCompany({ ...company, company_name: e.target.value })} />
-                    <Input label="Mobile" value={company.mobile || ''} onChange={(e) => setCompany({ ...company, mobile: e.target.value })} />
-                    <Input label="Email" value={company.email || ''} onChange={(e) => setCompany({ ...company, email: e.target.value })} />
-                    <Input label="GST Number" value={company.gst_number || ''} onChange={(e) => setCompany({ ...company, gst_number: e.target.value })} />
-                    <Input label="PAN Number" value={company.pan_number || ''} onChange={(e) => setCompany({ ...company, pan_number: e.target.value })} />
+                  <div className="flex items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <div className="w-28 h-28 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
+                        {company.logo_url ? (
+                          <img src={`${BACKEND_URL}${company.logo_url}`} alt="Logo" className="w-full h-full object-contain" />
+                        ) : (
+                          <Building2 className="w-8 h-8 text-gray-300" />
+                        )}
+                      </div>
+                      <label className="btn-ghost text-xs mt-2 w-full flex items-center justify-center gap-1 cursor-pointer">
+                        <Upload className="w-3 h-3" /> Upload Logo
+                        <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const formData = new FormData();
+                          formData.append('logo', file);
+                          try {
+                            const { data } = await api.post('/upload/logo', formData, {
+                              headers: { 'Content-Type': 'multipart/form-data' },
+                            });
+                            setCompany({ ...company, logo_url: data.logo_url });
+                            toast.success('Logo uploaded');
+                          } catch { toast.error('Upload failed'); }
+                        }} />
+                      </label>
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <Input label="Company Name" value={company.company_name || ''} onChange={(e) => setCompany({ ...company, company_name: e.target.value })} />
+                        <Input label="Mobile" value={company.mobile || ''} onChange={(e) => setCompany({ ...company, mobile: e.target.value })} />
+                        <Input label="Email" value={company.email || ''} onChange={(e) => setCompany({ ...company, email: e.target.value })} />
+                        <Input label="GST Number" value={company.gst_number || ''} onChange={(e) => setCompany({ ...company, gst_number: e.target.value })} />
+                        <Input label="PAN Number" value={company.pan_number || ''} onChange={(e) => setCompany({ ...company, pan_number: e.target.value })} />
+                      </div>
+                      <Input label="Address" value={company.address || ''} onChange={(e) => setCompany({ ...company, address: e.target.value })} />
+                    </div>
                   </div>
-                  <Input label="Address" value={company.address || ''} onChange={(e) => setCompany({ ...company, address: e.target.value })} />
                   <div className="flex justify-end">
                     <Button onClick={saveCompany} loading={loading}><Save className="w-4 h-4" /> Save</Button>
                   </div>

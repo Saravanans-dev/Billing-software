@@ -123,7 +123,7 @@ export function Billing() {
     return { subtotal, discountAmount, taxableAmount, gstAmount, grandTotal, roundOff };
   };
 
-  const handleSave = async (print = false) => {
+  const handleSave = async (format?: 'a4' | 'thermal') => {
     if (items.length === 0) {
       toast.error('Add at least one item');
       return;
@@ -156,8 +156,8 @@ export function Billing() {
           onClick: () => navigate('/reports'),
         },
       });
-      if (print) {
-        window.open(`/receipt/${data.id}`, '_blank');
+      if (format) {
+        window.open(`/receipt/${data.id}?format=${format}`, '_blank');
       }
       resetBill();
     } catch (error: any) {
@@ -488,11 +488,14 @@ export function Billing() {
           </div>
 
           <div className="space-y-2">
-            <Button className="w-full" size="lg" onClick={() => handleSave(false)} disabled={saving || items.length === 0}>
+            <Button className="w-full" size="lg" onClick={() => handleSave()} disabled={saving || items.length === 0}>
               {saving ? 'Saving...' : <><Save className="w-4 h-4" /> Save Bill</>}
             </Button>
-            <Button variant="secondary" className="w-full" onClick={() => handleSave(true)} disabled={saving || items.length === 0}>
-              <Printer className="w-4 h-4" /> Save & Print
+            <Button variant="secondary" className="w-full" onClick={() => handleSave('a4')} disabled={saving || items.length === 0}>
+              <Printer className="w-4 h-4" /> Save & Print (A4)
+            </Button>
+            <Button variant="secondary" className="w-full" onClick={() => handleSave('thermal')} disabled={saving || items.length === 0}>
+              <Printer className="w-4 h-4" /> Save & Print (Thermal)
             </Button>
             <Button variant="secondary" className="w-full" onClick={resetBill}>
               <RotateCcw className="w-4 h-4" /> New Bill
