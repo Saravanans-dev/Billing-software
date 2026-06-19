@@ -103,20 +103,30 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           </div>
           <div style={{ fontSize: '11px', lineHeight: '1.5', color: '#444' }}>
             <div>{company.address || 'Therikiyur, Ayyampalayam, Trichy - 621005'}</div>
-            <div>Phone: {company.mobile || '9876543210'}</div>
+            <div>Ph: {company.mobile || '9876543210'}</div>
           </div>
         </div>
 
         <hr style={{ border: 'none', borderTop: '2px solid #000', margin: '2mm 0' }} />
 
         {/* ═══════════ INVOICE DETAILS ═══════════ */}
-        <div style={{ fontSize: '13px', lineHeight: '1.7', marginBottom: '3mm' }}>
-          <div>Invoice No: {billNum}</div>
-          <div>Date: {formatDate(sale.bill_date)} &nbsp; Time: {formatTime(sale.bill_time)}</div>
-          <div>Cashier ID: {cashierId}</div>
-          <div>Cashier: {cashierName}</div>
-          <div>Customer Name: {sale.customer_name || 'Walk-In'}</div>
-          <div>Mobile Number: {sale.customer_mobile || '-'}</div>
+        <div style={{ fontSize: '13px', lineHeight: '1.8', marginBottom: '3mm' }}>
+          <table style={{ width: '100%' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <div>Invoice No: {billNum}</div>
+                  <div>Date: {formatDate(sale.bill_date)} &nbsp; Time: {formatTime(sale.bill_time)}</div>
+                  <div>Cashier ID: {cashierId}</div>
+                  <div>Cashier: {cashierName}</div>
+                </td>
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <div>Customer Name: {sale.customer_name || 'Walk-In'}</div>
+                  <div>Mobile Number: {sale.customer_mobile || '-'}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <hr style={{ border: 'none', borderTop: '2px solid #000', margin: '2mm 0' }} />
@@ -173,90 +183,77 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
         <hr style={{ border: 'none', borderTop: '1.5px dashed #aaa', margin: '2mm 0' }} />
 
-        {/* ═══════════ PAYMENT INFORMATION ═══════════ */}
-        <div style={{ fontSize: '12px', lineHeight: '1.7', marginBottom: '3mm' }}>
-          <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '1mm' }}>
-            PAYMENT INFORMATION
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5mm 0' }}>
-            <span>Payment Method</span>
-            <span style={{ fontWeight: 600 }}>{(sale.payment_mode || 'CASH').toUpperCase()}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5mm 0' }}>
-            <span>Received Amount</span>
-            <span style={{ fontWeight: 600 }}>{formatCurrency(grandTotal)}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5mm 0' }}>
-            <span>Balance Amount</span>
-            <span style={{ fontWeight: 600 }}>{formatCurrency(0)}</span>
-          </div>
-        </div>
+        {/* ═══════════ PAYMENT + BANK (SIDE BY SIDE) ═══════════ */}
+        <table style={{ width: '100%', marginBottom: '3mm', fontSize: '12px', lineHeight: '1.7' }}>
+          <tbody>
+            <tr>
+              <td style={{ width: '50%', verticalAlign: 'top', paddingRight: '2mm' }}>
+                <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '1mm' }}>PAYMENT INFO</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
+                  <span>Payment Method</span>
+                  <span style={{ fontWeight: 600 }}>{(sale.payment_mode || 'CASH').toUpperCase()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
+                  <span>Received Amount</span>
+                  <span style={{ fontWeight: 600 }}>{formatCurrency(grandTotal)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
+                  <span>Balance Amount</span>
+                  <span style={{ fontWeight: 600 }}>{formatCurrency(0)}</span>
+                </div>
+              </td>
+              <td style={{ width: '50%', verticalAlign: 'top', paddingLeft: '2mm' }}>
+                <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '1mm' }}>BANK DETAILS</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
+                  <span>Bank Name</span>
+                  <span>{settings['bank_name'] || '-'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
+                  <span>Account Name</span>
+                  <span>{settings['account_name'] || '-'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
+                  <span>Account Number</span>
+                  <span>{settings['account_number'] || '-'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
+                  <span>IFSC Code</span>
+                  <span>{settings['ifsc_code'] || '-'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.3mm 0' }}>
+                  <span>UPI ID</span>
+                  <span>{upiId || '-'}</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
         <hr style={{ border: 'none', borderTop: '1.5px dashed #aaa', margin: '2mm 0' }} />
 
-        {/* ═══════════ BANK DETAILS ═══════════ */}
-        <div style={{ fontSize: '12px', lineHeight: '1.7', marginBottom: '3mm' }}>
-          <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '1mm' }}>
-            BANK DETAILS
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5mm 0' }}>
-            <span>Bank Name</span>
-            <span>{settings['bank_name'] || '-'}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5mm 0' }}>
-            <span>Account Name</span>
-            <span>{settings['account_name'] || '-'}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5mm 0' }}>
-            <span>Account Number</span>
-            <span>{settings['account_number'] || '-'}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5mm 0' }}>
-            <span>IFSC Code</span>
-            <span>{settings['ifsc_code'] || '-'}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5mm 0' }}>
-            <span>UPI ID</span>
-            <span>{upiId || '-'}</span>
-          </div>
-        </div>
-
-        <hr style={{ border: 'none', borderTop: '1.5px dashed #aaa', margin: '2mm 0' }} />
-
-        {/* ═══════════ BARCODE ═══════════ */}
-        <div style={{ textAlign: 'center', margin: '2mm 0' }}>
-          <div style={{ fontSize: '10px', fontWeight: 600, marginBottom: '0.5mm' }}>Barcode</div>
-          <div style={{ fontFamily: "'Courier New', monospace", fontSize: '14px', letterSpacing: '1px', fontWeight: 600 }}>
-            {barcodeChars || 'N/A'}
-          </div>
-        </div>
-
-        <hr style={{ border: 'none', borderTop: '1.5px dashed #aaa', margin: '2mm 0' }} />
-
-        {/* ═══════════ QR CODE ═══════════ */}
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '3mm 0' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, marginBottom: '1mm' }}>QR Code</div>
-            {qrDataUrl ? (
-              <img src={qrDataUrl} alt="UPI QR" style={{ width: '48mm', height: '48mm' }} />
-            ) : (
-              <div
-                style={{
-                  width: '48mm',
-                  height: '48mm',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  color: '#999',
-                  border: '1.5px dashed #ccc',
-                }}
-              >
-                UPI QR
-              </div>
-            )}
-          </div>
-        </div>
+        {/* ═══════════ BARCODE + QR (SIDE BY SIDE) ═══════════ */}
+        <table style={{ width: '100%', marginBottom: '2mm' }}>
+          <tbody>
+            <tr>
+              <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'center', paddingRight: '2mm' }}>
+                <div style={{ fontSize: '10px', fontWeight: 600, marginBottom: '0.5mm' }}>Barcode</div>
+                <div style={{ fontFamily: "'Courier New', monospace", fontSize: '14px', letterSpacing: '1px', fontWeight: 600 }}>
+                  {barcodeChars || 'N/A'}
+                </div>
+              </td>
+              <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'center', paddingLeft: '2mm' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, marginBottom: '1mm' }}>QR Code</div>
+                {qrDataUrl ? (
+                  <img src={qrDataUrl} alt="UPI QR" style={{ width: '48mm', height: '48mm' }} />
+                ) : (
+                  <div style={{ width: '48mm', height: '48mm', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: '#999', border: '1.5px dashed #ccc', margin: '0 auto' }}>
+                    UPI QR
+                  </div>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
         <hr style={{ border: 'none', borderTop: '2px solid #000', margin: '2mm 0' }} />
 
