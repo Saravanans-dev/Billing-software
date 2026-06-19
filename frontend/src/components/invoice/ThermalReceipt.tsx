@@ -110,13 +110,23 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
         {/* ═══════════ INVOICE DETAILS ═══════════ */}
         <div style={{ fontSize: '7.5px', lineHeight: '1.6', marginBottom: '1.5mm' }}>
-          <div>Invoice No: {billNum}</div>
-          <div>Date: {formatDate(sale.bill_date)} &nbsp; Time: {formatTime(sale.bill_time)}</div>
-          <div>Cashier ID: {cashierId}</div>
-          <div>Cashier: {cashierName}</div>
-          <div>Customer Name: {sale.customer_name || 'Walk-In'}</div>
-          <div>Customer ID: {sale.customer_id ? sale.customer_id.slice(0, 8) : '-'}</div>
-          <div>Mobile Number: {sale.customer_mobile || '-'}</div>
+          <table style={{ width: '100%' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <div>Invoice No: {billNum}</div>
+                  <div>Date: {formatDate(sale.bill_date)} &nbsp; Time: {formatTime(sale.bill_time)}</div>
+                  <div>Cashier ID: {cashierId}</div>
+                  <div>Cashier: {cashierName}</div>
+                </td>
+                <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'right' }}>
+                  <div>Customer Name: {sale.customer_name || 'Walk-In'}</div>
+                  <div>Customer ID: {sale.customer_id ? sale.customer_id.slice(0, 8) : '-'}</div>
+                  <div>Mobile Number: {sale.customer_mobile || '-'}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '1mm 0' }} />
@@ -218,9 +228,9 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
 
         {/* ═══════════ BARCODE ═══════════ */}
-        <div style={{ textAlign: 'center', margin: '1.5mm 0' }}>
-          <div style={{ fontSize: '7px', fontWeight: 600, marginBottom: '0.5mm' }}>Barcode</div>
-          <div style={{ fontFamily: "'Libre Barcode 128', 'Courier New', monospace", fontSize: '16px', letterSpacing: '2px' }}>
+        <div style={{ textAlign: 'center', margin: '1mm 0' }}>
+          <div style={{ fontSize: '6px', fontWeight: 600, marginBottom: '0.3mm' }}>Barcode</div>
+          <div style={{ fontFamily: "'Courier New', monospace", fontSize: '10px', letterSpacing: '1px', fontWeight: 600 }}>
             {barcodeChars || 'N/A'}
           </div>
         </div>
