@@ -492,10 +492,7 @@ export function Billing() {
               {saving ? 'Saving...' : <><Save className="w-4 h-4" /> Save Bill</>}
             </Button>
             <Button variant="secondary" className="w-full" onClick={() => handleSave('a4')} disabled={saving || items.length === 0}>
-              <Printer className="w-4 h-4" /> Save & Print (A4)
-            </Button>
-            <Button variant="secondary" className="w-full" onClick={() => handleSave('thermal')} disabled={saving || items.length === 0}>
-              <Printer className="w-4 h-4" /> Save & Print (Thermal)
+              <Printer className="w-4 h-4" /> Save & Print
             </Button>
             <Button variant="secondary" className="w-full" onClick={resetBill}>
               <RotateCcw className="w-4 h-4" /> New Bill
