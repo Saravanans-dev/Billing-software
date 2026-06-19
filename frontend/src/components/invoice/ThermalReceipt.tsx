@@ -110,18 +110,13 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           </div>
         </div>
 
-        <hr style={{ border: 'none', borderTop: '2px solid #000', margin: '1mm 0' }} />
+        <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '1mm 0' }} />
 
-        {/* ═══════════ BIG BILL NUMBER ═══════════ */}
-        <div style={{ textAlign: 'center', margin: '1.5mm 0', padding: '1mm 0', borderTop: '1px solid #000', borderBottom: '1px solid #000' }}>
-          <div style={{ fontSize: '6px', fontWeight: 700, letterSpacing: '1px', color: '#555', marginBottom: '0.3mm' }}>INVOICE NUMBER</div>
-          <div style={{ fontSize: '14px', fontWeight: 900, letterSpacing: '2px' }}>{sale.bill_number}</div>
-        </div>
-
-        <hr style={{ border: 'none', borderTop: '2px solid #000', margin: '1mm 0' }} />
-
-        {/* ═══════════ INVOICE & CUSTOMER DETAILS ═══════════ */}
-        <div style={{ fontSize: '7px', lineHeight: '1.5', marginBottom: '1.5mm' }}>
+        {/* ═══════════ INVOICE DETAILS ═══════════ */}
+        <div style={{ fontSize: '7.5px', lineHeight: '1.5', marginBottom: '1.5mm' }}>
+          <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 800, marginBottom: '0.5mm', letterSpacing: '1px' }}>
+            {sale.bill_number}
+          </div>
           <table style={{ width: '100%' }}>
             <tbody>
               <tr>
