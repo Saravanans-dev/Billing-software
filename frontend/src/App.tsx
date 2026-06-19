@@ -12,6 +12,7 @@ import { Customers } from './pages/Customers';
 import { Suppliers } from './pages/Suppliers';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
+import { AdminData } from './pages/AdminData';
 import { ReceiptPrint } from './pages/ReceiptPrint';
 import { useEffect } from 'react';
 
@@ -57,6 +58,7 @@ function App() {
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="admin-data" element={<AdminData />} />
         </Route>
         <Route path="receipt/:id" element={<ReceiptPrint />} />
         <Route path="*" element={<Navigate to="/" replace />} />
