@@ -39,434 +39,208 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     }
   }, [upiLink]);
 
-  const formatDate = (d: string) => {
+  const fd = (d: string) => {
     if (!d) return '';
     return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
-  const formatTime = (t: string) => {
+  const ft = (t: string) => {
     if (!t) return '';
     return t.toString().slice(0, 5);
   };
 
-  const barcodeChars = sale.bill_number?.replace(/[^A-Za-z0-9]/g, '') || '';
-
-  const styles = {
-    card: {
-      maxWidth: '820px',
-      margin: '20px auto',
-      background: '#fff',
-      borderRadius: '10px',
-      boxShadow: '0 2px 20px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
-      padding: '35px 40px',
-      fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif",
-      color: '#1a1a2e',
-      fontSize: '13px',
-      lineHeight: '1.5',
-    },
-    header: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '18px',
-      paddingBottom: '18px',
-      borderBottom: '2px solid #1a1a2e',
-      marginBottom: '20px',
-    },
-    headerLogo: {
-      width: '60px',
-      height: '60px',
-      objectFit: 'contain' as const,
-      borderRadius: '6px',
-    },
-    headerLogoPlaceholder: {
-      width: '60px',
-      height: '60px',
-      background: '#f0f0f5',
-      borderRadius: '6px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '10px',
-      color: '#999',
-      flexShrink: 0,
-    },
-    headerInfo: {
-      flex: 1,
-    },
-    companyName: {
-      fontSize: '20px',
-      fontWeight: 900,
-      letterSpacing: '0.3px',
-      color: '#1a1a2e',
-      marginBottom: '2px',
-    },
-    companyDetails: {
-      fontSize: '12px',
-      color: '#555',
-      lineHeight: '1.6',
-    },
-    titleBadge: {
-      textAlign: 'center' as const,
-      marginBottom: '22px',
-    },
-    titleText: {
-      display: 'inline-block',
-      fontSize: '16px',
-      fontWeight: 800,
-      letterSpacing: '2px',
-      padding: '4px 28px',
-      borderBottom: '3px double #1a1a2e',
-      color: '#1a1a2e',
-    },
-    infoRow: {
-      display: 'flex',
-      gap: '20px',
-      marginBottom: '18px',
-    },
-    infoBox: {
-      flex: 1,
-      background: '#f8f9fc',
-      borderRadius: '8px',
-      padding: '14px 16px',
-      fontSize: '12px',
-      lineHeight: '1.8',
-    },
-    infoBoxTitle: {
-      fontWeight: 700,
-      fontSize: '12px',
-      color: '#1a1a2e',
-      marginBottom: '4px',
-      paddingBottom: '4px',
-      borderBottom: '1px solid #e0e0e8',
-    },
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse' as const,
-      marginBottom: '10px',
-      fontSize: '12px',
-    },
-    tableHead: {
-      background: '#1a1a2e',
-      color: '#fff',
-    },
-    tableTh: {
-      padding: '10px 8px',
-      fontWeight: 600,
-      fontSize: '11px',
-      textAlign: 'left' as const,
-      letterSpacing: '0.3px',
-      whiteSpace: 'nowrap' as const,
-    },
-    tableTd: {
-      padding: '8px',
-      borderBottom: '1px solid #eee',
-      fontSize: '12px',
-    },
-    countRow: {
-      display: 'flex',
-      justifyContent: 'flex-end',
-      gap: '16px',
-      fontSize: '12px',
-      color: '#555',
-      padding: '4px 0 12px',
-    },
-    summarySection: {
-      display: 'flex',
-      justifyContent: 'flex-end',
-      marginBottom: '14px',
-    },
-    summaryTable: {
-      width: '320px',
-      fontSize: '12px',
-      lineHeight: '2',
-    },
-    summaryTd: {
-      padding: '3px 0',
-    },
-    summaryLabel: {
-      textAlign: 'left' as const,
-      color: '#444',
-    },
-    summaryValue: {
-      textAlign: 'right' as const,
-      fontWeight: 600,
-    },
-    grandTotalBar: {
-      background: '#1a1a2e',
-      color: '#fff',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '12px 20px',
-      borderRadius: '6px',
-      fontWeight: 900,
-      fontSize: '16px',
-      marginBottom: '10px',
-    },
-    amountWords: {
-      textAlign: 'center' as const,
-      fontSize: '12px',
-      padding: '8px 0 14px',
-      color: '#444',
-    },
-    amountWordsHighlight: {
-      fontWeight: 700,
-      textTransform: 'uppercase' as const,
-      fontSize: '12px',
-      color: '#1a1a2e',
-      marginTop: '2px',
-    },
-    twoCol: {
-      display: 'flex',
-      gap: '20px',
-      margin: '16px 0',
-    },
-    twoColBox: {
-      flex: 1,
-      border: '1px solid #e0e0e8',
-      borderRadius: '8px',
-      padding: '14px 16px',
-      fontSize: '12px',
-      lineHeight: '2',
-    },
-    twoColBoxTitle: {
-      fontWeight: 700,
-      fontSize: '12px',
-      color: '#1a1a2e',
-      marginBottom: '6px',
-      paddingBottom: '4px',
-      borderBottom: '1px solid #e0e0e8',
-    },
-    bottomRow: {
-      display: 'flex',
-      gap: '20px',
-      alignItems: 'flex-start',
-      margin: '16px 0',
-    },
-    bottomBox: {
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column' as const,
-      alignItems: 'center',
-    },
-    barcode: {
-      fontFamily: "'Courier New', monospace",
-      fontSize: '28px',
-      fontWeight: 700,
-      letterSpacing: '3px',
-      lineHeight: 1,
-      color: '#000',
-      marginBottom: '4px',
-    },
-    barcodeLabel: {
-      fontSize: '11px',
-      fontWeight: 600,
-      color: '#555',
-      marginBottom: '8px',
-    },
-    qrLabel: {
-      fontSize: '11px',
-      fontWeight: 600,
-      color: '#555',
-      marginBottom: '8px',
-    },
-    terms: {
-      fontSize: '11px',
-      color: '#666',
-      lineHeight: '1.7',
-      marginBottom: '14px',
-      padding: '12px 0',
-      borderTop: '1px solid #e0e0e8',
-    },
-    footer: {
-      textAlign: 'center' as const,
-      borderTop: '2px solid #1a1a2e',
-      paddingTop: '14px',
-    },
-    footerThank: {
-      fontWeight: 900,
-      fontSize: '14px',
-      letterSpacing: '1px',
-      color: '#1a1a2e',
-      marginBottom: '4px',
-    },
-    footerName: {
-      fontWeight: 700,
-      fontSize: '12px',
-      color: '#555',
-      marginBottom: '2px',
-    },
-    footerTag: {
-      fontSize: '11px',
-      color: '#999',
-    },
-  };
+  const bc = sale.bill_number?.replace(/[^A-Za-z0-9]/g, '') || '';
 
   return (
     <div>
       <style>{`
-        @media print {
-          body { margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          .no-print { display: none !important; }
-          .inv-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        .inv-wrap {
+          max-width: 780px;
+          margin: 24px auto;
+          background: #fff;
+          border-radius: 10px;
+          box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+          border: 1px solid #e8e8ef;
+          padding: 32px 36px;
+          font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+          color: #1a1a2e;
+          font-size: 13px;
+          line-height: 1.5;
         }
+        @media print {
+          body { margin: 0; padding: 0; background: #fff; }
+          .no-print { display: none !important; }
+          .inv-wrap { box-shadow: none !important; border: 1px solid #ddd !important; margin: 0 auto; }
+        }
+        .inv-hdr { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid #1a1a2e; margin-bottom: 18px; }
+        .inv-hdr-logo { width: 56px; height: 56px; object-fit: contain; border-radius: 6px; flex-shrink: 0; }
+        .inv-hdr-logo-pl { width: 56px; height: 56px; background: #f0f0f5; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999; flex-shrink: 0; }
+        .inv-hdr-info { flex: 1; }
+        .inv-hdr-name { font-size: 20px; font-weight: 900; color: #1a1a2e; }
+        .inv-hdr-detail { font-size: 12px; color: #555; line-height: 1.6; }
+        .inv-title { text-align: center; margin-bottom: 20px; }
+        .inv-title span { display: inline-block; font-size: 16px; font-weight: 800; letter-spacing: 2px; padding: 4px 28px; border-bottom: 3px double #1a1a2e; color: #1a1a2e; }
+        .inv-row { display: flex; gap: 18px; margin-bottom: 18px; }
+        .inv-box { flex: 1; background: #f8f9fc; border-radius: 8px; padding: 14px 16px; font-size: 12px; line-height: 1.9; }
+        .inv-box-title { font-weight: 700; font-size: 12px; color: #1a1a2e; padding-bottom: 4px; border-bottom: 1px solid #e0e0e8; margin-bottom: 4px; }
+        .inv-tbl { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 12px; }
+        .inv-tbl th { background: #1a1a2e; color: #fff; padding: 10px 8px; font-weight: 600; font-size: 11px; letter-spacing: 0.3px; white-space: nowrap; }
+        .inv-tbl td { padding: 8px; border-bottom: 1px solid #eee; font-size: 12px; }
+        .inv-tbl .c { text-align: center; }
+        .inv-tbl .r { text-align: right; }
+        .inv-count { display: flex; justify-content: flex-end; gap: 16px; font-size: 12px; color: #555; padding: 2px 0 10px; }
+        .inv-sum { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+        .inv-sum table { width: 320px; font-size: 12px; line-height: 2; }
+        .inv-sum td { padding: 2px 0; }
+        .inv-sum .l { text-align: left; color: #444; }
+        .inv-sum .r { text-align: right; font-weight: 600; }
+        .inv-gt { background: #1a1a2e; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-radius: 6px; font-weight: 900; font-size: 16px; margin-bottom: 8px; }
+        .inv-words { text-align: center; font-size: 12px; padding: 6px 0 12px; color: #444; }
+        .inv-words strong { display: block; font-weight: 700; text-transform: uppercase; color: #1a1a2e; margin-top: 2px; }
+        .inv-two { display: flex; gap: 18px; margin: 14px 0; }
+        .inv-two-box { flex: 1; border: 1px solid #e0e0e8; border-radius: 8px; padding: 14px 16px; font-size: 12px; line-height: 2.1; }
+        .inv-two-box-title { font-weight: 700; font-size: 12px; color: #1a1a2e; padding-bottom: 4px; border-bottom: 1px solid #e0e0e8; margin-bottom: 4px; }
+        .inv-two-box .fr { display: flex; justify-content: space-between; }
+        .inv-two-box .fr span:last-child { font-weight: 600; }
+        .inv-bq { display: flex; gap: 18px; align-items: flex-start; margin: 14px 0; }
+        .inv-bq-box { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px; border: 1px solid #e0e0e8; border-radius: 8px; }
+        .inv-bq-box .lbl { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 8px; }
+        .inv-bc { font-family: 'Courier New', monospace; font-size: 26px; font-weight: 700; letter-spacing: 3px; line-height: 1; color: #000; margin-bottom: 2px; }
+        .inv-bc-txt { font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #555; }
+        .inv-terms { font-size: 11px; color: #666; line-height: 1.7; padding: 12px 0; border-top: 1px solid #e0e0e8; margin-bottom: 10px; }
+        .inv-foot { text-align: center; border-top: 2px solid #1a1a2e; padding-top: 14px; }
+        .inv-foot .t1 { font-weight: 900; font-size: 14px; letter-spacing: 1px; color: #1a1a2e; }
+        .inv-foot .t2 { font-weight: 700; font-size: 12px; color: #555; margin-top: 2px; }
+        .inv-foot .t3 { font-size: 11px; color: #999; margin-top: 2px; }
       `}</style>
-      <div className="inv-card" style={styles.card}>
-        {/* ═══════════ HEADER ═══════════ */}
-        <div style={styles.header}>
+
+      <div className="inv-wrap">
+        {/* HEADER */}
+        <div className="inv-hdr">
           {company.logo_url ? (
-            <img src={`${BACKEND_URL}${company.logo_url}`} alt="Logo" style={styles.headerLogo} />
+            <img className="inv-hdr-logo" src={`${BACKEND_URL}${company.logo_url}`} alt="Logo" />
           ) : (
-            <div style={styles.headerLogoPlaceholder}>Logo</div>
+            <div className="inv-hdr-logo-pl">Logo</div>
           )}
-          <div style={styles.headerInfo}>
-            <div style={styles.companyName}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-            <div style={styles.companyDetails}>
+          <div className="inv-hdr-info">
+            <div className="inv-hdr-name">{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
+            <div className="inv-hdr-detail">
               <div>{company.address || 'Therikiyur, Ayyampalayam, Trichy - 621005'}</div>
-              <div>Phone: {company.mobile || '9876543210'} {company.gst_number ? `| GSTIN: ${company.gst_number}` : ''} {company.email ? `| Email: ${company.email}` : ''}</div>
+              <div>Phone: {company.mobile || '9876543210'}{company.gst_number ? ` | GSTIN: ${company.gst_number}` : ''}{company.email ? ` | Email: ${company.email}` : ''}</div>
             </div>
           </div>
         </div>
 
-        {/* ═══════════ INVOICE TITLE ═══════════ */}
-        <div style={styles.titleBadge}>
-          <div style={styles.titleText}>TAX INVOICE</div>
-        </div>
+        {/* TITLE */}
+        <div className="inv-title"><span>TAX INVOICE</span></div>
 
-        {/* ═══════════ INVOICE & CUSTOMER DETAILS ═══════════ */}
-        <div style={styles.infoRow}>
-          <div style={styles.infoBox}>
-            <div style={styles.infoBoxTitle}>INVOICE</div>
+        {/* INVOICE & CUSTOMER */}
+        <div className="inv-row">
+          <div className="inv-box">
+            <div className="inv-box-title">INVOICE</div>
             <div><strong>Invoice No:</strong> {sale.bill_number}</div>
-            <div><strong>Date:</strong> {formatDate(sale.bill_date)}</div>
-            <div><strong>Time:</strong> {formatTime(sale.bill_time)}</div>
+            <div><strong>Date:</strong> {fd(sale.bill_date)}</div>
+            <div><strong>Time:</strong> {ft(sale.bill_time)}</div>
             <div><strong>Cashier ID:</strong> {sale.user_id?.slice(0, 8) || '-'}</div>
             <div><strong>Cashier:</strong> {sale.user_name || '-'}</div>
           </div>
-          <div style={styles.infoBox}>
-            <div style={styles.infoBoxTitle}>CUSTOMER</div>
+          <div className="inv-box">
+            <div className="inv-box-title">CUSTOMER</div>
             <div><strong>Customer ID:</strong> {sale.customer_id?.slice(0, 8) || 'WALK-IN'}</div>
             <div><strong>Name:</strong> {sale.customer_name || 'Walk-In Customer'}</div>
             <div><strong>Mobile:</strong> {sale.customer_mobile || '-'}</div>
           </div>
         </div>
 
-        {/* ═══════════ ITEMS TABLE ═══════════ */}
-        <table style={styles.table}>
+        {/* ITEMS TABLE */}
+        <table className="inv-tbl">
           <thead>
-            <tr style={styles.tableHead}>
-              <th style={{ ...styles.tableTh, width: '30px', textAlign: 'center' }}>#</th>
-              <th style={styles.tableTh}>Item Name</th>
-              <th style={{ ...styles.tableTh, width: '55px', textAlign: 'center' }}>Unit</th>
-              <th style={{ ...styles.tableTh, width: '50px', textAlign: 'center' }}>Qty</th>
-              <th style={{ ...styles.tableTh, width: '85px', textAlign: 'right' }}>Rate</th>
-              <th style={{ ...styles.tableTh, width: '60px', textAlign: 'center' }}>Disc%</th>
-              <th style={{ ...styles.tableTh, width: '100px', textAlign: 'right' }}>Amount</th>
+            <tr>
+              <th style={{ width: '30px' }} className="c">#</th>
+              <th>Item Name</th>
+              <th style={{ width: '55px' }} className="c">Unit</th>
+              <th style={{ width: '48px' }} className="c">Qty</th>
+              <th style={{ width: '80px' }} className="r">Rate</th>
+              <th style={{ width: '55px' }} className="c">Disc%</th>
+              <th style={{ width: '95px' }} className="r">Amount</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, idx) => (
               <tr key={item.id || idx}>
-                <td style={{ ...styles.tableTd, textAlign: 'center', color: '#888' }}>{idx + 1}</td>
-                <td style={styles.tableTd}>{item.product_name}</td>
-                <td style={{ ...styles.tableTd, textAlign: 'center' }}>{item.unit || '-'}</td>
-                <td style={{ ...styles.tableTd, textAlign: 'center' }}>{Number(item.quantity)}</td>
-                <td style={{ ...styles.tableTd, textAlign: 'right' }}>{Number(item.rate).toFixed(2)}</td>
-                <td style={{ ...styles.tableTd, textAlign: 'center' }}>
-                  {Number(item.discount_percentage) > 0 ? Number(item.discount_percentage).toFixed(1) : '-'}
-                </td>
-                <td style={{ ...styles.tableTd, textAlign: 'right', fontWeight: 600 }}>{Number(item.amount).toFixed(2)}</td>
+                <td className="c" style={{ color: '#888' }}>{idx + 1}</td>
+                <td>{item.product_name}</td>
+                <td className="c">{item.unit || '-'}</td>
+                <td className="c">{Number(item.quantity)}</td>
+                <td className="r">{Number(item.rate).toFixed(2)}</td>
+                <td className="c">{Number(item.discount_percentage) > 0 ? Number(item.discount_percentage).toFixed(1) : '-'}</td>
+                <td className="r" style={{ fontWeight: 600 }}>{Number(item.amount).toFixed(2)}</td>
               </tr>
             ))}
             {items.length === 0 && (
-              <tr>
-                <td colSpan={7} style={{ padding: '24px', textAlign: 'center', color: '#999' }}>No items</td>
-              </tr>
+              <tr><td colSpan={7} style={{ padding: '24px', textAlign: 'center', color: '#999' }}>No items</td></tr>
             )}
           </tbody>
         </table>
 
-        <div style={styles.countRow}>
+        <div className="inv-count">
           <span><strong>Items Count:</strong> {items.length}</span>
           <span><strong>Total Quantity:</strong> {totalQty}</span>
         </div>
 
-        {/* ═══════════ SUMMARY ═══════════ */}
-        <div style={styles.summarySection}>
-          <table style={styles.summaryTable}>
+        {/* SUMMARY */}
+        <div className="inv-sum">
+          <table>
             <tbody>
-              <tr>
-                <td style={{ ...styles.summaryTd, ...styles.summaryLabel }}>Sub Total</td>
-                <td style={{ ...styles.summaryTd, ...styles.summaryValue }}>{formatCurrency(subtotal)}</td>
-              </tr>
-              {discountAmount > 0 && (
-                <tr>
-                  <td style={{ ...styles.summaryTd, ...styles.summaryLabel }}>Discount</td>
-                  <td style={{ ...styles.summaryTd, ...styles.summaryValue, color: '#e53935' }}>-{formatCurrency(discountAmount)}</td>
-                </tr>
-              )}
-              {cgst > 0 && (
-                <tr>
-                  <td style={{ ...styles.summaryTd, ...styles.summaryLabel }}>CGST ({((gstTotal / 2 / subtotal) * 100).toFixed(2)}%)</td>
-                  <td style={{ ...styles.summaryTd, ...styles.summaryValue }}>{formatCurrency(cgst)}</td>
-                </tr>
-              )}
-              {sgst > 0 && (
-                <tr>
-                  <td style={{ ...styles.summaryTd, ...styles.summaryLabel }}>SGST ({((gstTotal / 2 / subtotal) * 100).toFixed(2)}%)</td>
-                  <td style={{ ...styles.summaryTd, ...styles.summaryValue }}>{formatCurrency(sgst)}</td>
-                </tr>
-              )}
-              {roundOff !== 0 && (
-                <tr>
-                  <td style={{ ...styles.summaryTd, ...styles.summaryLabel }}>Round Off</td>
-                  <td style={{ ...styles.summaryTd, ...styles.summaryValue }}>{roundOff.toFixed(2)}</td>
-                </tr>
-              )}
+              <tr><td className="l">Sub Total</td><td className="r">{formatCurrency(subtotal)}</td></tr>
+              {discountAmount > 0 && <tr><td className="l">Discount</td><td className="r" style={{ color: '#e53935' }}>-{formatCurrency(discountAmount)}</td></tr>}
+              {cgst > 0 && <tr><td className="l">CGST ({((gstTotal / 2 / subtotal) * 100).toFixed(2)}%)</td><td className="r">{formatCurrency(cgst)}</td></tr>}
+              {sgst > 0 && <tr><td className="l">SGST ({((gstTotal / 2 / subtotal) * 100).toFixed(2)}%)</td><td className="r">{formatCurrency(sgst)}</td></tr>}
+              {roundOff !== 0 && <tr><td className="l">Round Off</td><td className="r">{roundOff.toFixed(2)}</td></tr>}
             </tbody>
           </table>
         </div>
 
-        <div style={styles.grandTotalBar}>
+        <div className="inv-gt">
           <span>Grand Total</span>
           <span>{formatCurrency(Math.round(grandTotal))}</span>
         </div>
 
-        <div style={styles.amountWords}>
-          <span>Amount In Words:</span>
-          <div style={styles.amountWordsHighlight}>{numberToWords(Math.round(grandTotal))} ONLY</div>
+        <div className="inv-words">
+          Amount In Words:
+          <strong>{numberToWords(Math.round(grandTotal))} ONLY</strong>
         </div>
 
-        {/* ═══════════ PAYMENT & BANK ═══════════ */}
-        <div style={styles.twoCol}>
-          <div style={styles.twoColBox}>
-            <div style={styles.twoColBoxTitle}>PAYMENT INFORMATION</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Payment Method</span><span style={{ fontWeight: 600 }}>{(sale.payment_mode || 'CASH').toUpperCase()}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Received Amount</span><span style={{ fontWeight: 600 }}>{formatCurrency(Math.round(grandTotal))}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Balance Amount</span><span style={{ fontWeight: 600 }}>{formatCurrency(0)}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Reference Number</span><span style={{ fontWeight: 600 }}>{sale.bill_number || '-'}</span></div>
+        {/* PAYMENT & BANK */}
+        <div className="inv-two">
+          <div className="inv-two-box">
+            <div className="inv-two-box-title">PAYMENT INFORMATION</div>
+            <div className="fr"><span>Payment Method</span><span>{(sale.payment_mode || 'CASH').toUpperCase()}</span></div>
+            <div className="fr"><span>Received Amount</span><span>{formatCurrency(Math.round(grandTotal))}</span></div>
+            <div className="fr"><span>Balance Amount</span><span>{formatCurrency(0)}</span></div>
+            <div className="fr"><span>Reference Number</span><span>{sale.bill_number || '-'}</span></div>
           </div>
-          <div style={styles.twoColBox}>
-            <div style={styles.twoColBoxTitle}>BANK DETAILS</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Bank Name</span><span>{settings['bank_name'] || '-'}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Account Name</span><span>{settings['account_name'] || '-'}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Account Number</span><span>{settings['account_number'] || '-'}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>IFSC Code</span><span>{settings['ifsc_code'] || '-'}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>UPI ID</span><span>{upiId || '-'}</span></div>
+          <div className="inv-two-box">
+            <div className="inv-two-box-title">BANK DETAILS</div>
+            <div className="fr"><span>Bank Name</span><span>{settings['bank_name'] || '-'}</span></div>
+            <div className="fr"><span>Account Name</span><span>{settings['account_name'] || '-'}</span></div>
+            <div className="fr"><span>Account Number</span><span>{settings['account_number'] || '-'}</span></div>
+            <div className="fr"><span>IFSC Code</span><span>{settings['ifsc_code'] || '-'}</span></div>
+            <div className="fr"><span>UPI ID</span><span>{upiId || '-'}</span></div>
           </div>
         </div>
 
-        {/* ═══════════ BARCODE & QR ═══════════ */}
-        <div style={styles.bottomRow}>
-          <div style={styles.bottomBox}>
-            <div style={styles.barcodeLabel}>Invoice Barcode</div>
-            <div style={styles.barcode}>{barcodeChars}</div>
-            <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', color: '#555' }}>{barcodeChars}</div>
+        {/* BARCODE & QR */}
+        <div className="inv-bq">
+          <div className="inv-bq-box">
+            <div className="lbl">Invoice Barcode</div>
+            <div className="inv-bc">{bc}</div>
+            <div className="inv-bc-txt">{bc}</div>
           </div>
-          <div style={styles.bottomBox}>
-            <div style={styles.qrLabel}>Scan & Pay (UPI)</div>
+          <div className="inv-bq-box">
+            <div className="lbl">Scan & Pay (UPI)</div>
             {qrDataUrl ? (
-              <img src={qrDataUrl} alt="UPI QR" style={{ width: '110px', height: '110px' }} />
+              <img src={qrDataUrl} alt="QR" style={{ width: '110px', height: '110px' }} />
             ) : (
               <div style={{ width: '110px', height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', color: '#999', border: '1px dashed #ccc', borderRadius: '6px' }}>
                 UPI QR
@@ -475,19 +249,19 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           </div>
         </div>
 
-        {/* ═══════════ TERMS ═══════════ */}
-        <div style={styles.terms}>
+        {/* TERMS */}
+        <div className="inv-terms">
           <strong>Terms &amp; Conditions:</strong><br />
           1. Goods once sold cannot be returned.<br />
           2. Please retain this receipt for future reference.<br />
           3. Thank you for choosing {company.company_name || 'Student Xerox'}.
         </div>
 
-        {/* ═══════════ FOOTER ═══════════ */}
-        <div style={styles.footer}>
-          <div style={styles.footerThank}>THANK YOU VISIT AGAIN!</div>
-          <div style={styles.footerName}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-          <div style={styles.footerTag}>Fast Service &bull; Quality Printing</div>
+        {/* FOOTER */}
+        <div className="inv-foot">
+          <div className="t1">THANK YOU VISIT AGAIN!</div>
+          <div className="t2">{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
+          <div className="t3">Fast Service &bull; Quality Printing</div>
         </div>
       </div>
     </div>
