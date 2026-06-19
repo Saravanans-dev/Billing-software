@@ -49,8 +49,6 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     return t.toString().slice(0, 5);
   };
 
-  const barcodeText = sale.bill_number?.replace(/[^A-Za-z0-9]/g, '') || '';
-
   return (
     <div>
       <style>{`
@@ -77,17 +75,6 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         .receipt-table tr:last-child td { border-bottom: none; }
         .receipt-table .amt { text-align: right; padding-right: 0.3mm; }
         .receipt-table .ctr { text-align: center; }
-        .barcode-wrap {
-          font-family: 'Courier New', monospace;
-          font-size: 22px;
-          font-weight: 700;
-          letter-spacing: 2.5px;
-          color: #000;
-          line-height: 1;
-          transform: scaleY(2.5);
-          display: inline-block;
-          margin-bottom: 1mm;
-        }
       `}</style>
       <div
         className="mx-auto bg-white text-black"
@@ -101,36 +88,45 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         }}
       >
         {/* ═══════════ HEADER ═══════════ */}
-        <div style={{ textAlign: 'center', marginBottom: '2mm' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5mm' }}>
           {company.logo_url && (
-            <img
-              src={`${BACKEND_URL}${company.logo_url}`}
-              alt="Logo"
-              style={{ maxWidth: '40mm', maxHeight: '12mm', margin: '0 auto 1.5mm', objectFit: 'contain' }}
-            />
+            <div style={{ flexShrink: 0, marginRight: '2mm' }}>
+              <img
+                src={`${BACKEND_URL}${company.logo_url}`}
+                alt="Logo"
+                style={{ width: '12mm', height: '12mm', objectFit: 'contain' }}
+              />
+            </div>
           )}
-          <div style={{ fontSize: '15px', fontWeight: 900, letterSpacing: '0.5px', marginBottom: '0.5mm' }}>
-            {company.company_name?.toUpperCase() || 'STUDENT XEROX'}
-          </div>
-          <div style={{ fontSize: '7px', lineHeight: '1.4', color: '#444' }}>
-            <div>{company.address || 'Therikiyur, Ayyampalayam, Trichy - 621005'}</div>
-            <div>Phone: {company.mobile || '9876543210'}</div>
-            {company.email && <div>Email: {company.email}</div>}
-            {company.gst_number && <div style={{ fontWeight: 600 }}>GSTIN: {company.gst_number}</div>}
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontSize: '14px', fontWeight: 900, letterSpacing: '0.5px', marginBottom: '0.3mm' }}>
+              {company.company_name?.toUpperCase() || 'STUDENT XEROX'}
+            </div>
+            <div style={{ fontSize: '6.5px', lineHeight: '1.3', color: '#444' }}>
+              <div>{company.address || 'Therikiyur, Ayyampalayam, Trichy - 621005'}</div>
+              <div>Phone: {company.mobile || '9876543210'} {company.gst_number ? `| GSTIN: ${company.gst_number}` : ''}</div>
+              {company.email && <div>Email: {company.email}</div>}
+            </div>
           </div>
         </div>
 
-        <hr style={{ border: 'none', borderTop: '1px dashed #aaa', margin: '1mm 0' }} />
+        <hr style={{ border: 'none', borderTop: '2px solid #000', margin: '1mm 0' }} />
+
+        {/* ═══════════ BIG BILL NUMBER ═══════════ */}
+        <div style={{ textAlign: 'center', margin: '1.5mm 0', padding: '1mm 0', borderTop: '1px solid #000', borderBottom: '1px solid #000' }}>
+          <div style={{ fontSize: '6px', fontWeight: 700, letterSpacing: '1px', color: '#555', marginBottom: '0.3mm' }}>INVOICE NUMBER</div>
+          <div style={{ fontSize: '14px', fontWeight: 900, letterSpacing: '2px' }}>{sale.bill_number}</div>
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '2px solid #000', margin: '1mm 0' }} />
 
         {/* ═══════════ INVOICE & CUSTOMER DETAILS ═══════════ */}
-        <div style={{ fontSize: '7.5px', lineHeight: '1.5', marginBottom: '1.5mm' }}>
+        <div style={{ fontSize: '7px', lineHeight: '1.5', marginBottom: '1.5mm' }}>
           <table style={{ width: '100%' }}>
             <tbody>
               <tr>
                 <td style={{ width: '50%', verticalAlign: 'top' }}>
-                  <div><strong>Invoice:</strong> {sale.bill_number}</div>
-                  <div><strong>Date:</strong> {formatDate(sale.bill_date)}</div>
-                  <div><strong>Time:</strong> {formatTime(sale.bill_time)}</div>
+                  <div><strong>Date:</strong> {formatDate(sale.bill_date)} &nbsp; <strong>Time:</strong> {formatTime(sale.bill_time)}</div>
                   <div><strong>Cashier:</strong> {sale.user_name || '-'}</div>
                 </td>
                 <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'right' }}>
@@ -327,14 +323,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
                 UPI QR
               </div>
             )}
-            {barcodeText && (
-              <div style={{ textAlign: 'center', marginTop: '1.5mm' }}>
-                <div className="barcode-wrap">{barcodeText}</div>
-                <div style={{ fontSize: '6.5px', fontWeight: 600, letterSpacing: '1px' }}>
-                  {barcodeText}
-                </div>
-              </div>
-            )}
+
           </div>
         </div>
 
