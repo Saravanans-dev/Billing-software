@@ -1,8 +1,18 @@
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pool from '../config/database';
 import { AuthRequest } from '../middleware/auth';
+
+function getJwtSecret(): string {
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+  const generated = crypto.randomBytes(32).toString('hex');
+  console.warn('JWT_SECRET not set — using auto-generated random secret. Tokens will be invalidated on server restart. Set JWT_SECRET env var for persistence.');
+  return generated;
+}
+
+const JWT_SECRET = getJwtSecret();
 
 export async function login(req: Request, res: Response) {
   try {
@@ -32,13 +42,9 @@ export async function login(req: Request, res: Response) {
 
     await pool.query('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      return res.status(500).json({ error: 'JWT secret not configured' });
-    }
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role, full_name: user.full_name },
-      secret,
+      JWT_SECRET,
       { algorithm: 'HS256', expiresIn: '24h' }
     );
 

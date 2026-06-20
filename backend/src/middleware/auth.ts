@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -10,6 +11,15 @@ export interface AuthRequest extends Request {
   };
 }
 
+function getJwtSecret(): string {
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+  const generated = crypto.randomBytes(32).toString('hex');
+  console.warn('JWT_SECRET not set — using auto-generated random secret. Tokens will be invalidated on server restart. Set JWT_SECRET env var for persistence.');
+  return generated;
+}
+
+const JWT_SECRET = getJwtSecret();
+
 export function authenticate(req: AuthRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,11 +28,7 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
 
   const token = authHeader.split(' ')[1];
   try {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      return res.status(500).json({ error: 'JWT secret not configured' });
-    }
-    const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] }) as any;
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as any;
     req.user = decoded;
     next();
   } catch (error) {
