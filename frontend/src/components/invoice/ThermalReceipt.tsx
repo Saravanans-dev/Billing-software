@@ -20,7 +20,6 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const gstAmount = Number(sale.gst_amount) || 0;
   const discountAmount = Number(sale.discount_amount) || 0;
   const roundOff = Number(sale.round_off) || 0;
-  const perItemDiscount = items.reduce((sum, i) => sum + Number(i.discount_amount || 0), 0);
   const upiId = settings['upi_id'] || '';
   const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
   const billNum = sale.bill_number || '';
@@ -151,10 +150,10 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             <span>Sub Total</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
-          {perItemDiscount + discountAmount > 0 ? (
+          {discountAmount > 0 ? (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Discount</span>
-              <span>-{formatCurrency(perItemDiscount + discountAmount)}</span>
+              <span>-{formatCurrency(discountAmount)}</span>
             </div>
           ) : null}
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>

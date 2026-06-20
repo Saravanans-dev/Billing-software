@@ -20,9 +20,6 @@ interface LineItem {
   unit: string;
   quantity: number;
   rate: number;
-  discount_type: 'percentage' | 'fixed';
-  discount_percentage: number;
-  discount_amount: number;
   gst_percentage: number;
   gst_amount: number;
   amount: number;
@@ -83,9 +80,6 @@ export function Billing() {
         unit: product.unit || 'Kg',
         quantity: 1,
         rate,
-        discount_type: 'percentage',
-        discount_percentage: 0,
-        discount_amount: 0,
         gst_percentage: parseFloat(product.gst_percentage) || 0,
         gst_amount: 0,
         amount: rate,
@@ -102,13 +96,7 @@ export function Billing() {
       if (field === 'quantity' || field === 'rate') {
         updated.amount = updated.quantity * updated.rate;
       }
-      if (updated.discount_type === 'percentage') {
-        updated.discount_amount = (updated.amount * updated.discount_percentage) / 100;
-      } else {
-        updated.discount_percentage = updated.amount > 0 ? (updated.discount_amount / updated.amount) * 100 : 0;
-      }
-      const netAmount = updated.amount - updated.discount_amount;
-      updated.gst_amount = (netAmount * updated.gst_percentage) / 100;
+      updated.gst_amount = (updated.amount * updated.gst_percentage) / 100;
       return updated;
     }));
   };
@@ -119,13 +107,12 @@ export function Billing() {
 
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, i) => sum + i.amount, 0);
-    const totalDiscount = items.reduce((sum, i) => sum + i.discount_amount, 0);
-    const taxableAmount = subtotal - totalDiscount;
-    const discountAmount = discountType === 'percentage' ? (taxableAmount * discountValue) / 100 : discountValue;
+    const discountAmount = discountType === 'percentage' ? (subtotal * discountValue) / 100 : discountValue;
+    const taxableAmount = subtotal - discountAmount;
     const gstAmount = items.reduce((sum, i) => sum + i.gst_amount, 0);
-    const grandTotal = taxableAmount + gstAmount - discountAmount;
+    const grandTotal = taxableAmount + gstAmount;
     const roundOff = Math.round(grandTotal) - grandTotal;
-    return { subtotal, totalDiscount, discountAmount, taxableAmount, gstAmount, grandTotal, roundOff };
+    return { subtotal, discountAmount, taxableAmount, gstAmount, grandTotal, roundOff };
   };
 
   const handleSave = async (format?: 'a4' | 'thermal') => {
@@ -142,7 +129,7 @@ export function Billing() {
         customer_mobile: customerMobile,
         customer_address: customerAddress,
         customer_gst: customerGst,
-        items: items.map(({ id, discount_type, ...rest }) => rest),
+        items: items,
         subtotal: totals.subtotal,
         discount_amount: totals.discountAmount,
         taxable_amount: totals.taxableAmount,
@@ -319,7 +306,6 @@ export function Billing() {
                       <th className="px-3 py-2.5 text-left font-medium text-gray-600 w-16">Unit</th>
                       <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-20">Qty</th>
                       <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-24">Rate</th>
-                      <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-24">Disc</th>
                       <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-16">GST %</th>
                       <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-24">Amount</th>
                       <th className="px-3 py-2.5 w-10"></th>
@@ -351,28 +337,6 @@ export function Billing() {
                             step="0.01"
                           />
                         </td>
-                        <td className="px-3 py-2">
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => updateItem(item.id, 'discount_type', 'percentage')}
-                              className={`px-1.5 py-0.5 text-[10px] rounded ${item.discount_type === 'percentage' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500'}`}
-                            >%</button>
-                            <button
-                              type="button"
-                              onClick={() => updateItem(item.id, 'discount_type', 'fixed')}
-                              className={`px-1.5 py-0.5 text-[10px] rounded ${item.discount_type === 'fixed' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500'}`}
-                            >₹</button>
-                            <input
-                              type="number"
-                              value={item.discount_type === 'percentage' ? item.discount_percentage : item.discount_amount}
-                              onChange={(e) => updateItem(item.id, item.discount_type === 'percentage' ? 'discount_percentage' : 'discount_amount', parseFloat(e.target.value) || 0)}
-                              className="w-full px-2 py-1 text-right text-xs border border-gray-200 rounded focus:outline-none focus:border-primary"
-                              min="0"
-                              step="0.01"
-                            />
-                          </div>
-                        </td>
                         <td className="px-3 py-2 text-right">{item.gst_percentage}%</td>
                         <td className="px-3 py-2 text-right font-medium">{formatCurrency(item.amount)}</td>
                         <td className="px-3 py-2">
@@ -384,7 +348,7 @@ export function Billing() {
                     ))}
                     {items.length === 0 && (
                       <tr>
-                        <td colSpan={9} className="px-3 py-12 text-center text-gray-400">
+                        <td colSpan={8} className="px-3 py-12 text-center text-gray-400">
                           <div className="flex flex-col items-center gap-2">
                             <Plus className="w-6 h-6" />
                             <span className="text-sm">Search and add products above</span>
@@ -483,10 +447,12 @@ export function Billing() {
                 />
               </div>
 
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Discount</span>
-                <span className="font-medium text-red-500">-{formatCurrency(totals.totalDiscount + totals.discountAmount)}</span>
-              </div>
+              {totals.discountAmount > 0 ? (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Discount</span>
+                  <span className="font-medium text-red-500">-{formatCurrency(totals.discountAmount)}</span>
+                </div>
+              ) : null}
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Taxable</span>
                 <span className="font-medium">{formatCurrency(totals.taxableAmount)}</span>
