@@ -21,7 +21,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
 
   const upiLink = upiId
-    ? `upi://pay?pa=${upiId}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&tn=${sale.bill_number || ''}`
+    ? `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(sale.bill_number || '')}`
     : '';
 
   useEffect(() => {
