@@ -99,26 +99,22 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         <hr style={s.ds} />
 
         {/* ═══════ INVOICE & CUSTOMER ═══════ */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '7.5pt', lineHeight: '1.55' }}>
-          <tbody>
-            <tr>
-              <td style={{ width: '50%', verticalAlign: 'top' }}>
-                <span style={s.b}>Invoice Details</span><br />
-                Invoice No : {billNum}<br />
-                Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {formatDate(sale.bill_date)}<br />
-                Time &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {formatTime(sale.bill_time)}<br />
-                Cashier ID : {cashierId}<br />
-                Cashier&nbsp;&nbsp;&nbsp;: {cashierName}
-              </td>
-              <td style={{ width: '50%', verticalAlign: 'top' }}>
-                <span style={s.b}>Customer Details</span><br />
-                Customer ID : {customerId}<br />
-                Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {sale.customer_name || 'Walk-In Customer'}<br />
-                Mobile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {sale.customer_mobile || '-'}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{ display: 'flex', fontSize: '7.5pt', lineHeight: '1.55' }}>
+          <div style={{ width: '50%' }}>
+            <span style={s.b}>Invoice Details</span><br />
+            Invoice No : {billNum}<br />
+            Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {formatDate(sale.bill_date)}<br />
+            Time &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {formatTime(sale.bill_time)}<br />
+            Cashier ID : {cashierId}<br />
+            Cashier&nbsp;&nbsp;&nbsp;: {cashierName}
+          </div>
+          <div style={{ width: '50%' }}>
+            <span style={s.b}>Customer Details</span><br />
+            Customer ID : {customerId}<br />
+            Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {sale.customer_name || 'Walk-In Customer'}<br />
+            Mobile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {sale.customer_mobile || '-'}
+          </div>
+        </div>
 
         <hr style={s.ds} />
 
@@ -216,27 +212,23 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         <hr style={s.ds} />
 
         {/* ═══════ PAYMENT & BANK ═══════ */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '7.5pt', lineHeight: '1.5' }}>
-          <tbody>
-            <tr>
-              <td style={{ verticalAlign: 'top', width: '50%', paddingRight: '0.5mm' }}>
-                <span style={s.b}>Payment Info</span><br />
-                Method&nbsp;&nbsp;: {(sale.payment_mode || 'Cash').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}<br />
-                Received : {formatCurrency(Math.round(grandTotal))}<br />
-                Balance&nbsp;&nbsp;: {formatCurrency(0)}<br />
-                Ref No&nbsp;&nbsp;&nbsp;: {billNum}
-              </td>
-              <td style={{ verticalAlign: 'top', width: '50%', paddingLeft: '0.5mm' }}>
-                <span style={s.b}>Bank Details</span><br />
-                {settings['bank_name'] ? <>Bank&nbsp;&nbsp;: {settings['bank_name']}<br /></> : null}
-                {settings['account_name'] ? <>Name : {settings['account_name']}<br /></> : null}
-                {settings['account_number'] ? <>A/c&nbsp;&nbsp;: {settings['account_number']}<br /></> : null}
-                {settings['ifsc_code'] ? <>IFSC : {settings['ifsc_code']}<br /></> : null}
-                {upiId ? <>UPI&nbsp;&nbsp;: {upiId}</> : null}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{ display: 'flex', fontSize: '7.5pt', lineHeight: '1.5' }}>
+          <div style={{ width: '50%', paddingRight: '0.5mm' }}>
+            <span style={s.b}>Payment Info</span><br />
+            Method&nbsp;&nbsp;: {(sale.payment_mode || 'Cash').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}<br />
+            Received : {formatCurrency(Math.round(grandTotal))}<br />
+            Balance&nbsp;&nbsp;: {formatCurrency(0)}<br />
+            Ref No&nbsp;&nbsp;&nbsp;: {billNum}
+          </div>
+          <div style={{ width: '50%', paddingLeft: '0.5mm' }}>
+            <span style={s.b}>Bank Details</span><br />
+            {settings['bank_name'] ? <>Bank&nbsp;&nbsp;: {settings['bank_name']}<br /></> : null}
+            {settings['account_name'] ? <>Name : {settings['account_name']}<br /></> : null}
+            {settings['account_number'] ? <>A/c&nbsp;&nbsp;: {settings['account_number']}<br /></> : null}
+            {settings['ifsc_code'] ? <>IFSC : {settings['ifsc_code']}<br /></> : null}
+            {upiId ? <>UPI&nbsp;&nbsp;: {upiId}</> : null}
+          </div>
+        </div>
 
         <hr style={s.ds} />
 
