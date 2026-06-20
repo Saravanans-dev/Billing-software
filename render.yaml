@@ -17,7 +17,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGIN
-        value: https://free-frontend.onrender.com
+        value: https://free-frontend-u0kv.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: free-db
