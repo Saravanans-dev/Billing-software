@@ -4,6 +4,8 @@ import {
   Users, BarChart3, Settings, LogOut, Store,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { useEffect, useState } from 'react';
+import api, { BACKEND_URL } from '../../services/api';
 
 const menuItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -19,14 +21,25 @@ const menuItems = [
 
 export function Sidebar() {
   const logout = useAuthStore((s) => s.logout);
+  const [logoUrl, setLogoUrl] = useState('');
+
+  useEffect(() => {
+    api.get('/settings/company').then(({ data }) => {
+      if (data.logo_url) setLogoUrl(`${BACKEND_URL}${data.logo_url}`);
+    }).catch(() => {});
+  }, []);
 
   return (
     <aside className="w-60 h-screen bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-40">
       <div className="px-5 py-5 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-            <Store className="w-5 h-5 text-white" />
-          </div>
+          {logoUrl ? (
+            <img src={logoUrl} alt="" className="w-9 h-9 object-contain rounded" crossOrigin="anonymous" />
+          ) : (
+            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+              <Store className="w-5 h-5 text-white" />
+            </div>
+          )}
           <div>
             <h1 className="text-sm font-bold text-gray-900 leading-tight">Student Xerox</h1>
             <p className="text-[10px] text-gray-500">Billing Software</p>
