@@ -206,19 +206,13 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           </>
         ) : null}
 
-        {/* ═══════ BARCODE & QR CODE ═══════ */}
-        <div style={{ fontSize: '7.5pt', lineHeight: '1.6' }}>
-          <div style={s.cc}>
-            {billNum ? <div style={{ fontSize: '7pt', marginBottom: '0.5mm', color: '#555' }}>BARCODE</div> : null}
-            {billNum ? <div style={{ fontFamily: "'Courier New',monospace", fontSize: '9pt', letterSpacing: '3px', fontWeight: '700' }}>{billNum}</div> : null}
+        {/* ═══════ QR CODE ═══════ */}
+        {qrDataUrl ? (
+          <div style={{ ...s.cc, margin: '0.5mm 0' }}>
+            <div style={{ fontSize: '7pt', marginBottom: '0.3mm', color: '#555' }}>QR CODE</div>
+            <img src={qrDataUrl} alt="UPI QR" style={{ width: '14mm', height: '14mm' }} />
           </div>
-          {qrDataUrl ? (
-            <div style={{ ...s.cc, margin: '1mm 0' }}>
-              <div style={{ fontSize: '7pt', marginBottom: '0.5mm', color: '#555' }}>QR CODE</div>
-              <img src={qrDataUrl} alt="UPI QR" style={{ width: '22mm', height: '22mm' }} />
-            </div>
-          ) : null}
-        </div>
+        ) : null}
 
         <hr style={s.ds} />
 
@@ -226,6 +220,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         <div style={{ ...s.cc, margin: '1mm 0' }}>
           <div style={{ fontWeight: '900', fontSize: '10pt', letterSpacing: '0.5px' }}>THANK YOU VISIT AGAIN!</div>
           <div style={{ fontSize: '9pt', fontWeight: '700', marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
+          <div style={{ marginTop: '0.8mm', fontSize: '9pt', color: '#000', letterSpacing: '3px' }}>~ ~ ~ ~ ~ ~ ~ ~ ~ ~</div>
         </div>
 
       </div></div>
