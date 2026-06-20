@@ -35,7 +35,7 @@ export function Sidebar() {
       <div className="px-5 py-5 border-b border-gray-100">
         <div className="flex items-center gap-3">
           {logoUrl ? (
-            <img src={logoUrl} alt="" className="w-14 h-14 object-contain rounded" crossOrigin="anonymous" />
+            <img src={logoUrl} alt="" className="w-[60px] h-[60px] object-contain rounded" crossOrigin="anonymous" />
           ) : (
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
               <Store className="w-5 h-5 text-white" />
