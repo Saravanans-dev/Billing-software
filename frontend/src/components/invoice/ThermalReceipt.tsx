@@ -59,7 +59,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     rr: { textAlign: 'right' as const },
     ll: { textAlign: 'left' as const },
     b: { fontWeight: '700' as const },
-    sh: { fontSize: '14pt', fontWeight: '900' as const, letterSpacing: '0.5px' },
+    sh: { fontSize: '18pt', fontWeight: '900' as const, letterSpacing: '0.5px' },
     i8: { fontSize: '8pt', lineHeight: '1.5' },
     ds: { border: 'none', borderTop: '1px dashed #000', margin: '1.5mm 0' },
     d2: { border: 'none', borderTop: '1px dashed #000', margin: '1mm 0' },
@@ -218,8 +218,8 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
         {/* ═══════ THANK YOU ═══════ */}
         <div style={{ ...s.cc, margin: '1mm 0' }}>
-          <div style={{ fontWeight: '900', fontSize: '10pt', letterSpacing: '0.5px' }}>THANK YOU VISIT AGAIN!</div>
-          <div style={{ fontSize: '9pt', fontWeight: '700', marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
+          <div style={{ fontWeight: '900', fontSize: '12pt', letterSpacing: '0.5px' }}>THANK YOU VISIT AGAIN!</div>
+          <div style={{ fontSize: '11pt', fontWeight: '700', marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
         </div>
         <hr style={s.ds} />
 

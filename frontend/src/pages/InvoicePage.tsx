@@ -216,7 +216,7 @@ export function InvoicePage() {
       </div>
       <div ref={printRef} style={iStyle}>
         <div style={hStyle}>
-          <h1 style={{ margin: '0', fontSize: '22px', letterSpacing: '1px' }}>{company?.company_name?.toUpperCase() || 'STUDENT XEROX'}</h1>
+          <h1 style={{ margin: '0', fontSize: '26px', letterSpacing: '1px' }}>{company?.company_name?.toUpperCase() || 'STUDENT XEROX'}</h1>
           {company?.address ? <p style={{ margin: '4px 0 0', fontSize: '13px', opacity: 0.85 }}>{company.address}</p> : null}
           {company?.mobile ? <p style={{ margin: '2px 0 0', fontSize: '13px', opacity: 0.85 }}>Ph: {company.mobile}</p> : null}
           {company?.email ? <p style={{ margin: '2px 0 0', fontSize: '13px', opacity: 0.85 }}>{company.email}</p> : null}
