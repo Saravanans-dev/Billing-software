@@ -222,6 +222,7 @@ export function Billing() {
             {' | User: '}{user?.full_name}
           </p>
         </div>
+        </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="sm" onClick={resetBill}>
             <RotateCcw className="w-3.5 h-3.5" /> New Bill
