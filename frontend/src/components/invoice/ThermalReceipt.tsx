@@ -209,28 +209,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           {numberToWords(Math.round(grandTotal))}
         </div>
 
-        <hr style={s.ds} />
 
-        {/* ═══════ PAYMENT & BANK ═══════ */}
-        <div style={{ display: 'flex', fontSize: '7.5pt', lineHeight: '1.5' }}>
-          <div style={{ width: '50%', paddingRight: '0.5mm' }}>
-            <span style={s.b}>Payment Info</span><br />
-            Method&nbsp;&nbsp;: {(sale.payment_mode || 'Cash').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}<br />
-            Received : {formatCurrency(Math.round(grandTotal))}<br />
-            Balance&nbsp;&nbsp;: {formatCurrency(0)}<br />
-            Ref No&nbsp;&nbsp;&nbsp;: {billNum}
-          </div>
-          <div style={{ width: '50%', paddingLeft: '0.5mm' }}>
-            <span style={s.b}>Bank Details</span><br />
-            {settings['bank_name'] ? <>Bank&nbsp;&nbsp;: {settings['bank_name']}<br /></> : null}
-            {settings['account_name'] ? <>Name : {settings['account_name']}<br /></> : null}
-            {settings['account_number'] ? <>A/c&nbsp;&nbsp;: {settings['account_number']}<br /></> : null}
-            {settings['ifsc_code'] ? <>IFSC : {settings['ifsc_code']}<br /></> : null}
-            {upiId ? <>UPI&nbsp;&nbsp;: {upiId}</> : null}
-          </div>
-        </div>
-
-        <hr style={s.ds} />
 
         {/* ═══════ QR CODE ═══════ */}
         {qrDataUrl ? (
