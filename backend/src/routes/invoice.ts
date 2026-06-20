@@ -3,7 +3,7 @@ import pool from '../config/database';
 
 const router = Router();
 
-router.get('/:billNumber', async (req: Request, res: Response) => {
+router.get('/:billNumber(.*)', async (req: Request, res: Response) => {
   try {
     const { billNumber } = req.params;
 
