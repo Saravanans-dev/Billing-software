@@ -22,10 +22,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const billNum = sale.bill_number || '';
 
   const invoiceUrl = `${window.location.origin}/invoice/${encodeURIComponent(billNum)}`;
-
-  const qrData = upiId
-    ? `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNum)}`
-    : invoiceUrl;
+  const qrData = invoiceUrl;
 
   console.log('[QR DEBUG] qrData content:', qrData);
 

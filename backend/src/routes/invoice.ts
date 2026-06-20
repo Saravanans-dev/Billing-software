@@ -25,10 +25,13 @@ router.get('/:billNumber', async (req: Request, res: Response) => {
     );
 
     const company = await pool.query('SELECT * FROM company_settings LIMIT 1');
+    const settingsResult = await pool.query("SELECT setting_value FROM settings WHERE setting_key = 'upi_id'");
+    const upiId = settingsResult.rows[0]?.setting_value || '';
 
     res.json({
       sale: { ...sale.rows[0], items: items.rows },
       company: company.rows[0] || null,
+      upi_id: upiId,
     });
   } catch (error) {
     console.error('Public invoice error:', error);

@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import QRCode from 'qrcode';
 import { formatCurrency } from '../lib/utils';
 import { API_URL } from '../services/api';
 
@@ -48,6 +49,8 @@ export function InvoicePage() {
   const { billNumber } = useParams<{ billNumber: string }>();
   const [sale, setSale] = useState<Sale | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
+  const [upiId, setUpiId] = useState('');
+  const [qrDataUrl, setQrDataUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
@@ -60,10 +63,17 @@ export function InvoicePage() {
         return r.json();
       })
       .then((data) => {
-        if (data) { setSale(data.sale); setCompany(data.company); setLoading(false); }
+        if (data) { setSale(data.sale); setCompany(data.company); setUpiId(data.upi_id || ''); setLoading(false); }
       })
       .catch(() => { setNotFound(true); setLoading(false); });
   }, [billNumber]);
+
+  useEffect(() => {
+    if (!upiId || !sale) return;
+    const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(company?.company_name || '')}&am=${Number(sale.grand_total).toFixed(2)}&cu=INR&tn=${encodeURIComponent(sale.bill_number)}`;
+    QRCode.toDataURL(upiLink, { width: 180, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
+      .then(setQrDataUrl).catch(() => {});
+  }, [upiId, sale, company]);
 
   const handlePrint = () => { window.print(); };
 
@@ -263,11 +273,19 @@ export function InvoicePage() {
           <div style={totalStyle}><span>SGST (50%)</span><span>{formatCurrency(sgst)}</span></div>
           {sale.round_off !== 0 ? <div style={totalStyle}><span>Round Off</span><span>{sale.round_off.toFixed(2)}</span></div> : null}
           <div style={grandTotalStyle}><span>Grand Total</span><span>{formatCurrency(Math.round(sale.grand_total))}</span></div>
-          <div style={{ ...totalStyle, marginTop: '8px' }}>
-            <span>Payment Mode</span>
-            <span style={{ fontWeight: 600, textTransform: 'uppercase' }}>{sale.payment_mode || 'CASH'}</span>
+            <div style={{ ...totalStyle, marginTop: '8px' }}>
+              <span>Payment Mode</span>
+              <span style={{ fontWeight: 600, textTransform: 'uppercase' }}>{sale.payment_mode || 'CASH'}</span>
+            </div>
           </div>
-        </div>
+
+          {upiId && qrDataUrl ? (
+            <div style={{ textAlign: 'center', padding: '16px 32px 24px', borderTop: '1px solid #e0e0e0' }}>
+              <p style={{ margin: '0 0 8px', fontSize: '13px', color: '#666', fontWeight: 500 }}>Scan to Pay</p>
+              <img src={qrDataUrl} alt="UPI QR" style={{ width: 140, height: 140 }} />
+              <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#999' }}>UPI Payment • {formatCurrency(sale.grand_total)}</p>
+            </div>
+          ) : null}
 
         <div style={footer}>
           <p style={{ margin: '0', fontWeight: 600, fontSize: '14px' }}>Thank you for choosing {company?.company_name || 'Student Xerox'}!</p>
