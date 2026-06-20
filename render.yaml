@@ -40,10 +40,7 @@ services:
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: free-backend
-          type: web
-          property: url
+        value: https://free-backend.onrender.com
     routes:
       - type: rewrite
         source: /*
