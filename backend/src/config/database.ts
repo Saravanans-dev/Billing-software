@@ -291,7 +291,7 @@ export async function runMigrations() {
       );
       console.log('Default admin user created.');
 
-      await client.query("INSERT INTO company_settings (company_name) VALUES ('Student Xerox') ON CONFLICT DO NOTHING");
+      await client.query("INSERT INTO company_settings (company_name, address, mobile) VALUES ('Student Xerox', 'Therikiyur, Ayyampalayam, Trichy - 621005', '9876543210') ON CONFLICT DO NOTHING");
       await client.query("INSERT INTO settings (setting_key, setting_value) VALUES ('financial_year', '2026-27') ON CONFLICT DO NOTHING");
     }
   } catch (error) {

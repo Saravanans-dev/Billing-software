@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
-import { runMigrations } from './config/database';
+import pool, { runMigrations } from './config/database';
 
 import authRoutes from './routes/auth';
 import customerRoutes from './routes/customers';
@@ -84,11 +84,17 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Student Xerox Billing API running on port ${PORT}`);
-  runMigrations().catch((err) => {
-    console.error('Migration failed, server still running:', err);
-  });
+  try {
+    await runMigrations();
+      await pool.query(
+        `UPDATE company_settings SET address=$1, mobile=$2 WHERE address IS NULL OR mobile IS NULL`,
+        ['Therikiyur, Ayyampalayam, Trichy - 621005', '9876543210']
+      );
+  } catch (err) {
+    console.error('Startup task failed, server still running:', err);
+  }
 });
 
 export default app;

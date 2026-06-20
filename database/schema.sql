@@ -249,7 +249,7 @@ INSERT INTO users (username, password_hash, full_name, role) VALUES
 ('admin', '$2b$10$8K1p/a0dL1LXMIgoEDFrwOfMQkfAjkMBcGmPmGqYQE4zVZnJmZbRq', 'Administrator', 'admin');
 
 -- Default company settings
-INSERT INTO company_settings (company_name) VALUES ('Student Xerox');
+INSERT INTO company_settings (company_name, address, mobile) VALUES ('Student Xerox', 'Therikiyur, Ayyampalayam, Trichy - 621005', '9876543210');
 
 -- Default settings
 INSERT INTO settings (setting_key, setting_value) VALUES
