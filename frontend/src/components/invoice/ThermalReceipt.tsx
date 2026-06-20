@@ -84,7 +84,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         {/* ═══════ CENTERED LOGO + HEADER ═══════ */}
         <div style={s.cc}>
           {logoUrl ? (
-            <img src={logoUrl} alt="" style={{ width: '12mm', height: '12mm', objectFit: 'contain', display: 'block', margin: '0 auto 0.5mm' }} crossOrigin="anonymous" />
+            <img src={logoUrl} alt="" style={{ width: '18mm', height: '18mm', objectFit: 'contain', display: 'block', margin: '0 auto 1mm' }} crossOrigin="anonymous" />
           ) : null}
           <div style={s.sh}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
           <div style={s.sub}>Billing Software</div>
