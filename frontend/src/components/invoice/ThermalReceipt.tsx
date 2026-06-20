@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { formatCurrency } from '../../lib/utils';
+import { BACKEND_URL } from '../../services/api';
 import type { Sale, SaleItem, CompanySettings } from '../../types';
 
 interface ThermalReceiptProps {
@@ -17,8 +18,8 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const subtotal = Number(sale.subtotal) || 0;
   const discountAmount = Number(sale.discount_amount) || 0;
   const gstAmount = Number(sale.gst_amount) || 0;
-  const roundOff = Number(sale.round_off) || 0;
   const upiId = settings['upi_id'] || '';
+  const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
 
   const upiLink = upiId
     ? `upi://pay?pa=${upiId}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&tn=${sale.bill_number || ''}`
@@ -27,7 +28,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   useEffect(() => {
     if (upiLink) {
       QRCode.toDataURL(upiLink, {
-        width: 180,
+        width: 160,
         margin: 1,
         color: { dark: '#000000', light: '#ffffff' },
       }).then(setQrDataUrl).catch(() => {});
@@ -36,18 +37,21 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
   const formatDate = (d: string) => {
     if (!d) return '';
-    return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   const formatTime = (t: string) => {
     if (!t) return '';
-    return t.toString().slice(0, 5);
+    const parts = t.toString().split(':');
+    if (parts.length < 2) return t.toString().slice(0, 5);
+    const h = parseInt(parts[0]);
+    const m = parts[1];
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12.toString().padStart(2, '0')}:${m} ${ampm}`;
   };
 
   const billNum = sale.bill_number || '';
-  const cashierName = sale.user_name || 'Admin';
-
-  const colSizes = { sn: '4mm', unit: '6mm', qty: '7mm', rate: '12mm', disc: '7mm', amt: '14mm' };
 
   return (
     <div>
@@ -61,191 +65,153 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         * { box-sizing: border-box; margin: 0; padding: 0; }
         .r {
           width: 72mm;
-          padding: 2.5mm 4mm;
+          padding: 2mm 4mm;
           font-family: 'Courier New', 'Courier', monospace;
           color: #000;
-          font-size: 9pt;
-          line-height: 1.35;
-          margin: 0 auto;
           background: #fff;
+          margin: 0 auto;
         }
-        .r table { width: 100%; border-collapse: collapse; }
-        .r-c { text-align: center; }
-        .r-r { text-align: right; }
-        .r-l { text-align: left; }
-        .r-b { font-weight: 700; }
-        .shop-name { font-size: 14pt; font-weight: 900; letter-spacing: 0.5px; }
-        .shop-info { font-size: 8pt; line-height: 1.5; }
-        .sep { border: none; border-top: 1px dashed #000; margin: 1.8mm 0; }
-        .info { width: 100%; font-size: 8pt; margin-bottom: 1mm; }
-        .info td { padding: 0.2mm 0; vertical-align: top; }
-        .tbl { width: 100%; font-size: 7.5pt; margin-bottom: 1.5mm; }
-        .tbl th {
-          padding: 0.6mm 0.4mm;
-          font-weight: 700;
-          border-top: 1px dashed #000;
-          border-bottom: 1px dashed #000;
-          font-size: 7pt;
-          white-space: nowrap;
-        }
-        .tbl td { padding: 0.4mm 0.4mm; border-bottom: 0.5px dotted #ccc; vertical-align: bottom; }
-        .sum { width: 100%; font-size: 8pt; margin-bottom: 1mm; }
-        .sum td { padding: 0.4mm 0.4mm; }
-        .gt {
-          width: 100%;
-          font-size: 10pt;
-          font-weight: 900;
-          background: #000;
-          color: #fff;
-        }
-        .gt td { padding: 0.8mm 0.4mm; }
-        .two { width: 100%; font-size: 7.5pt; margin-bottom: 1.5mm; }
-        .two td { padding: 0.2mm 0.4mm; vertical-align: top; }
-        .two .hd { font-weight: 700; font-size: 8pt; margin-bottom: 0.3mm; }
+        .c { text-align: center; }
+        .rgt { text-align: right; }
+        .lft { text-align: left; }
+        .b { font-weight: 700; }
+        .fs8 { font-size: 8pt; line-height: 1.4; }
+        .fs9 { font-size: 9pt; line-height: 1.35; }
+        .fs10 { font-size: 10pt; }
+        .shop { font-size: 14pt; font-weight: 900; letter-spacing: 0.5px; }
+        .dash { border: none; border-top: 1px dashed #000; margin: 1.5mm 0; }
+        .dtl { font-size: 8pt; line-height: 1.6; }
+        .itbl { width: 100%; font-size: 8pt; border-collapse: collapse; }
+        .itbl th { padding: 0.5mm 0.3mm; font-weight: 700; border-top: 1px dashed #000; border-bottom: 1px dashed #000; font-size: 7.5pt; }
+        .itbl td { padding: 0.3mm 0.3mm; border-bottom: 0.5px dotted #ccc; vertical-align: bottom; }
+        .stbl { width: 100%; font-size: 8pt; border-collapse: collapse; }
+        .stbl td { padding: 0.3mm 0.3mm; }
+        .gtbl { width: 100%; font-size: 10pt; font-weight: 900; border-collapse: collapse; }
+        .gtbl td { padding: 0.6mm 0.3mm; }
         .qr { text-align: center; margin: 1.5mm 0; }
-        .qr img { width: 32mm; height: 32mm; }
-        .foot { text-align: center; margin-top: 1.5mm; padding-top: 1.5mm; border-top: 1px dashed #000; }
-        .foot .tk { font-weight: 900; font-size: 10pt; letter-spacing: 0.5px; }
-        .foot .sn { font-size: 8pt; margin-top: 0.3mm; }
+        .qr img { width: 30mm; height: 30mm; }
       `}</style>
 
-      <div className="r">
-        {/* SHOP HEADER */}
-        <div className="r-c">
-          <div className="shop-name">{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
-          <div className="shop-info">
-            {company.address ? <div>{company.address}</div> : null}
-            {company.mobile ? <div>Phone: {company.mobile}</div> : null}
-            {company.gst_number ? <div>GST: {company.gst_number}</div> : null}
+      <div className="r fs9">
+        {/* LOGO */}
+        {logoUrl ? (
+          <div className="c" style={{ marginBottom: '1mm' }}>
+            <img src={logoUrl} alt="Logo" style={{ maxWidth: '35mm', maxHeight: '12mm', objectFit: 'contain' }} crossOrigin="anonymous" />
           </div>
+        ) : null}
+
+        {/* SHOP NAME & ADDRESS */}
+        <div className="c fs8">
+          <div className="shop">{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
+          {company.address ? <div>{company.address}</div> : null}
+          {company.mobile ? <div>Ph: {company.mobile}</div> : null}
+          {company.gst_number ? <div>GST: {company.gst_number}</div> : null}
         </div>
 
-        <hr className="sep" />
+        <hr className="dash" />
 
-        {/* INVOICE LEFT | CUSTOMER RIGHT */}
-        <table className="info">
-          <tbody>
-            <tr>
-              <td className="r-l">
-                Bill No: {billNum}<br />
-                Date: {formatDate(sale.bill_date)}<br />
-                Time: {formatTime(sale.bill_time)}<br />
-                Cashier: {cashierName}
-              </td>
-              <td className="r-r">
-                {sale.customer_name && sale.customer_name !== 'Walk-In Customer' ? (
-                  <>
-                    {sale.customer_name}<br />
-                    {sale.customer_mobile || ''}
-                  </>
-                ) : (
-                  'Customer: Walk-In'
-                )}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {/* BILL INFO */}
+        <div className="dtl">
+          Bill No : {billNum}<br />
+          Date &nbsp;&nbsp;&nbsp;: {formatDate(sale.bill_date)}<br />
+          Time &nbsp;&nbsp;&nbsp;: {formatTime(sale.bill_time)}
+        </div>
 
-        <hr className="sep" />
+        <hr className="dash" />
+
+        {/* CUSTOMER */}
+        <div className="dtl">
+          Customer : {sale.customer_name || 'Walk-In Customer'}<br />
+          Mobile &nbsp;&nbsp;: {sale.customer_mobile || '-'}
+        </div>
+
+        <hr className="dash" />
 
         {/* ITEMS TABLE */}
-        <table className="tbl">
+        <table className="itbl">
           <thead>
             <tr>
-              <th style={{ width: colSizes.sn, textAlign: 'center' }}>#</th>
-              <th style={{ textAlign: 'left' }}>Item Name</th>
-              <th style={{ width: colSizes.unit, textAlign: 'center' }}>Unit</th>
-              <th style={{ width: colSizes.qty, textAlign: 'center' }}>Qty</th>
-              <th style={{ width: colSizes.rate, textAlign: 'right' }}>Rate</th>
-              <th style={{ width: colSizes.disc, textAlign: 'center' }}>Disc%</th>
-              <th style={{ width: colSizes.amt, textAlign: 'right' }}>Amount</th>
+              <th style={{ textAlign: 'left' }}>Item</th>
+              <th style={{ width: '8mm', textAlign: 'center' }}>Qty</th>
+              <th style={{ width: '12mm', textAlign: 'right' }}>Rate</th>
+              <th style={{ width: '14mm', textAlign: 'right' }}>Amt</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, idx) => (
               <tr key={item.id || idx}>
-                <td style={{ textAlign: 'center' }}>{idx + 1}</td>
-                <td style={{ maxWidth: '22mm', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product_name}</td>
-                <td style={{ textAlign: 'center' }}>{item.unit || '-'}</td>
-                <td style={{ textAlign: 'center' }}>{Number(item.quantity)}</td>
-                <td style={{ textAlign: 'right' }}>{Number(item.rate).toFixed(2)}</td>
-                <td style={{ textAlign: 'center' }}>{Number(item.discount_percentage) > 0 ? Number(item.discount_percentage).toFixed(1) : '-'}</td>
-                <td style={{ textAlign: 'right' }}>{Number(item.amount).toFixed(2)}</td>
+                <td style={{ maxWidth: '34mm', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product_name}</td>
+                <td className="c">{Number(item.quantity)}</td>
+                <td className="rgt">{Number(item.rate).toFixed(2)}</td>
+                <td className="rgt">{Number(item.amount).toFixed(2)}</td>
               </tr>
             ))}
             {items.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ padding: '3mm', textAlign: 'center', color: '#999' }}>No items</td>
+                <td colSpan={4} className="c" style={{ padding: '2mm', color: '#999' }}>No items</td>
               </tr>
             ) : null}
           </tbody>
         </table>
 
-        <hr className="sep" />
+        <hr className="dash" />
 
-        {/* SUB TOTAL & DISCOUNT */}
-        <table className="sum">
+        {/* SUBTOTAL / DISCOUNT / GST */}
+        <table className="stbl">
           <tbody>
             <tr>
-              <td className="r-l">Sub Total</td>
-              <td className="r-r">{formatCurrency(subtotal)}</td>
+              <td>Subtotal</td>
+              <td className="rgt">{formatCurrency(subtotal)}</td>
             </tr>
             {discountAmount > 0 ? (
               <tr>
-                <td className="r-l">Discount</td>
-                <td className="r-r">-{formatCurrency(discountAmount)}</td>
+                <td>Discount</td>
+                <td className="rgt">{formatCurrency(discountAmount)}</td>
               </tr>
             ) : null}
             {gstAmount > 0 ? (
               <tr>
-                <td className="r-l">GST</td>
-                <td className="r-r">{formatCurrency(gstAmount)}</td>
-              </tr>
-            ) : null}
-            {roundOff !== 0 ? (
-              <tr>
-                <td className="r-l">Round Off</td>
-                <td className="r-r">{roundOff.toFixed(2)}</td>
+                <td>GST</td>
+                <td className="rgt">{formatCurrency(gstAmount)}</td>
               </tr>
             ) : null}
           </tbody>
         </table>
+
+        <hr className="dash" />
 
         {/* GRAND TOTAL */}
-        <table className="gt">
+        <table className="gtbl">
           <tbody>
             <tr>
-              <td className="r-l">Grand Total</td>
-              <td className="r-r">{formatCurrency(Math.round(grandTotal))}</td>
+              <td>GRAND TOTAL</td>
+              <td className="rgt">{formatCurrency(Math.round(grandTotal))}</td>
             </tr>
           </tbody>
         </table>
 
-        <hr className="sep" />
+        <hr className="dash" />
 
-        {/* PAYMENT & BANK */}
-        <table className="two">
-          <tbody>
-            <tr>
-              <td style={{ width: '50%' }}>
-                <div className="hd">Payment</div>
-                <div>Mode: {(sale.payment_mode || 'CASH').toUpperCase()}</div>
-                <div>Amount: {formatCurrency(Math.round(grandTotal))}</div>
-              </td>
-              <td style={{ width: '50%' }}>
-                <div className="hd">Bank</div>
-                <div>{settings['bank_name'] || '-'}</div>
-                {settings['account_number'] ? <div>A/c: {settings['account_number']}</div> : null}
-                {settings['ifsc_code'] ? <div>IFSC: {settings['ifsc_code']}</div> : null}
-                {upiId ? <div>UPI: {upiId}</div> : null}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {/* PAYMENT */}
+        <div className="dtl">
+          Payment Method : {(sale.payment_mode || 'Cash').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+        </div>
 
-        {sale.notes ? (
-          <div style={{ fontSize: '7.5pt', marginBottom: '1mm' }}>Notes: {sale.notes}</div>
-        ) : null}
+        <hr className="dash" />
+
+        {/* BANK DETAILS */}
+        <div className="c fs8" style={{ marginBottom: '1mm' }}>
+          <span className="b">BANK DETAILS</span>
+        </div>
+        <div className="dtl">
+          {settings['bank_name'] ? <div>Bank Name : {settings['bank_name']}</div> : null}
+          {settings['account_name'] ? <div>A/C Name&nbsp;&nbsp;: {settings['account_name']}</div> : null}
+          {settings['account_number'] ? <div>A/C No&nbsp;&nbsp;&nbsp;&nbsp;: {settings['account_number']}</div> : null}
+          {settings['ifsc_code'] ? <div>IFSC Code : {settings['ifsc_code']}</div> : null}
+          {upiId ? <div>UPI ID&nbsp;&nbsp;&nbsp;&nbsp;: {upiId}</div> : null}
+        </div>
+
+        <hr className="dash" />
 
         {/* QR CODE */}
         {qrDataUrl ? (
@@ -255,11 +221,14 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         ) : null}
 
         {/* FOOTER */}
-        <hr className="sep" />
-        <div className="foot">
-          <div className="tk">THANK YOU VISIT AGAIN!</div>
-          <div className="sn">{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
+        <div className="c fs8" style={{ marginTop: '1mm' }}>
+          <div className="b fs10" style={{ letterSpacing: '0.5px' }}>Thank You Visit Again!</div>
+          <div style={{ marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
+          {company.email ? <div>{company.email}</div> : null}
+          {company.mobile ? <div>Ph: {company.mobile}</div> : null}
         </div>
+
+        <hr className="dash" />
       </div>
     </div>
   );
