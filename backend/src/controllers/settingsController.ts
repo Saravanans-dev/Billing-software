@@ -61,7 +61,8 @@ export async function getSettings(req: AuthRequest, res: Response) {
 
 export async function updateSetting(req: AuthRequest, res: Response) {
   try {
-    const { key, value } = req.body;
+    const key = req.params.key || req.body.key;
+    const value = req.body.value;
     await pool.query(
       `INSERT INTO settings (setting_key, setting_value) VALUES ($1, $2) 
        ON CONFLICT (setting_key) DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP`,

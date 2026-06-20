@@ -172,6 +172,13 @@ export async function deleteSale(req: AuthRequest, res: Response) {
       }
     }
 
+    if (sale.rows[0].payment_mode === 'credit' && sale.rows[0].customer_id) {
+      await client.query(
+        'UPDATE customers SET outstanding_amount = GREATEST(0, outstanding_amount - $1) WHERE id = $2',
+        [sale.rows[0].grand_total, sale.rows[0].customer_id]
+      );
+    }
+
     await client.query('DELETE FROM sales WHERE id = $1', [req.params.id]);
     await client.query('COMMIT');
     res.json({ message: 'Sale deleted successfully' });

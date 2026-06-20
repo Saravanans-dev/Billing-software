@@ -4,6 +4,7 @@ import { AuthRequest } from '../middleware/auth';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
+import path from 'path';
 import { numberToWords } from '../lib/numberToWords';
 
 const PAGE = { W: 419.53, H: 595.28, M: 20 };
@@ -155,10 +156,13 @@ export async function printInvoice(req: AuthRequest, res: Response) {
 
     // ═══ HEADER ═══
     if (c.logo_url) {
-      try {
-        doc.image(c.logo_url, PAGE.W / 2 - 25, PAGE.M, { width: 50, height: 50 });
-        doc.moveDown(3);
-      } catch (_) { /* skip logo */ }
+      const logoPath = path.join(__dirname, '../../', c.logo_url.replace(/^\//, ''));
+      if (require('fs').existsSync(logoPath)) {
+        try {
+          doc.image(logoPath, PAGE.W / 2 - 25, PAGE.M, { width: 50, height: 50 });
+          doc.moveDown(3);
+        } catch (_) { /* skip logo */ }
+      }
     }
 
     doc.fontSize(16).font('Helvetica-Bold').fillColor('#000');
@@ -198,11 +202,10 @@ export async function printInvoice(req: AuthRequest, res: Response) {
 
     const cols = [
       { key: '#', w: 12, align: 'left' as const },
-      { key: 'Item Name', w: 118, align: 'left' as const },
+      { key: 'Item Name', w: 142, align: 'left' as const },
       { key: 'Unit', w: 22, align: 'center' as const },
       { key: 'Qty', w: 24, align: 'center' as const },
       { key: 'Rate', w: 38, align: 'right' as const },
-      { key: 'Disc%', w: 24, align: 'right' as const },
       { key: 'Amount', w: 44, align: 'right' as const },
     ];
     const tw = cols.reduce((s, c) => s + c.w, 0);
@@ -224,7 +227,6 @@ export async function printInvoice(req: AuthRequest, res: Response) {
         String(item.unit || '-'),
         String(Number(item.quantity)),
         Number(item.rate).toFixed(2),
-        Number(item.discount_percentage) > 0 ? Number(item.discount_percentage).toFixed(1) : '-',
         Number(item.amount).toFixed(2),
       ];
       const rowH = cells.length > 1 && cells[1].length > 30 ? 18 : 12;

@@ -20,6 +20,7 @@ import exportRoutes from './routes/exports';
 import settingsRoutes from './routes/settings';
 import uploadRoutes from './routes/upload';
 import invoiceRoutes from './routes/invoice';
+import { sanitizeInput } from './middleware/sanitize';
 
 dotenv.config();
 
@@ -30,8 +31,8 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet({ contentSecurityPolicy: false }));
 const corsOrigin = process.env.CORS_ORIGIN;
 if (corsOrigin) {
-  app.use(cors({ origin: corsOrigin, credentials: true }));
-} else {
+  app.use(cors({ origin: corsOrigin.split(',').map(s => s.trim()), credentials: true }));
+} else if (process.env.NODE_ENV !== 'production') {
   app.use(cors({ origin: '*', credentials: true }));
 }
 
@@ -47,6 +48,9 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+
+// Input sanitization
+app.use('/api/', sanitizeInput);
 
 // Static files
 app.use('/uploads', express.static('uploads'));

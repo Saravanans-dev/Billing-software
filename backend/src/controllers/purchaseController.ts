@@ -46,12 +46,14 @@ export async function createPurchase(req: AuthRequest, res: Response) {
     for (const item of items) {
       if (item.product_id) {
         await client.query(
-          `INSERT INTO products (id, product_name, category, unit, hsn_code, gst_percentage, purchase_rate, current_stock)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          `INSERT INTO products (id, product_name, category, unit, hsn_code, gst_percentage, purchase_rate, wholesale_rate, retail_rate, current_stock)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
            ON CONFLICT (id) DO UPDATE SET
            purchase_rate = CASE WHEN $7 > 0 THEN $7 ELSE products.purchase_rate END,
-           current_stock = products.current_stock + $8`,
-          [item.product_id, item.product_name, item.category, item.unit, item.hsn_code, item.gst_percentage, item.rate, item.quantity]
+           wholesale_rate = CASE WHEN $8 > 0 THEN $8 ELSE products.wholesale_rate END,
+           retail_rate = CASE WHEN $9 > 0 THEN $9 ELSE products.retail_rate END,
+           current_stock = products.current_stock + $10`,
+          [item.product_id, item.product_name, item.category, item.unit, item.hsn_code, item.gst_percentage, item.rate, item.rate, item.rate, item.quantity]
         );
 
         await client.query(

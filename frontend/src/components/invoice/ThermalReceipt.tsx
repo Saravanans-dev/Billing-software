@@ -89,9 +89,8 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           <div style={s.sh}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
           <div style={s.sub}>Billing Software</div>
           <div style={{ ...s.i8, marginTop: '1mm' }}>
-            <div>Therikiyur, Ayyampalayam</div>
-            <div>Trichy - 621005</div>
-            <div>Phone: 9876543210</div>
+            {company.address ? <div>{company.address}</div> : null}
+            {company.mobile ? <div>Phone: {company.mobile}</div> : null}
           </div>
         </div>
 

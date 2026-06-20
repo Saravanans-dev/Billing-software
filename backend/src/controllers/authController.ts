@@ -32,9 +32,13 @@ export async function login(req: Request, res: Response) {
 
     await pool.query('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
 
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ error: 'JWT secret not configured' });
+    }
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role, full_name: user.full_name },
-      process.env.JWT_SECRET || 'student-xerox-billing-jwt-secret-key-2026',
+      secret,
       { algorithm: 'HS256', expiresIn: '24h' }
     );
 

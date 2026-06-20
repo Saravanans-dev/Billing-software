@@ -107,7 +107,8 @@ export function Billing() {
 
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, i) => sum + i.amount, 0);
-    const discountAmount = discountType === 'percentage' ? (subtotal * discountValue) / 100 : discountValue;
+    const rawDiscount = discountType === 'percentage' ? (subtotal * discountValue) / 100 : discountValue;
+    const discountAmount = Math.min(rawDiscount, subtotal);
     const taxableAmount = subtotal - discountAmount;
     const gstAmount = items.reduce((sum, i) => sum + i.gst_amount, 0);
     const grandTotal = taxableAmount + gstAmount;

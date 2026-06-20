@@ -103,7 +103,7 @@ export async function getGSTReport(req: AuthRequest, res: Response) {
     if (to) { paramIndex++; params.push(to); dateFilter += ` AND s.bill_date <= $${paramIndex}`; }
 
     const result = await pool.query(
-      `SELECT si.gst_percentage, COUNT(*) as item_count, COALESCE(SUM(si.amount - si.gst_amount),0) as taxable_value,
+      `SELECT si.gst_percentage, COUNT(*) as item_count, COALESCE(SUM(si.amount),0) as taxable_value,
        COALESCE(SUM(si.gst_amount),0) as gst_amount
        FROM sales s JOIN sale_items si ON s.id = si.sale_id WHERE si.gst_percentage > 0${dateFilter}
        GROUP BY si.gst_percentage ORDER BY si.gst_percentage`, params
