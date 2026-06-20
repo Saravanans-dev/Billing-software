@@ -46,22 +46,21 @@ export function ReceiptPrint() {
     );
   }
 
+  const printStyle: React.CSSProperties = {
+    padding: '10px 40px',
+    fontSize: '15px',
+    background: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontWeight: 600,
+  };
+
   return (
     <div>
       <div className="no-print" style={{ textAlign: 'center', padding: '10px', fontFamily: 'monospace' }}>
-        <button
-          onClick={() => window.print()}
-          style={{
-            padding: '10px 40px',
-            fontSize: '15px',
-            background: '#2563eb',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
+        <button onClick={() => window.print()} style={printStyle}>
           PRINT RECEIPT
         </button>
       </div>
