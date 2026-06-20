@@ -13,6 +13,7 @@ import { Suppliers } from './pages/Suppliers';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
 import { ReceiptPrint } from './pages/ReceiptPrint';
+import { InvoicePage } from './pages/InvoicePage';
 import { useEffect } from 'react';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -59,6 +60,7 @@ function App() {
           <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="receipt/:id" element={<ReceiptPrint />} />
+        <Route path="invoice/:billNumber" element={<InvoicePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

@@ -19,10 +19,13 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const discountAmount = Number(sale.discount_amount) || 0;
   const upiId = settings['upi_id'] || '';
   const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
+  const billNum = sale.bill_number || '';
+
+  const invoiceUrl = `${window.location.origin}/invoice/${encodeURIComponent(billNum)}`;
 
   const qrData = upiId
-    ? `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(sale.bill_number || '')}`
-    : `Bill No: ${sale.bill_number || ''} | ₹${grandTotal.toFixed(2)}`;
+    ? `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNum)}`
+    : invoiceUrl;
 
   useEffect(() => {
     QRCode.toDataURL(qrData, { width: 140, margin: 1, color: { dark: '#000000', light: '#ffffff' } })
@@ -44,7 +47,6 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     return `${h12.toString().padStart(2, '0')}:${p[1]} ${a}`;
   };
 
-  const billNum = sale.bill_number || '';
   const cashierId = sale.user_id ? sale.user_id.slice(0, 8) : '-';
   const cashierName = sale.user_name || '-';
   const customerId = sale.customer_id ? sale.customer_id.slice(0, 8) : '-';
