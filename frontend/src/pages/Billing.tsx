@@ -20,6 +20,7 @@ interface LineItem {
   unit: string;
   quantity: number;
   rate: number;
+  discount_type: 'percentage' | 'fixed';
   discount_percentage: number;
   discount_amount: number;
   gst_percentage: number;
@@ -82,6 +83,7 @@ export function Billing() {
         unit: product.unit || 'Kg',
         quantity: 1,
         rate,
+        discount_type: 'percentage',
         discount_percentage: 0,
         discount_amount: 0,
         gst_percentage: parseFloat(product.gst_percentage) || 0,
@@ -93,14 +95,18 @@ export function Billing() {
     setProductSearch('');
   };
 
-  const updateItem = (id: string, field: string, value: number) => {
+  const updateItem = (id: string, field: string, value: number | string) => {
     setItems(items.map((item) => {
       if (item.id !== id) return item;
       const updated = { ...item, [field]: value };
       if (field === 'quantity' || field === 'rate') {
         updated.amount = updated.quantity * updated.rate;
       }
-      updated.discount_amount = (updated.amount * updated.discount_percentage) / 100;
+      if (updated.discount_type === 'percentage') {
+        updated.discount_amount = (updated.amount * updated.discount_percentage) / 100;
+      } else {
+        updated.discount_percentage = updated.amount > 0 ? (updated.discount_amount / updated.amount) * 100 : 0;
+      }
       const netAmount = updated.amount - updated.discount_amount;
       updated.gst_amount = (netAmount * updated.gst_percentage) / 100;
       return updated;
@@ -136,7 +142,7 @@ export function Billing() {
         customer_mobile: customerMobile,
         customer_address: customerAddress,
         customer_gst: customerGst,
-        items: items.map(({ id, ...rest }) => rest),
+        items: items.map(({ id, discount_type, ...rest }) => rest),
         subtotal: totals.subtotal,
         discount_amount: totals.discountAmount,
         taxable_amount: totals.taxableAmount,
@@ -313,7 +319,7 @@ export function Billing() {
                       <th className="px-3 py-2.5 text-left font-medium text-gray-600 w-16">Unit</th>
                       <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-20">Qty</th>
                       <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-24">Rate</th>
-                      <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-20">Disc %</th>
+                      <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-24">Disc</th>
                       <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-16">GST %</th>
                       <th className="px-3 py-2.5 text-right font-medium text-gray-600 w-24">Amount</th>
                       <th className="px-3 py-2.5 w-10"></th>
@@ -346,14 +352,26 @@ export function Billing() {
                           />
                         </td>
                         <td className="px-3 py-2">
-                          <input
-                            type="number"
-                            value={item.discount_percentage}
-                            onChange={(e) => updateItem(item.id, 'discount_percentage', parseFloat(e.target.value) || 0)}
-                            className="w-full px-2 py-1 text-right text-xs border border-gray-200 rounded focus:outline-none focus:border-primary"
-                            min="0"
-                            max="100"
-                          />
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => updateItem(item.id, 'discount_type', 'percentage')}
+                              className={`px-1.5 py-0.5 text-[10px] rounded ${item.discount_type === 'percentage' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500'}`}
+                            >%</button>
+                            <button
+                              type="button"
+                              onClick={() => updateItem(item.id, 'discount_type', 'fixed')}
+                              className={`px-1.5 py-0.5 text-[10px] rounded ${item.discount_type === 'fixed' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500'}`}
+                            >₹</button>
+                            <input
+                              type="number"
+                              value={item.discount_type === 'percentage' ? item.discount_percentage : item.discount_amount}
+                              onChange={(e) => updateItem(item.id, item.discount_type === 'percentage' ? 'discount_percentage' : 'discount_amount', parseFloat(e.target.value) || 0)}
+                              className="w-full px-2 py-1 text-right text-xs border border-gray-200 rounded focus:outline-none focus:border-primary"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
                         </td>
                         <td className="px-3 py-2 text-right">{item.gst_percentage}%</td>
                         <td className="px-3 py-2 text-right font-medium">{formatCurrency(item.amount)}</td>
