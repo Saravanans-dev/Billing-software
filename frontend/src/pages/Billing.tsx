@@ -5,7 +5,7 @@ import {
   ChevronDown, Calculator, RotateCcw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
+import api, { BACKEND_URL } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
@@ -49,10 +49,12 @@ export function Billing() {
   const [showProductSearch, setShowProductSearch] = useState(false);
   const [newCustomer, setNewCustomer] = useState({ customer_name: '', mobile: '', address: '', gst_number: '' });
   const productSearchRef = useRef<HTMLInputElement>(null);
+  const [company, setCompany] = useState<{ company_name?: string; logo_url?: string }>({});
 
   const productSearchTimer = useRef<any>();
 
   useEffect(() => {
+    api.get('/settings/company').then(({ data }) => setCompany(data)).catch(() => {});
     api.get('/customers?limit=100').then(({ data }) => setCustomers(data.customers));
     api.get('/products?limit=200').then(({ data }) => setProducts(data.products));
   }, []);
@@ -117,7 +119,7 @@ export function Billing() {
     const gstAmount = items.reduce((sum, i) => sum + i.gst_amount, 0);
     const grandTotal = taxableAmount + gstAmount - discountAmount;
     const roundOff = Math.round(grandTotal) - grandTotal;
-    return { subtotal, discountAmount, taxableAmount, gstAmount, grandTotal, roundOff };
+    return { subtotal, totalDiscount, discountAmount, taxableAmount, gstAmount, grandTotal, roundOff };
   };
 
   const handleSave = async (format?: 'a4' | 'thermal') => {
@@ -207,9 +209,13 @@ export function Billing() {
   return (
     <div className="page-container">
       <div className="flex items-center justify-between mb-5">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">New Bill</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
+        <div className="flex items-center gap-3">
+          {company?.logo_url ? (
+            <img src={`${BACKEND_URL}${company.logo_url}`} alt="" className="w-10 h-10 object-contain rounded" crossOrigin="anonymous" />
+          ) : null}
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">New Bill</h1>
+            <p className="text-xs text-gray-500 mt-0.5">
             {new Date().toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
             {' | '}
             {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
@@ -430,6 +436,12 @@ export function Billing() {
                 <span className="text-gray-500">Subtotal</span>
                 <span className="font-medium">{formatCurrency(totals.subtotal)}</span>
               </div>
+              {totals.totalDiscount > 0 ? (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Item Discount</span>
+                  <span className="font-medium text-red-500">-{formatCurrency(totals.totalDiscount)}</span>
+                </div>
+              ) : null}
 
               <div className="border-t border-gray-100 pt-3">
                 <label className="text-xs text-gray-500 mb-1 block">Discount</label>
@@ -460,7 +472,7 @@ export function Billing() {
               </div>
 
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Discount</span>
+                <span className="text-gray-500">Extra Discount</span>
                 <span className="font-medium text-red-500">-{formatCurrency(totals.discountAmount)}</span>
               </div>
               <div className="flex justify-between text-sm">

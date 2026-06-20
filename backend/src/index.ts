@@ -94,6 +94,9 @@ app.listen(PORT, async () => {
         `UPDATE company_settings SET address=$1, mobile=$2 WHERE address IS NULL OR mobile IS NULL`,
         ['Therikiyur, Ayyampalayam, Trichy - 621005', '9876543210']
       );
+      await pool.query(
+        `UPDATE company_settings SET logo_url='/uploads/logo.jpg' WHERE logo_url IS NULL`
+      );
   } catch (err) {
     console.error('Startup task failed, server still running:', err);
   }

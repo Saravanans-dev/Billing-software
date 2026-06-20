@@ -17,6 +17,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const grandTotal = Number(sale.grand_total) || 0;
   const subtotal = Number(sale.subtotal) || 0;
   const discountAmount = Number(sale.discount_amount) || 0;
+  const perItemDiscount = items.reduce((sum, i) => sum + Number(i.discount_amount || 0), 0);
   const upiId = settings['upi_id'] || '';
   const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
   const billNum = sale.bill_number || '';
@@ -80,12 +81,14 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
       <div style={s.pg}><div style={s.in}>
 
         {/* ═══════ HEADER ═══════ */}
-        {logoUrl ? <div style={s.cc}><img src={logoUrl} alt="" style={{ maxWidth: '30mm', maxHeight: '10mm', objectFit: 'contain', marginBottom: '0.5mm' }} crossOrigin="anonymous" /></div> : null}
-        <div style={{ ...s.cc, ...s.i8 }}>
-          <div style={s.sh}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-          <div style={{ marginTop: '0.3mm' }}>Therikiyur, Ayyampalayam</div>
-          <div>Trichy - 621005</div>
-          <div style={{ marginTop: '0.3mm' }}>Ph: 9876543210</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
+          {logoUrl ? <img src={logoUrl} alt="" style={{ width: '10mm', height: '10mm', objectFit: 'contain', flexShrink: 0 }} crossOrigin="anonymous" /> : null}
+          <div style={{ flex: 1, textAlign: logoUrl ? 'left' : 'center', ...s.i8 }}>
+            <div style={s.sh}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
+            <div style={{ marginTop: '0.3mm' }}>Therikiyur, Ayyampalayam</div>
+            <div>Trichy - 621005</div>
+            <div style={{ marginTop: '0.3mm' }}>Ph: 9876543210</div>
+          </div>
         </div>
 
         <hr style={s.ds} />
@@ -151,17 +154,18 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             <span>Sub Total</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
+          {perItemDiscount > 0 ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Item Discount</span>
+              <span>-{formatCurrency(perItemDiscount)}</span>
+            </div>
+          ) : null}
           {discountAmount > 0 ? (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Discount</span>
+              <span>Extra Discount</span>
               <span>-{formatCurrency(discountAmount)}</span>
             </div>
-          ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Discount</span>
-              <span>{formatCurrency(0)}</span>
-            </div>
-          )}
+          ) : null}
         </div>
 
         <div style={{ borderTop: '2px solid #000', borderBottom: '2px solid #000', margin: '1mm 0', padding: '0.5mm 0' }}>
