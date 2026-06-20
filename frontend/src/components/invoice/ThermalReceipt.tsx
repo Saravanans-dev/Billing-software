@@ -216,7 +216,6 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         {qrDataUrl ? (
           <div style={{ ...s.cc, margin: '0.5mm 0' }}>
             <img src={qrDataUrl} alt="UPI QR" style={{ width: '14mm', height: '14mm' }} />
-            <div style={{ fontSize: '7pt', marginTop: '0.3mm', color: '#555' }}>UPI QR</div>
           </div>
         ) : null}
 
