@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { formatCurrency } from '../lib/utils';
-import { API_URL } from '../services/api';
+import { API_URL, BACKEND_URL } from '../services/api';
 
 interface SaleItem {
   id?: string;
@@ -216,6 +216,9 @@ export function InvoicePage() {
       </div>
       <div ref={printRef} style={iStyle}>
         <div style={hStyle}>
+          {company?.logo_url ? (
+            <img src={`${BACKEND_URL}${company.logo_url}`} alt="" style={{ width: '48px', height: '48px', objectFit: 'contain', marginBottom: '4px' }} crossOrigin="anonymous" />
+          ) : null}
           <h1 style={{ margin: '0', fontSize: '26px', letterSpacing: '1px' }}>{company?.company_name?.toUpperCase() || 'STUDENT XEROX'}</h1>
           {company?.address ? <p style={{ margin: '4px 0 0', fontSize: '13px', opacity: 0.85 }}>{company.address}</p> : null}
           {company?.mobile ? <p style={{ margin: '2px 0 0', fontSize: '13px', opacity: 0.85 }}>Ph: {company.mobile}</p> : null}

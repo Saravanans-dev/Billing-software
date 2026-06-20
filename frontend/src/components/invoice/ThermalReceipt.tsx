@@ -16,7 +16,10 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const items = sale.items || [];
   const grandTotal = Number(sale.grand_total) || 0;
   const subtotal = Number(sale.subtotal) || 0;
+  const taxableAmount = Number(sale.taxable_amount) || 0;
+  const gstAmount = Number(sale.gst_amount) || 0;
   const discountAmount = Number(sale.discount_amount) || 0;
+  const roundOff = Number(sale.round_off) || 0;
   const perItemDiscount = items.reduce((sum, i) => sum + Number(i.discount_amount || 0), 0);
   const upiId = settings['upi_id'] || '';
   const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
@@ -27,16 +30,9 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     ? `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNum)}`
     : invoiceUrl;
 
-  console.log('[QR DEBUG] qrData content:', qrData);
-
-  useEffect(() => {
-    QRCode.toDataURL(qrData, { width: 140, margin: 1, color: { dark: '#000000', light: '#ffffff' } })
-      .then(setQrDataUrl).catch(() => {});
-  }, [qrData]);
-
   const formatDate = (d: string) => {
     if (!d) return '';
-    return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
   const formatTime = (t: string) => {
@@ -49,9 +45,14 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     return `${h12.toString().padStart(2, '0')}:${p[1]} ${a}`;
   };
 
-  const cashierId = sale.user_id ? sale.user_id.slice(0, 8) : '-';
+  useEffect(() => {
+    QRCode.toDataURL(qrData, { width: 140, margin: 1, color: { dark: '#000000', light: '#ffffff' } })
+      .then(setQrDataUrl).catch(() => {});
+  }, [qrData]);
+
   const cashierName = sale.user_name || '-';
-  const customerId = sale.customer_id ? sale.customer_id.slice(0, 8) : '-';
+  const customerName = sale.customer_name || 'Walk-In Customer';
+  const customerMobile = sale.customer_mobile || '-';
 
   const s = {
     pg: { width: '80mm', margin: '0 auto', background: '#fff', fontFamily: "'Courier New','Courier',monospace", color: '#000', fontSize: '9pt', lineHeight: '1.35' },
@@ -60,7 +61,8 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     rr: { textAlign: 'right' as const },
     ll: { textAlign: 'left' as const },
     b: { fontWeight: '700' as const },
-    sh: { fontSize: '18pt', fontWeight: '900' as const, letterSpacing: '0.5px' },
+    sh: { fontSize: '16pt', fontWeight: '900' as const, letterSpacing: '0.5px' },
+    sub: { fontSize: '8pt', fontWeight: '700' as const, marginTop: '0.5mm' },
     i8: { fontSize: '8pt', lineHeight: '1.5' },
     ds: { border: 'none', borderTop: '1px dashed #000', margin: '1.5mm 0' },
     d2: { border: 'none', borderTop: '1px dashed #000', margin: '1mm 0' },
@@ -80,40 +82,35 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
       `}</style>
       <div style={s.pg}><div style={s.in}>
 
-        {/* ═══════ HEADER ═══════ */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          {logoUrl ? <img src={logoUrl} alt="" style={{ width: '10mm', height: '10mm', objectFit: 'contain', flexShrink: 0 }} crossOrigin="anonymous" /> : null}
-          <div style={{ flex: 1, textAlign: logoUrl ? 'left' : 'center', ...s.i8 }}>
-            <div style={s.sh}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-            <div style={{ marginTop: '0.3mm' }}>Therikiyur, Ayyampalayam</div>
+        {/* ═══════ CENTERED LOGO + HEADER ═══════ */}
+        <div style={s.cc}>
+          {logoUrl ? (
+            <img src={logoUrl} alt="" style={{ width: '12mm', height: '12mm', objectFit: 'contain', display: 'block', margin: '0 auto 0.5mm' }} crossOrigin="anonymous" />
+          ) : null}
+          <div style={s.sh}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
+          <div style={s.sub}>Billing Software</div>
+          <div style={{ ...s.i8, marginTop: '1mm' }}>
+            <div>Therikiyur, Ayyampalayam</div>
             <div>Trichy - 621005</div>
-            <div style={{ marginTop: '0.3mm' }}>Ph: 9876543210</div>
+            <div>Phone: 9876543210</div>
           </div>
         </div>
 
         <hr style={s.ds} />
 
-        {/* ═══════ INVOICE & CUSTOMER (TWO COLUMN) ═══════ */}
+        {/* ═══════ INVOICE & CUSTOMER ═══════ */}
         <div style={{ fontSize: '7.5pt', lineHeight: '1.55' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Invoice No: {billNum}</span>
-            <span style={{ textAlign: 'right' }}>Customer ID: {customerId}</span>
+            <span style={{ textAlign: 'right' }}>Customer: {customerName}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Date: {formatDate(sale.bill_date)}</span>
-            <span style={{ textAlign: 'right' }}>Customer Name: {sale.customer_name || 'Walk-In Customer'}</span>
+            <span style={{ textAlign: 'right' }}>Mobile: {customerMobile}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Time: {formatTime(sale.bill_time)}</span>
-            <span style={{ textAlign: 'right' }}>Mobile Number: {sale.customer_mobile || '-'}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Cashier ID: {cashierId}</span>
-            <span></span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Cashier: {cashierName}</span>
-            <span></span>
+            <span style={{ textAlign: 'right' }}>Cashier: {cashierName}</span>
           </div>
         </div>
 
@@ -148,7 +145,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
         <hr style={s.d2} />
 
-        {/* ═══════ SUBTOTAL & DISCOUNT ═══════ */}
+        {/* ═══════ TOTALS (from backend values only) ═══════ */}
         <div style={{ fontSize: '8pt', lineHeight: '1.7' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Sub Total</span>
@@ -160,10 +157,26 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
               <span>-{formatCurrency(perItemDiscount)}</span>
             </div>
           ) : null}
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Taxable</span>
+            <span>{formatCurrency(taxableAmount)}</span>
+          </div>
+          {gstAmount > 0 ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>GST</span>
+              <span>{formatCurrency(gstAmount)}</span>
+            </div>
+          ) : null}
           {discountAmount > 0 ? (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Extra Discount</span>
+              <span>Discount</span>
               <span>-{formatCurrency(discountAmount)}</span>
+            </div>
+          ) : null}
+          {roundOff !== 0 ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Round Off</span>
+              <span>{roundOff.toFixed(2)}</span>
             </div>
           ) : null}
         </div>
@@ -177,16 +190,15 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
         <hr style={s.ds} />
 
-        {/* ═══════ PAYMENT INFORMATION ═══════ */}
-        <div style={{ fontWeight: '700', fontSize: '8pt', marginBottom: '0.5mm' }}>PAYMENT INFORMATION</div>
-        <div style={{ fontSize: '7.5pt', lineHeight: '1.6' }}>
+        {/* ═══════ PAYMENT ═══════ */}
+        <div style={{ fontSize: '8pt', lineHeight: '1.6' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Method</span>
-            <span>{(sale.payment_mode || 'CASH').toUpperCase()}</span>
+            <span>Payment Mode</span>
+            <span style={{ fontWeight: '700', textTransform: 'uppercase' }}>{sale.payment_mode || 'CASH'}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Received Amount</span>
-            <span>{formatCurrency(grandTotal)}</span>
+            <span>{formatCurrency(Math.round(grandTotal))}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Balance Amount</span>
@@ -218,12 +230,12 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           </div>
         ) : null}
 
-        <hr style={s.ds} />
+        {qrDataUrl ? <hr style={s.ds} /> : null}
 
         {/* ═══════ THANK YOU ═══════ */}
         <div style={{ ...s.cc, margin: '1mm 0' }}>
-          <div style={{ fontWeight: '900', fontSize: '12pt', letterSpacing: '0.5px' }}>THANK YOU VISIT AGAIN!</div>
-          <div style={{ fontSize: '11pt', fontWeight: '700', marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
+          <div style={{ fontWeight: '900', fontSize: '10pt', letterSpacing: '0.5px' }}>THANK YOU VISIT AGAIN!</div>
+          <div style={{ fontSize: '9pt', fontWeight: '700', marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
         </div>
         <hr style={s.ds} />
 
