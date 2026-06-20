@@ -89,22 +89,16 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
         <hr style={s.ds} />
 
-        {/* ═══════ INVOICE & CUSTOMER (TWO COLUMN) ═══════ */}
+        {/* ═══════ INVOICE & CUSTOMER ═══════ */}
         <div style={{ fontSize: '7.5pt', lineHeight: '1.6' }}>
-          <div style={{ display: 'flex' }}>
-            <div style={{ width: '55%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Invoice No</span><span>{billNum}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Date</span><span>{formatDate(sale.bill_date)}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Time</span><span>{formatTime(sale.bill_time)}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Cashier ID</span><span>{cashierId}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Cashier</span><span>{cashierName}</span></div>
-            </div>
-            <div style={{ width: '45%', paddingLeft: '1mm' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Customer ID</span><span>{customerId}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Customer Name</span><span>{sale.customer_name || 'Walk-In Customer'}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Mobile Number</span><span>{sale.customer_mobile || '-'}</span></div>
-            </div>
-          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Invoice No</span><span>{billNum}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Date</span><span>{formatDate(sale.bill_date)}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Time</span><span>{formatTime(sale.bill_time)}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Cashier ID</span><span>{cashierId}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Cashier</span><span>{cashierName}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5mm' }}><span>Customer ID</span><span>{customerId}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Customer Name</span><span>{sale.customer_name || 'Walk-In Customer'}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Mobile Number</span><span>{sale.customer_mobile || '-'}</span></div>
         </div>
 
         <hr style={s.ds} />
