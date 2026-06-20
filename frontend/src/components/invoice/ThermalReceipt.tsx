@@ -151,10 +151,10 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             <span>Sub Total</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
-          {perItemDiscount > 0 ? (
+          {perItemDiscount + discountAmount > 0 ? (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Item Discount</span>
-              <span>-{formatCurrency(perItemDiscount)}</span>
+              <span>Discount</span>
+              <span>-{formatCurrency(perItemDiscount + discountAmount)}</span>
             </div>
           ) : null}
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -165,12 +165,6 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>GST</span>
               <span>{formatCurrency(gstAmount)}</span>
-            </div>
-          ) : null}
-          {discountAmount > 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Discount</span>
-              <span>-{formatCurrency(discountAmount)}</span>
             </div>
           ) : null}
           {roundOff !== 0 ? (

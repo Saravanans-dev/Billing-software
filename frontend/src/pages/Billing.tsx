@@ -455,13 +455,6 @@ export function Billing() {
                 <span className="text-gray-500">Subtotal</span>
                 <span className="font-medium">{formatCurrency(totals.subtotal)}</span>
               </div>
-              {totals.totalDiscount > 0 ? (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Item Discount</span>
-                  <span className="font-medium text-red-500">-{formatCurrency(totals.totalDiscount)}</span>
-                </div>
-              ) : null}
-
               <div className="border-t border-gray-100 pt-3">
                 <label className="text-xs text-gray-500 mb-1 block">Discount</label>
                 <div className="flex gap-2 mb-2">
@@ -491,8 +484,8 @@ export function Billing() {
               </div>
 
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Extra Discount</span>
-                <span className="font-medium text-red-500">-{formatCurrency(totals.discountAmount)}</span>
+                <span className="text-gray-500">Discount</span>
+                <span className="font-medium text-red-500">-{formatCurrency(totals.totalDiscount + totals.discountAmount)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Taxable</span>
