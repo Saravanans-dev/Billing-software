@@ -204,6 +204,14 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           </>
         ) : null}
 
+        {/* ═══════ BARCODE ═══════ */}
+        {billNum ? (
+          <div style={{ ...s.cc, margin: '0.5mm 0' }}>
+            <div style={{ fontSize: '7pt', marginBottom: '0.3mm', color: '#555' }}>BARCODE</div>
+            <div style={{ fontFamily: "'Courier New',monospace", fontSize: '8pt', letterSpacing: '4px', fontWeight: '700' }}>{billNum}</div>
+          </div>
+        ) : null}
+
         {/* ═══════ QR CODE ═══════ */}
         {qrDataUrl ? (
           <div style={{ ...s.cc, margin: '0.5mm 0' }}>
