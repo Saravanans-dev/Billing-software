@@ -11,6 +11,7 @@ router.use(authenticate);
 router.get('/company', getCompanySettings);
 router.put('/company', authorize('admin'), updateCompanySettings);
 router.get('/', getSettings);
+router.put('/', authorize('admin'), updateSetting);
 router.put('/:key', authorize('admin'), updateSetting);
 
 // User management
