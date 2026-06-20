@@ -27,6 +27,8 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     ? `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNum)}`
     : invoiceUrl;
 
+  console.log('[QR DEBUG] qrData content:', qrData);
+
   useEffect(() => {
     QRCode.toDataURL(qrData, { width: 140, margin: 1, color: { dark: '#000000', light: '#ffffff' } })
       .then(setQrDataUrl).catch(() => {});
