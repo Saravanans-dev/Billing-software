@@ -105,8 +105,8 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
             Invoice No : {billNum}<br />
             Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {formatDate(sale.bill_date)}<br />
             Time &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {formatTime(sale.bill_time)}<br />
-            Cashier ID : {cashierId}<br />
-            Cashier&nbsp;&nbsp;&nbsp;: {cashierName}
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Cashier ID</span><span>{cashierId}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Cashier</span><span>{cashierName}</span></div>
           </div>
           <div style={{ width: '50%' }}>
             <span style={s.b}>Customer Details</span><br />
@@ -235,42 +235,9 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         {/* ═══════ QR CODE ═══════ */}
         {qrDataUrl ? (
           <div style={s.cc}>
-            <div style={{ fontWeight: '700', fontSize: '7pt', marginBottom: '0.5mm' }}>Scan & Pay (UPI)</div>
-            <img src={qrDataUrl} alt="UPI QR" style={{ width: '28mm', height: '28mm' }} />
+            <img src={qrDataUrl} alt="UPI QR" style={{ width: '18mm', height: '18mm' }} />
           </div>
         ) : null}
-
-        {billNum ? <div style={{ ...s.cc, fontSize: '7pt', color: '#555', marginTop: '0.5mm' }}>{billNum}</div> : null}
-
-        <hr style={s.ds} />
-
-        {/* ═══════ TERMS ═══════ */}
-        <div style={{ fontSize: '7pt', lineHeight: '1.35', marginBottom: '0.5mm' }}>
-          <span style={s.b}>Terms & Conditions :</span><br />
-          1. Goods once sold cannot be returned.<br />
-          2. Please retain this receipt for future reference.<br />
-          3. Thank you for choosing {company.company_name || 'Student Xerox'}.
-        </div>
-
-        <hr style={s.d2} />
-
-        {/* ═══════ CONTACT ═══════ */}
-        <div style={{ ...s.cc, ...s.i8, marginBottom: '0.5mm' }}>
-          {company.email ? <div><span style={s.b}>Email :</span> {company.email}</div> : null}
-          {company.mobile ? <div><span style={s.b}>WhatsApp :</span> {company.mobile}</div> : null}
-          {settings['instagram'] ? <div><span style={s.b}>Instagram :</span> {settings['instagram']}</div> : null}
-        </div>
-
-        <hr style={s.ds} />
-
-        {/* ═══════ FOOTER ═══════ */}
-        <div style={s.cc}>
-          <div style={{ fontWeight: '900', fontSize: '9pt', letterSpacing: '0.3px', marginBottom: '0.3mm' }}>THANK YOU VISIT AGAIN!</div>
-          <div style={{ fontWeight: '700', fontSize: '8pt' }}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-          <div style={{ fontSize: '7pt', color: '#555', marginTop: '0.2mm' }}>Fast Service • Quality Printing</div>
-        </div>
-
-        <hr style={s.ds} />
       </div></div>
     </div>
   );
