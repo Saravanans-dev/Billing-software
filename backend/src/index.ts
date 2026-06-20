@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
+import fs from 'fs';
 import pool, { runMigrations } from './config/database';
 
 import authRoutes from './routes/auth';
@@ -95,8 +97,21 @@ app.listen(PORT, async () => {
         ['Therikiyur, Ayyampalayam, Trichy - 621005', '9876543210']
       );
       await pool.query(
-        `UPDATE company_settings SET logo_url='/uploads/logo.jpg' WHERE logo_url IS NULL`
+        `UPDATE company_settings SET logo_url='/uploads/logo.jpeg' WHERE logo_url IS NULL`
       );
+
+      const uploadsDir = path.join(__dirname, '../uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      const logoDest = path.join(uploadsDir, 'logo.jpeg');
+      if (!fs.existsSync(logoDest)) {
+        const logoSrc = path.join(__dirname, '../assets/logo.jpeg');
+        if (fs.existsSync(logoSrc)) {
+          fs.copyFileSync(logoSrc, logoDest);
+          console.log('Logo copied to uploads');
+        }
+      }
   } catch (err) {
     console.error('Startup task failed, server still running:', err);
   }
