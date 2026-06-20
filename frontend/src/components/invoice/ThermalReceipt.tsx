@@ -20,16 +20,14 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const upiId = settings['upi_id'] || '';
   const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
 
-  const upiLink = upiId
+  const qrContent = upiId
     ? `upi://pay?pa=${upiId}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&tn=${sale.bill_number || ''}`
-    : '';
+    : `Bill: ${sale.bill_number || ''} | Amount: ₹${grandTotal.toFixed(2)}`;
 
   useEffect(() => {
-    if (upiLink) {
-      QRCode.toDataURL(upiLink, { width: 140, margin: 1, color: { dark: '#000000', light: '#ffffff' } })
-        .then(setQrDataUrl).catch(() => {});
-    }
-  }, [upiLink]);
+    QRCode.toDataURL(qrContent, { width: 140, margin: 1, color: { dark: '#000000', light: '#ffffff' } })
+      .then(setQrDataUrl).catch(() => {});
+  }, [qrContent]);
 
   const formatDate = (d: string) => {
     if (!d) return '';
@@ -220,7 +218,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         <div style={{ ...s.cc, margin: '1mm 0' }}>
           <div style={{ fontWeight: '900', fontSize: '10pt', letterSpacing: '0.5px' }}>THANK YOU VISIT AGAIN!</div>
           <div style={{ fontSize: '9pt', fontWeight: '700', marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-          <div style={{ marginTop: '0.8mm', fontSize: '9pt', color: '#000', letterSpacing: '3px' }}>~ ~ ~ ~ ~ ~ ~ ~ ~ ~</div>
+          <div style={{ marginTop: '0.8mm', fontSize: '9pt', color: '#000', letterSpacing: '2px' }}>- - - - - - - - - - - - -</div>
         </div>
 
       </div></div>
