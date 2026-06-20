@@ -28,8 +28,7 @@ services:
       sizeGB: 1
 
   # ===== Frontend Static Site =====
-  - type: web
-    runtime: static
+  - type: static
     name: free-frontend
     repo: https://github.com/Saravanans-dev/Billing-software
     branch: main
