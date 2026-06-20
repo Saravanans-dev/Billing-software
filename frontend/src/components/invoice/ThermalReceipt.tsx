@@ -90,28 +90,28 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         <hr style={s.ds} />
 
         {/* ═══════ INVOICE & CUSTOMER (TWO COLUMN) ═══════ */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '7pt', lineHeight: '1.55' }}>
-          <tr>
-            <td style={{ width: '55%', padding: '0 0.5mm 0 0' }}>Invoice No: {billNum}</td>
-            <td style={{ width: '45%', padding: '0 0 0 0.5mm' }}>Customer ID: {customerId}</td>
-          </tr>
-          <tr>
-            <td>Date: {formatDate(sale.bill_date)}</td>
-            <td>Customer Name: {sale.customer_name || 'Walk-In Customer'}</td>
-          </tr>
-          <tr>
-            <td>Time: {formatTime(sale.bill_time)}</td>
-            <td>Mobile Number: {sale.customer_mobile || '-'}</td>
-          </tr>
-          <tr>
-            <td>Cashier ID: {cashierId}</td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>Cashier: {cashierName}</td>
-            <td></td>
-          </tr>
-        </table>
+        <div style={{ fontSize: '7.5pt', lineHeight: '1.55' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Invoice No: {billNum}</span>
+            <span style={{ textAlign: 'right' }}>Customer ID: {customerId}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Date: {formatDate(sale.bill_date)}</span>
+            <span style={{ textAlign: 'right' }}>Customer Name: {sale.customer_name || 'Walk-In Customer'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Time: {formatTime(sale.bill_time)}</span>
+            <span style={{ textAlign: 'right' }}>Mobile Number: {sale.customer_mobile || '-'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Cashier ID: {cashierId}</span>
+            <span></span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Cashier: {cashierName}</span>
+            <span></span>
+          </div>
+        </div>
 
         <hr style={s.ds} />
 
