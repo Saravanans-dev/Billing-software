@@ -218,8 +218,8 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
         <div style={{ ...s.cc, margin: '1mm 0' }}>
           <div style={{ fontWeight: '900', fontSize: '10pt', letterSpacing: '0.5px' }}>THANK YOU VISIT AGAIN!</div>
           <div style={{ fontSize: '9pt', fontWeight: '700', marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'STUDENT XEROX'}</div>
-          <div style={{ marginTop: '0.8mm', fontSize: '9pt', color: '#000', letterSpacing: '2px' }}>- - - - - - - - - - - - -</div>
         </div>
+        <hr style={s.ds} />
 
       </div></div>
     </div>
