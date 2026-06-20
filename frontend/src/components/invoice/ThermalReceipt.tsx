@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { formatCurrency } from '../../lib/utils';
-import { BACKEND_URL } from '../../services/api';
 import type { Sale, SaleItem, CompanySettings } from '../../types';
 
 interface ThermalReceiptProps {
@@ -52,6 +51,14 @@ function Barcode39({ value }: { value: string }) {
   );
 }
 
+function padRight(s: string, n: number) {
+  return s.padEnd(n, ' ');
+}
+
+function padLeft(s: string, n: number) {
+  return s.padStart(n, ' ');
+}
+
 export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps) {
   const [qrDataUrl, setQrDataUrl] = useState('');
 
@@ -71,7 +78,7 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
     if (upiLink) {
       QRCode.toDataURL(upiLink, {
         width: 180,
-        margin: 2,
+        margin: 1,
         color: { dark: '#000000', light: '#ffffff' },
       }).then(setQrDataUrl).catch(() => {});
     }
@@ -89,7 +96,6 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
 
   const billNum = sale.bill_number || '';
   const cashierName = sale.user_name || 'Admin';
-  const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
 
   return (
     <div>
@@ -101,111 +107,129 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           .no-print { display: none !important; }
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        .receipt { width: 72mm; padding: 3mm 4mm; font-family: 'Courier New', Courier, monospace; color: #000; font-size: 9pt; line-height: 1.3; margin: 0 auto; background: #fff; word-break: break-all; }
-        .receipt table { width: 100%; border-collapse: collapse; }
-        .r-center { text-align: center; }
-        .r-right { text-align: right; }
-        .r-left { text-align: left; }
-        .r-bold { font-weight: 700; }
-        .r-shop-name { font-size: 14pt; font-weight: 900; letter-spacing: 1px; }
-        .r-shop-info { font-size: 8pt; line-height: 1.5; }
-        .r-dash { border: none; border-top: 1px dashed #000; margin: 2mm 0; }
-        .r-dot { border: none; border-top: 0.5px dotted #999; margin: 1mm 0; }
-        .r-info { width: 100%; font-size: 7.5pt; margin-bottom: 1mm; }
-        .r-info td { padding: 0.3mm 0; vertical-align: bottom; }
-        .r-customer { font-size: 7.5pt; margin-bottom: 1mm; }
-        .r-items { width: 100%; font-size: 7pt; margin-bottom: 2mm; }
-        .r-items th { padding: 0.8mm 0.5mm; font-weight: 700; text-align: left; border-top: 1px dashed #000; border-bottom: 1px dashed #000; font-size: 7pt; }
-        .r-items td { padding: 0.6mm 0.5mm; border-bottom: 0.5px dotted #ddd; vertical-align: bottom; }
-        .r-items td.amt { text-align: right; }
-        .r-items td.ctr { text-align: center; }
-        .r-items .item-name { max-width: 22mm; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .r-totals { width: 100%; font-size: 8pt; }
-        .r-totals td { padding: 0.5mm 0.5mm; }
-        .r-totals .label { text-align: left; }
-        .r-totals .value { text-align: right; }
-        .r-grand-total { width: 100%; font-size: 10pt; font-weight: 900; background: #000; color: #fff; }
-        .r-grand-total td { padding: 1mm 0.5mm; }
-        .r-grand-total .label { text-align: left; }
-        .r-grand-total .value { text-align: right; }
-        .r-two-col { width: 100%; font-size: 7pt; margin-bottom: 2mm; }
-        .r-two-col td { padding: 0.3mm 0.5mm; vertical-align: top; }
-        .r-two-col .col-title { font-weight: 700; font-size: 7.5pt; margin-bottom: 0.5mm; }
-        .r-qr { text-align: center; margin: 2mm 0; }
-        .r-qr img { width: 35mm; height: 35mm; }
-        .r-barcode { text-align: center; margin: 2mm 0; }
-        .r-barcode-label { font-size: 6pt; margin-top: 0.5mm; color: #555; }
-        .r-footer { text-align: center; margin-top: 2mm; padding-top: 2mm; border-top: 1px dashed #000; }
-        .r-footer .r-thankyou { font-weight: 900; font-size: 10pt; letter-spacing: 1px; }
-        .r-footer .r-shop { font-size: 8pt; margin-top: 0.5mm; }
+        .receipt {
+          width: 72mm;
+          padding: 2.5mm 3.5mm;
+          font-family: 'Courier New', 'Courier', monospace;
+          color: #000;
+          font-size: 9pt;
+          line-height: 1.35;
+          margin: 0 auto;
+          background: #fff;
+        }
+        .r-ctr { text-align: center; }
+        .r-rgt { text-align: right; }
+        .r-lft { text-align: left; }
+        .r-bld { font-weight: 700; }
+        .r-name { font-size: 14pt; font-weight: 900; letter-spacing: 0.5px; }
+        .r-info { font-size: 8pt; line-height: 1.5; }
+        .r-sep { border: none; border-top: 1px dashed #000; margin: 1.8mm 0; }
+        .r-line { width: 100%; font-size: 8pt; margin-bottom: 1mm; }
+        .r-line td { padding: 0.2mm 0; vertical-align: top; }
+        .r-tbl { width: 100%; font-size: 7.5pt; margin-bottom: 1.5mm; border-collapse: collapse; }
+        .r-tbl th {
+          padding: 0.6mm 0.3mm;
+          font-weight: 700;
+          text-align: left;
+          border-top: 1px dashed #000;
+          border-bottom: 1px dashed #000;
+          font-size: 7pt;
+          white-space: nowrap;
+        }
+        .r-tbl td { padding: 0.4mm 0.3mm; border-bottom: 0.5px dotted #ccc; vertical-align: bottom; }
+        .r-tbl .a { text-align: right; }
+        .r-tbl .c { text-align: center; }
+        .r-tbl td.wrp { max-width: 24mm; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .r-sum { width: 100%; font-size: 8pt; margin-bottom: 1mm; border-collapse: collapse; }
+        .r-sum td { padding: 0.4mm 0.3mm; }
+        .r-sum .l { text-align: left; }
+        .r-sum .v { text-align: right; }
+        .r-gt {
+          width: 100%;
+          font-size: 10pt;
+          font-weight: 900;
+          background: #000;
+          color: #fff;
+          border-collapse: collapse;
+        }
+        .r-gt td { padding: 0.8mm 0.3mm; }
+        .r-gt .l { text-align: left; }
+        .r-gt .v { text-align: right; }
+        .r-2col { width: 100%; font-size: 7.5pt; margin-bottom: 1.5mm; border-collapse: collapse; }
+        .r-2col td { padding: 0.2mm 0.3mm; vertical-align: top; }
+        .r-2col .t { font-weight: 700; font-size: 8pt; margin-bottom: 0.3mm; }
+        .r-qr { text-align: center; margin: 1.5mm 0; }
+        .r-qr img { width: 32mm; height: 32mm; }
+        .r-bar { text-align: center; margin: 1.5mm 0; }
+        .r-bar-lbl { font-size: 6pt; margin-top: 0.3mm; color: #555; }
+        .r-foot { text-align: center; margin-top: 1.5mm; padding-top: 1.5mm; border-top: 1px dashed #000; }
+        .r-foot .r-tku { font-weight: 900; font-size: 10pt; letter-spacing: 0.5px; }
+        .r-foot .r-sn { font-size: 8pt; margin-top: 0.3mm; }
       `}</style>
 
       <div className="receipt">
-        {/* ═══════════ 1. SHOP NAME (center, large bold) ═══════════ */}
-        <div className="r-center">
-          {logoUrl && (
-            <img
-              src={logoUrl}
-              alt="Logo"
-              style={{ maxWidth: '40mm', maxHeight: '15mm', objectFit: 'contain', marginBottom: '0.5mm' }}
-              crossOrigin="anonymous"
-            />
-          )}
-          <div className="r-shop-name">{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
-          <div className="r-shop-info">
-            {company.address && <div>{company.address}</div>}
-            {company.mobile && <div>Phone: {company.mobile}</div>}
-            {company.email && <div>{company.email}</div>}
+        {/* SHOP HEADER */}
+        <div className="r-ctr">
+          <div className="r-name">{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
+          <div className="r-info">
+            {company.address ? <div>{company.address}</div> : null}
+            {company.mobile ? <div>Phone: {company.mobile}</div> : null}
+            {company.email ? <div>{company.email}</div> : null}
+            {company.gst_number ? <div>GST: {company.gst_number}</div> : null}
           </div>
         </div>
 
-        {/* ═══════════ 2. DASHED SEPARATOR ═══════════ */}
-        <hr className="r-dash" />
+        <hr className="r-sep" />
 
-        {/* ═══════════ 3. INVOICE DETAILS (left) | CUSTOMER (right) ═══════════ */}
-        <table className="r-info">
+        {/* BILL & CUSTOMER INFO */}
+        <table className="r-line">
           <tbody>
             <tr>
-              <td className="r-left">
+              <td className="r-lft">
                 Bill No: {billNum}<br />
                 Date: {formatDate(sale.bill_date)}<br />
                 Time: {formatTime(sale.bill_time)}<br />
                 Cashier: {cashierName}
               </td>
-              <td className="r-right">
-                Customer: {sale.customer_name || 'Walk-In'}<br />
-                {sale.customer_mobile ? `Mobile: ${sale.customer_mobile}` : ''}<br />
-                {sale.customer_address || ''}
+              <td className="r-rgt">
+                {sale.customer_name && sale.customer_name !== 'Walk-In Customer' ? (
+                  <>
+                    {sale.customer_name}<br />
+                    {sale.customer_mobile || ''}
+                  </>
+                ) : (
+                  <>Customer: Walk-In</>
+                )}
               </td>
             </tr>
           </tbody>
         </table>
 
-        <hr className="r-dash" />
+        <hr className="r-sep" />
 
-        {/* ═══════════ 4. ITEMS TABLE ═══════════ */}
-        <table className="r-items">
+        {/* ITEMS TABLE */}
+        <table className="r-tbl">
           <thead>
             <tr>
               <th style={{ width: '4mm', textAlign: 'center' }}>#</th>
-              <th style={{ textAlign: 'left' }}>Item Name</th>
-              <th style={{ width: '6mm', textAlign: 'center' }}>Unit</th>
+              <th>Item</th>
+              <th style={{ width: '5mm', textAlign: 'center' }}>Unt</th>
               <th style={{ width: '6mm', textAlign: 'center' }}>Qty</th>
               <th style={{ width: '11mm', textAlign: 'right' }}>Rate</th>
-              <th style={{ width: '7mm', textAlign: 'center' }}>Disc%</th>
-              <th style={{ width: '13mm', textAlign: 'right' }}>Amount</th>
+              <th style={{ width: '6mm', textAlign: 'center' }}>Disc</th>
+              <th style={{ width: '13mm', textAlign: 'right' }}>Amt</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, idx) => (
               <tr key={item.id || idx}>
-                <td className="ctr">{idx + 1}</td>
-                <td><span className="item-name">{item.product_name}</span></td>
-                <td className="ctr">{item.unit || '-'}</td>
-                <td className="ctr">{Number(item.quantity)}</td>
-                <td className="amt">{Number(item.rate).toFixed(2)}</td>
-                <td className="ctr">{Number(item.discount_percentage) > 0 ? Number(item.discount_percentage).toFixed(1) : '-'}</td>
-                <td className="amt">{Number(item.amount).toFixed(2)}</td>
+                <td className="c">{idx + 1}</td>
+                <td className="wrp">{item.product_name}</td>
+                <td className="c">{item.unit || '-'}</td>
+                <td className="c">{Number(item.quantity)}</td>
+                <td className="a">{Number(item.rate).toFixed(2)}</td>
+                <td className="c">{Number(item.discount_percentage) > 0 ? Number(item.discount_percentage).toFixed(1) : '-'}</td>
+                <td className="a">{Number(item.amount).toFixed(2)}</td>
               </tr>
             ))}
             {items.length === 0 && (
@@ -216,93 +240,90 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           </tbody>
         </table>
 
-        <hr className="r-dash" />
+        <hr className="r-sep" />
 
-        {/* ═══════════ 5. SUB TOTAL & DISCOUNT ═══════════ */}
-        <table className="r-totals">
+        {/* TOTALS */}
+        <table className="r-sum">
           <tbody>
             <tr>
-              <td className="label">Sub Total</td>
-              <td className="value">{formatCurrency(subtotal)}</td>
+              <td className="l">Sub Total</td>
+              <td className="v">{formatCurrency(subtotal)}</td>
             </tr>
-            {discountAmount > 0 && (
+            {discountAmount > 0 ? (
               <tr>
-                <td className="label">Discount</td>
-                <td className="value">-{formatCurrency(discountAmount)}</td>
+                <td className="l">Discount</td>
+                <td className="v">-{formatCurrency(discountAmount)}</td>
               </tr>
-            )}
-            {gstAmount > 0 && (
+            ) : null}
+            {gstAmount > 0 ? (
               <tr>
-                <td className="label">GST</td>
-                <td className="value">{formatCurrency(gstAmount)}</td>
+                <td className="l">GST</td>
+                <td className="v">{formatCurrency(gstAmount)}</td>
               </tr>
-            )}
-            {roundOff !== 0 && (
+            ) : null}
+            {roundOff !== 0 ? (
               <tr>
-                <td className="label">Round Off</td>
-                <td className="value">{roundOff.toFixed(2)}</td>
+                <td className="l">Round Off</td>
+                <td className="v">{roundOff.toFixed(2)}</td>
               </tr>
-            )}
+            ) : null}
           </tbody>
         </table>
 
-        {/* ═══════════ 6. GRAND TOTAL (black bg, white text) ═══════════ */}
-        <table className="r-grand-total">
+        {/* GRAND TOTAL */}
+        <table className="r-gt">
           <tbody>
             <tr>
-              <td className="label">Grand Total</td>
-              <td className="value">{formatCurrency(Math.round(grandTotal))}</td>
+              <td className="l">Grand Total</td>
+              <td className="v">{formatCurrency(Math.round(grandTotal))}</td>
             </tr>
           </tbody>
         </table>
 
-        <hr className="r-dash" />
+        <hr className="r-sep" />
 
-        {/* ═══════════ 7. PAYMENT INFO (left) | BANK DETAILS (right) ═══════════ */}
-        <table className="r-two-col">
+        {/* PAYMENT & BANK */}
+        <table className="r-2col">
           <tbody>
             <tr>
               <td style={{ width: '50%' }}>
-                <div className="col-title">Payment Info</div>
+                <div className="t">Payment</div>
                 <div>Mode: {(sale.payment_mode || 'CASH').toUpperCase()}</div>
                 <div>Amount: {formatCurrency(Math.round(grandTotal))}</div>
               </td>
               <td style={{ width: '50%' }}>
-                <div className="col-title">Bank Details</div>
+                <div className="t">Bank</div>
                 <div>{settings['bank_name'] || '-'}</div>
-                <div>{settings['account_name'] ? `Name: ${settings['account_name']}` : ''}</div>
-                <div>{settings['account_number'] ? `A/c: ${settings['account_number']}` : ''}</div>
-                <div>{settings['ifsc_code'] ? `IFSC: ${settings['ifsc_code']}` : ''}</div>
-                {upiId && <div>UPI: {upiId}</div>}
+                {settings['account_number'] ? <div>A/c: {settings['account_number']}</div> : null}
+                {settings['ifsc_code'] ? <div>IFSC: {settings['ifsc_code']}</div> : null}
+                {upiId ? <div>UPI: {upiId}</div> : null}
               </td>
             </tr>
           </tbody>
         </table>
 
-        {sale.notes && (
-          <div style={{ fontSize: '7pt', marginBottom: '1mm' }}>
-            Notes: {sale.notes}
-          </div>
-        )}
+        {sale.notes ? (
+          <div style={{ fontSize: '7.5pt', marginBottom: '1mm' }}>Notes: {sale.notes}</div>
+        ) : null}
 
-        {/* ═══════════ 8. QR CODE (centered) ═══════════ */}
-        {qrDataUrl && (
+        {/* QR CODE */}
+        {qrDataUrl ? (
           <div className="r-qr">
             <img src={qrDataUrl} alt="UPI QR" />
           </div>
-        )}
+        ) : null}
 
-        {/* ═══════════ 9. BARCODE (below QR) ═══════════ */}
-        <div className="r-barcode">
+        {/* BARCODE */}
+        <div className="r-bar">
           <Barcode39 value={billNum || company.company_name || 'BILL'} />
-          <div className="r-barcode-label">{billNum || 'BILL'}</div>
+          <div className="r-bar-lbl">{billNum || 'BILL'}</div>
         </div>
 
-        {/* ═══════════ 10. FOOTER ═══════════ */}
-        <hr className="r-dash" />
-        <div className="r-footer">
-          <div className="r-thankyou">THANK YOU VISIT AGAIN!</div>
-          <div className="r-shop">{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
+        {/* FOOTER */}
+        <hr className="r-sep" />
+        <div className="r-foot">
+          <div className="r-tku">THANK YOU VISIT AGAIN!</div>
+          <div className="r-sn">{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
         </div>
       </div>
     </div>
