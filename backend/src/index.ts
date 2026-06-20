@@ -20,6 +20,7 @@ import exportRoutes from './routes/exports';
 import settingsRoutes from './routes/settings';
 import uploadRoutes from './routes/upload';
 import invoiceRoutes from './routes/invoice';
+import paymentRoutes from './routes/payments';
 import { sanitizeInput } from './middleware/sanitize';
 
 dotenv.config();
@@ -68,6 +69,7 @@ app.use('/api/exports', exportRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/invoice', invoiceRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Root redirect
 app.get('/', (_req, res) => {

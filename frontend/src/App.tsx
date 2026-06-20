@@ -16,6 +16,7 @@ const Reports = lazy(() => import('./pages/Reports').then(m => ({ default: m.Rep
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const ReceiptPrint = lazy(() => import('./pages/ReceiptPrint').then(m => ({ default: m.ReceiptPrint })));
 const InvoicePage = lazy(() => import('./pages/InvoicePage').then(m => ({ default: m.InvoicePage })));
+const PendingPayments = lazy(() => import('./pages/PendingPayments').then(m => ({ default: m.PendingPayments })));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token);
@@ -59,6 +60,7 @@ function App() {
             <Route path="customers" element={<Customers />} />
             <Route path="suppliers" element={<Suppliers />} />
             <Route path="reports" element={<Reports />} />
+            <Route path="pending-payments" element={<PendingPayments />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="receipt/:id" element={<ReceiptPrint />} />

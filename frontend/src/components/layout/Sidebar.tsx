@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, IndianRupee, Package, ShoppingCart, Warehouse,
-  Users, BarChart3, Settings, LogOut, Store,
+  Users, BarChart3, Settings, LogOut, Store, AlertTriangle,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,7 @@ const menuItems = [
   { path: '/stock', label: 'Stock', icon: Warehouse },
   { path: '/customers', label: 'Customers', icon: Users },
   { path: '/suppliers', label: 'Suppliers', icon: Store },
+  { path: '/pending-payments', label: 'Pending Payments', icon: AlertTriangle },
   { path: '/reports', label: 'Reports', icon: BarChart3 },
   { path: '/settings', label: 'Settings', icon: Settings },
 ];
