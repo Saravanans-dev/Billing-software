@@ -1,6 +1,6 @@
-import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import JWT_SECRET from '../config/jwt';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -10,15 +10,6 @@ export interface AuthRequest extends Request {
     full_name: string;
   };
 }
-
-function getJwtSecret(): string {
-  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
-  const generated = crypto.randomBytes(32).toString('hex');
-  console.warn('JWT_SECRET not set — using auto-generated random secret. Tokens will be invalidated on server restart. Set JWT_SECRET env var for persistence.');
-  return generated;
-}
-
-const JWT_SECRET = getJwtSecret();
 
 export function authenticate(req: AuthRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
