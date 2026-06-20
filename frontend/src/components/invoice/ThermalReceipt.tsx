@@ -10,6 +10,29 @@ interface ThermalReceiptProps {
   settings: Record<string, string>;
 }
 
+const s = {
+  page: { width: '80mm', margin: '0 auto', background: '#fff', fontFamily: "'Courier New','Courier',monospace", color: '#000', fontSize: '9pt', lineHeight: '1.35' },
+  inner: { width: '72mm', padding: '2mm 4mm', margin: '0 auto' },
+  c: { textAlign: 'center' as const },
+  r: { textAlign: 'right' as const },
+  l: { textAlign: 'left' as const },
+  b: { fontWeight: '700' as const },
+  shop: { fontSize: '14pt', fontWeight: '900' as const, letterSpacing: '0.5px' },
+  info: { fontSize: '8pt', lineHeight: '1.5' },
+  dtl: { fontSize: '8pt', lineHeight: '1.6' },
+  dash: { border: 'none', borderTop: '1px dashed #000', margin: '1.5mm 0' },
+  th: { padding: '0.5mm 0.3mm', fontWeight: '700' as const, borderTop: '1px dashed #000', borderBottom: '1px dashed #000', fontSize: '7.5pt', whiteSpace: 'nowrap' as const },
+  td: { padding: '0.3mm 0.3mm', borderBottom: '0.5px dotted #ccc', verticalAlign: 'bottom' as const, fontSize: '8pt' },
+  rgt: { textAlign: 'right' as const, padding: '0.3mm 0.3mm' },
+  lft: { textAlign: 'left' as const, padding: '0.3mm 0.3mm' },
+  gt: { fontSize: '10pt', fontWeight: '900' as const, background: '#000', color: '#fff' },
+  gtd: { padding: '0.6mm 0.3mm' },
+  qr: { textAlign: 'center' as const, margin: '1.5mm 0' },
+  qri: { width: '30mm', height: '30mm' },
+  logo: { maxWidth: '35mm', maxHeight: '12mm', objectFit: 'contain' as const },
+  foot: { textAlign: 'center' as const, fontSize: '8pt', lineHeight: '1.4' },
+};
+
 export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps) {
   const [qrDataUrl, setQrDataUrl] = useState('');
 
@@ -62,148 +85,120 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none !important; }
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        .r {
-          width: 72mm;
-          padding: 2mm 4mm;
-          font-family: 'Courier New', 'Courier', monospace;
-          color: #000;
-          background: #fff;
-          margin: 0 auto;
-        }
-        .c { text-align: center; }
-        .rgt { text-align: right; }
-        .lft { text-align: left; }
-        .b { font-weight: 700; }
-        .fs8 { font-size: 8pt; line-height: 1.4; }
-        .fs9 { font-size: 9pt; line-height: 1.35; }
-        .fs10 { font-size: 10pt; }
-        .shop { font-size: 14pt; font-weight: 900; letter-spacing: 0.5px; }
-        .dash { border: none; border-top: 1px dashed #000; margin: 1.5mm 0; }
-        .dtl { font-size: 8pt; line-height: 1.6; }
-        .itbl { width: 100%; font-size: 8pt; border-collapse: collapse; }
-        .itbl th { padding: 0.5mm 0.3mm; font-weight: 700; border-top: 1px dashed #000; border-bottom: 1px dashed #000; font-size: 7.5pt; }
-        .itbl td { padding: 0.3mm 0.3mm; border-bottom: 0.5px dotted #ccc; vertical-align: bottom; }
-        .stbl { width: 100%; font-size: 8pt; border-collapse: collapse; }
-        .stbl td { padding: 0.3mm 0.3mm; }
-        .gtbl { width: 100%; font-size: 10pt; font-weight: 900; border-collapse: collapse; }
-        .gtbl td { padding: 0.6mm 0.3mm; }
-        .qr { text-align: center; margin: 1.5mm 0; }
-        .qr img { width: 30mm; height: 30mm; }
       `}</style>
-
-      <div className="r fs9">
+      <div style={s.page}>
+      <div style={{ ...s.inner, fontSize: '9pt', lineHeight: '1.35' }}>
         {/* LOGO */}
         {logoUrl ? (
-          <div className="c" style={{ marginBottom: '1mm' }}>
-            <img src={logoUrl} alt="Logo" style={{ maxWidth: '35mm', maxHeight: '12mm', objectFit: 'contain' }} crossOrigin="anonymous" />
+          <div style={s.c}>
+            <img src={logoUrl} alt="" style={s.logo} crossOrigin="anonymous" />
           </div>
         ) : null}
 
-        {/* SHOP NAME & ADDRESS */}
-        <div className="c fs8">
-          <div className="shop">{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
+        {/* SHOP HEADER */}
+        <div style={{ ...s.c, ...s.info }}>
+          <div style={s.shop}>{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
           {company.address ? <div>{company.address}</div> : null}
           {company.mobile ? <div>Ph: {company.mobile}</div> : null}
           {company.gst_number ? <div>GST: {company.gst_number}</div> : null}
         </div>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
 
         {/* BILL INFO */}
-        <div className="dtl">
+        <div style={s.dtl}>
           Bill No : {billNum}<br />
           Date &nbsp;&nbsp;&nbsp;: {formatDate(sale.bill_date)}<br />
           Time &nbsp;&nbsp;&nbsp;: {formatTime(sale.bill_time)}
         </div>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
 
         {/* CUSTOMER */}
-        <div className="dtl">
+        <div style={s.dtl}>
           Customer : {sale.customer_name || 'Walk-In Customer'}<br />
           Mobile &nbsp;&nbsp;: {sale.customer_mobile || '-'}
         </div>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
 
         {/* ITEMS TABLE */}
-        <table className="itbl">
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8pt' }}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left' }}>Item</th>
-              <th style={{ width: '8mm', textAlign: 'center' }}>Qty</th>
-              <th style={{ width: '12mm', textAlign: 'right' }}>Rate</th>
-              <th style={{ width: '14mm', textAlign: 'right' }}>Amt</th>
+              <th style={{ ...s.th, textAlign: 'left' }}>Item</th>
+              <th style={{ ...s.th, width: '8mm', textAlign: 'center' }}>Qty</th>
+              <th style={{ ...s.th, width: '12mm', textAlign: 'right' }}>Rate</th>
+              <th style={{ ...s.th, width: '14mm', textAlign: 'right' }}>Amt</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, idx) => (
               <tr key={item.id || idx}>
-                <td style={{ maxWidth: '34mm', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product_name}</td>
-                <td className="c">{Number(item.quantity)}</td>
-                <td className="rgt">{Number(item.rate).toFixed(2)}</td>
-                <td className="rgt">{Number(item.amount).toFixed(2)}</td>
+                <td style={{ ...s.td, maxWidth: '34mm', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product_name}</td>
+                <td style={{ ...s.td, textAlign: 'center' }}>{Number(item.quantity)}</td>
+                <td style={{ ...s.td, textAlign: 'right' }}>{Number(item.rate).toFixed(2)}</td>
+                <td style={{ ...s.td, textAlign: 'right' }}>{Number(item.amount).toFixed(2)}</td>
               </tr>
             ))}
             {items.length === 0 ? (
               <tr>
-                <td colSpan={4} className="c" style={{ padding: '2mm', color: '#999' }}>No items</td>
+                <td colSpan={4} style={{ padding: '2mm', textAlign: 'center', color: '#999', fontSize: '8pt' }}>No items</td>
               </tr>
             ) : null}
           </tbody>
         </table>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
 
-        {/* SUBTOTAL / DISCOUNT / GST */}
-        <table className="stbl">
+        {/* TOTALS */}
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8pt' }}>
           <tbody>
             <tr>
-              <td>Subtotal</td>
-              <td className="rgt">{formatCurrency(subtotal)}</td>
+              <td style={s.lft}>Subtotal</td>
+              <td style={s.rgt}>{formatCurrency(subtotal)}</td>
             </tr>
             {discountAmount > 0 ? (
               <tr>
-                <td>Discount</td>
-                <td className="rgt">{formatCurrency(discountAmount)}</td>
+                <td style={s.lft}>Discount</td>
+                <td style={s.rgt}>{formatCurrency(discountAmount)}</td>
               </tr>
             ) : null}
             {gstAmount > 0 ? (
               <tr>
-                <td>GST</td>
-                <td className="rgt">{formatCurrency(gstAmount)}</td>
+                <td style={s.lft}>GST</td>
+                <td style={s.rgt}>{formatCurrency(gstAmount)}</td>
               </tr>
             ) : null}
           </tbody>
         </table>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
 
         {/* GRAND TOTAL */}
-        <table className="gtbl">
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
-            <tr>
-              <td>GRAND TOTAL</td>
-              <td className="rgt">{formatCurrency(Math.round(grandTotal))}</td>
+            <tr style={s.gt}>
+              <td style={s.gtd}>GRAND TOTAL</td>
+              <td style={{ ...s.gtd, textAlign: 'right' }}>{formatCurrency(Math.round(grandTotal))}</td>
             </tr>
           </tbody>
         </table>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
 
         {/* PAYMENT */}
-        <div className="dtl">
+        <div style={s.dtl}>
           Payment Method : {(sale.payment_mode || 'Cash').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
         </div>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
 
         {/* BANK DETAILS */}
-        <div className="c fs8" style={{ marginBottom: '1mm' }}>
-          <span className="b">BANK DETAILS</span>
+        <div style={{ ...s.c, ...s.info, marginBottom: '1mm' }}>
+          <span style={s.b}>BANK DETAILS</span>
         </div>
-        <div className="dtl">
+        <div style={s.dtl}>
           {settings['bank_name'] ? <div>Bank Name : {settings['bank_name']}</div> : null}
           {settings['account_name'] ? <div>A/C Name&nbsp;&nbsp;: {settings['account_name']}</div> : null}
           {settings['account_number'] ? <div>A/C No&nbsp;&nbsp;&nbsp;&nbsp;: {settings['account_number']}</div> : null}
@@ -211,25 +206,26 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
           {upiId ? <div>UPI ID&nbsp;&nbsp;&nbsp;&nbsp;: {upiId}</div> : null}
         </div>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
 
         {/* QR CODE */}
         {qrDataUrl ? (
-          <div className="qr">
-            <img src={qrDataUrl} alt="UPI QR" />
+          <div style={s.qr}>
+            <img src={qrDataUrl} alt="UPI QR" style={s.qri} />
           </div>
         ) : null}
 
         {/* FOOTER */}
-        <div className="c fs8" style={{ marginTop: '1mm' }}>
-          <div className="b fs10" style={{ letterSpacing: '0.5px' }}>Thank You Visit Again!</div>
-          <div style={{ marginTop: '0.3mm' }}>{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
+        <div style={s.foot}>
+          <div style={{ fontWeight: '900', fontSize: '10pt', letterSpacing: '0.5px' }}>Thank You Visit Again!</div>
+          <div>{company.company_name?.toUpperCase() || 'SHOP NAME'}</div>
           {company.email ? <div>{company.email}</div> : null}
           {company.mobile ? <div>Ph: {company.mobile}</div> : null}
         </div>
 
-        <hr className="dash" />
+        <hr style={s.dash} />
       </div>
+    </div>
     </div>
   );
 }
