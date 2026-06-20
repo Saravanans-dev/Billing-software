@@ -20,16 +20,14 @@ export function ThermalReceipt({ sale, company, settings }: ThermalReceiptProps)
   const upiId = settings['upi_id'] || '';
   const logoUrl = company.logo_url ? `${BACKEND_URL}${company.logo_url}` : '';
 
-  const upiLink = upiId
+  const qrData = upiId
     ? `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(company.company_name || '')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(sale.bill_number || '')}`
-    : '';
+    : `Bill No: ${sale.bill_number || ''} | ₹${grandTotal.toFixed(2)}`;
 
   useEffect(() => {
-    if (upiLink) {
-      QRCode.toDataURL(upiLink, { width: 140, margin: 1, color: { dark: '#000000', light: '#ffffff' } })
-        .then(setQrDataUrl).catch(() => {});
-    }
-  }, [upiLink]);
+    QRCode.toDataURL(qrData, { width: 140, margin: 1, color: { dark: '#000000', light: '#ffffff' } })
+      .then(setQrDataUrl).catch(() => {});
+  }, [qrData]);
 
   const formatDate = (d: string) => {
     if (!d) return '';
