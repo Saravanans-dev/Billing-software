@@ -29,7 +29,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 const corsOrigin = process.env.CORS_ORIGIN;
 if (corsOrigin) {
   app.use(cors({ origin: corsOrigin.split(',').map(s => s.trim()), credentials: true }));
