@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import { Layout } from './components/layout/Layout';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useCallback } from 'react';
 
 const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
@@ -24,6 +24,42 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const token = useAuthStore((s) => s.token);
+  if (token) return <Navigate to="/billing" replace />;
+  return <>{children}</>;
+}
+
+function AuthGuard() {
+  const token = useAuthStore((s) => s.token);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const redirectFromLogin = useCallback(() => {
+    if (token && location.pathname === '/login') {
+      navigate('/billing', { replace: true });
+    }
+  }, [token, location.pathname, navigate]);
+
+  useEffect(() => {
+    redirectFromLogin();
+  }, [redirectFromLogin]);
+
+  useEffect(() => {
+    if (!token) return;
+    const handlePopState = () => {
+      if (window.location.pathname === '/login') {
+        window.history.pushState(null, '', window.location.href);
+        navigate('/billing', { replace: true });
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [token, navigate]);
+
+  return null;
+}
+
 function App() {
   const verifyAuth = useAuthStore((s) => s.verifyAuth);
 
@@ -40,9 +76,10 @@ function App() {
           style: { fontSize: '13px', borderRadius: '8px' },
         }}
       />
+      <AuthGuard />
       <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-gray-50"><div className="text-gray-400 text-sm">Loading...</div></div>}>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route
             path="/"
             element={

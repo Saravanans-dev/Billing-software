@@ -105,6 +105,11 @@ function createWindow() {
 
   mainWindow.webContents.on('before-input-event', (_event, input) => {
     if (input.type === 'keyDown') {
+      // Block Alt+Left (back) and Alt+Right (forward) navigation
+      if (input.alt && (input.key === 'ArrowLeft' || input.key === 'ArrowRight')) {
+        _event.preventDefault();
+        return;
+      }
       if (input.key === 'Enter' && barcodeBuffer.length > 3) {
         mainWindow.webContents.send('barcode-scanned', barcodeBuffer);
         barcodeBuffer = '';
@@ -115,6 +120,13 @@ function createWindow() {
         clearTimeout(barcodeTimer);
         barcodeTimer = setTimeout(() => { barcodeBuffer = ''; }, 80);
       }
+    }
+  });
+
+  // Block mouse back/forward buttons
+  mainWindow.on('app-command', (_event, command) => {
+    if (command === 'browser-backward' || command === 'browser-forward') {
+      _event.preventDefault();
     }
   });
 

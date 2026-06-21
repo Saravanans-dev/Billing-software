@@ -32,7 +32,7 @@ export function Login() {
     try {
       await login(username, password);
       toast.success('Login successful');
-      navigate('/billing');
+      navigate('/billing', { replace: true });
     } catch (error: any) {
       toast.error(error.message || 'Login failed');
     } finally {
