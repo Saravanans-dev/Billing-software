@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Store, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { BACKEND_URL } from '../services/api';
 import toast from 'react-hot-toast';
 
 export function Login() {
@@ -10,6 +11,7 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
 
@@ -36,9 +38,18 @@ export function Login() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
-              <Store className="w-8 h-8 text-white" />
-            </div>
+            {!logoError ? (
+              <img
+                src={`${BACKEND_URL}/uploads/logo.jpeg`}
+                alt="Logo"
+                className="w-20 h-20 object-contain mx-auto mb-4"
+                onError={() => setLogoError(true)}
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
+                <Store className="w-8 h-8 text-white" />
+              </div>
+            )}
             <h1 className="text-xl font-bold text-gray-900">Student Xerox</h1>
             <p className="text-sm text-gray-500 mt-1">Billing Software</p>
           </div>
