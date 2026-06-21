@@ -7,9 +7,9 @@ services:
     environment:
       POSTGRES_DB: student_xerox_billing
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required. Set it in .env or environment}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
@@ -28,9 +28,9 @@ services:
       DB_PORT: 5432
       DB_NAME: student_xerox_billing
       DB_USER: postgres
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      JWT_SECRET: ${JWT_SECRET:-student-xerox-billing-jwt-secret-key-2026}
-      CORS_ORIGIN: "*"
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required. Set it in .env or environment}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required. Set it in .env or environment}
+      CORS_ORIGIN: ${CORS_ORIGIN:-"*"}
     depends_on:
       - postgres
     restart: unless-stopped

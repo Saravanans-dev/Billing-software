@@ -29,13 +29,35 @@ async function generatePurchaseNumber(): Promise<string> {
 export async function createPurchase(req: AuthRequest, res: Response) {
   const client = await pool.connect();
   try {
+    if (!req.body.items || !Array.isArray(req.body.items) || req.body.items.length === 0) {
+      return res.status(400).json({ error: 'At least one item is required' });
+    }
+
+    for (const item of req.body.items) {
+      if (typeof item.product_name !== 'string' || item.product_name.trim() === '') {
+        return res.status(400).json({ error: 'Each item must have a product name' });
+      }
+      if (typeof item.quantity !== 'number' || item.quantity <= 0) {
+        return res.status(400).json({ error: `Invalid quantity for ${item.product_name}` });
+      }
+      if (typeof item.rate !== 'number' || item.rate < 0) {
+        return res.status(400).json({ error: `Invalid rate for ${item.product_name}` });
+      }
+      if (typeof item.amount !== 'number' || item.amount < 0) {
+        return res.status(400).json({ error: `Invalid amount for ${item.product_name}` });
+      }
+    }
+
+    if (typeof req.body.grand_total !== 'number' || req.body.grand_total < 0) {
+      return res.status(400).json({ error: 'Invalid grand total' });
+    }
+    if (typeof req.body.subtotal !== 'number' || req.body.subtotal < 0) {
+      return res.status(400).json({ error: 'Invalid subtotal' });
+    }
+
     await client.query('BEGIN');
     const purchaseNumber = await generatePurchaseNumber();
     const { supplier_id, supplier_name, supplier_mobile, items, subtotal, gst_amount, grand_total, payment_mode, notes } = req.body;
-
-    if (!items || items.length === 0) {
-      return res.status(400).json({ error: 'At least one item is required' });
-    }
 
     const purchaseResult = await client.query(
       `INSERT INTO purchases (purchase_number, supplier_id, supplier_name, supplier_mobile, subtotal, gst_amount, grand_total, payment_mode, user_id, notes)
@@ -45,6 +67,7 @@ export async function createPurchase(req: AuthRequest, res: Response) {
 
     for (const item of items) {
       if (item.product_id) {
+        const rate = typeof item.rate === 'number' && item.rate > 0 ? item.rate : 0;
         await client.query(
           `INSERT INTO products (id, product_name, category, unit, hsn_code, gst_percentage, purchase_rate, wholesale_rate, retail_rate, current_stock)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -53,7 +76,7 @@ export async function createPurchase(req: AuthRequest, res: Response) {
            wholesale_rate = CASE WHEN $8 > 0 THEN $8 ELSE products.wholesale_rate END,
            retail_rate = CASE WHEN $9 > 0 THEN $9 ELSE products.retail_rate END,
            current_stock = products.current_stock + $10`,
-          [item.product_id, item.product_name, item.category, item.unit, item.hsn_code, item.gst_percentage, item.rate, item.rate, item.rate, item.quantity]
+          [item.product_id, item.product_name, item.category, item.unit, item.hsn_code, item.gst_percentage, rate, rate, rate, item.quantity]
         );
 
         await client.query(

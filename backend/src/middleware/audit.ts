@@ -2,6 +2,22 @@ import { Response, NextFunction } from 'express';
 import { AuthRequest } from './auth';
 import pool from '../config/database';
 
+const SENSITIVE_FIELDS = new Set(['password', 'current_password', 'new_password', 'password_hash']);
+
+function sanitizeForAudit(obj: Record<string, unknown>): Record<string, unknown> {
+  const sanitized: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (SENSITIVE_FIELDS.has(key)) {
+      sanitized[key] = '[REDACTED]';
+    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+      sanitized[key] = sanitizeForAudit(value as Record<string, unknown>);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+  return sanitized;
+}
+
 export function auditLog(action: string, entityType?: string) {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     const originalJson = res.json.bind(res);
@@ -16,7 +32,7 @@ export function auditLog(action: string, entityType?: string) {
             action,
             entityType || null,
             entityId,
-            JSON.stringify({ body: req.body, params: req.params }),
+            JSON.stringify({ body: sanitizeForAudit(req.body), params: req.params }),
             req.ip,
           ]
         ).catch((err) => console.error('Audit log error:', err));

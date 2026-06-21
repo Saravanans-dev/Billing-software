@@ -294,6 +294,18 @@ export async function runMigrations() {
       await client.query("INSERT INTO company_settings (company_name, address, mobile) VALUES ('Student Xerox', 'Therikiyur, Ayyampalayam, Trichy - 621005', '9876543210') ON CONFLICT DO NOTHING");
       await client.query("INSERT INTO settings (setting_key, setting_value) VALUES ('financial_year', '2026-27') ON CONFLICT DO NOTHING");
     }
+
+    // Add login_attempts and locked_until columns if not exist (migration)
+    await client.query(`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='login_attempts') THEN
+          ALTER TABLE users ADD COLUMN login_attempts INTEGER DEFAULT 0;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='locked_until') THEN
+          ALTER TABLE users ADD COLUMN locked_until TIMESTAMP;
+        END IF;
+      END $$;
+    `);
   } catch (error) {
     console.error('Migration error:', error);
   } finally {

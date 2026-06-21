@@ -1,9 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import pool from '../config/database';
+import { authenticate, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
-router.get('/:billNumber(.*)', async (req: Request, res: Response) => {
+router.get('/:billNumber(.*)', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { billNumber } = req.params;
 

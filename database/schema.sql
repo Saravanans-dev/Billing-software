@@ -14,6 +14,8 @@ CREATE TABLE users (
     mobile VARCHAR(20),
     role VARCHAR(20) NOT NULL DEFAULT 'operator' CHECK (role IN ('admin', 'manager', 'operator')),
     is_active BOOLEAN DEFAULT true,
+    login_attempts INTEGER DEFAULT 0,
+    locked_until TIMESTAMP,
     last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

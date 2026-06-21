@@ -57,9 +57,13 @@ export function InvoicePage() {
 
   useEffect(() => {
     if (!billNumber) return;
-    fetch(`${API_URL}/invoice/${encodeURIComponent(billNumber)}`)
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    fetch(`${API_URL}/invoice/${encodeURIComponent(billNumber)}`, { headers })
       .then((r) => {
         if (r.status === 404) { setNotFound(true); setLoading(false); return null; }
+        if (r.status === 401) { setNotFound(true); setLoading(false); return null; }
         return r.json();
       })
       .then((data) => {

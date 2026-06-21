@@ -29,6 +29,41 @@ async function generateBillNumber(): Promise<string> {
 export async function createSale(req: AuthRequest, res: Response) {
   const client = await pool.connect();
   try {
+    if (!req.body.items || !Array.isArray(req.body.items) || req.body.items.length === 0) {
+      return res.status(400).json({ error: 'At least one item is required' });
+    }
+
+    for (const item of req.body.items) {
+      if (typeof item.product_name !== 'string' || item.product_name.trim() === '') {
+        return res.status(400).json({ error: 'Each item must have a product name' });
+      }
+      if (typeof item.quantity !== 'number' || item.quantity <= 0) {
+        return res.status(400).json({ error: `Invalid quantity for ${item.product_name}` });
+      }
+      if (typeof item.rate !== 'number' || item.rate < 0) {
+        return res.status(400).json({ error: `Invalid rate for ${item.product_name}` });
+      }
+      if (typeof item.amount !== 'number' || item.amount < 0) {
+        return res.status(400).json({ error: `Invalid amount for ${item.product_name}` });
+      }
+      if (typeof item.gst_percentage !== 'number' || item.gst_percentage < 0) {
+        return res.status(400).json({ error: `Invalid GST percentage for ${item.product_name}` });
+      }
+      if (typeof item.gst_amount !== 'number' || item.gst_amount < 0) {
+        return res.status(400).json({ error: `Invalid GST amount for ${item.product_name}` });
+      }
+    }
+
+    if (typeof req.body.grand_total !== 'number' || req.body.grand_total < 0) {
+      return res.status(400).json({ error: 'Invalid grand total' });
+    }
+    if (typeof req.body.subtotal !== 'number' || req.body.subtotal < 0) {
+      return res.status(400).json({ error: 'Invalid subtotal' });
+    }
+    if (typeof req.body.discount_amount !== 'number' || req.body.discount_amount < 0) {
+      return res.status(400).json({ error: 'Invalid discount amount' });
+    }
+
     await client.query('BEGIN');
     const billNumber = await generateBillNumber();
     const {
@@ -36,10 +71,6 @@ export async function createSale(req: AuthRequest, res: Response) {
       items, subtotal, discount_type, discount_value, discount_amount,
       taxable_amount, gst_amount, grand_total, round_off, payment_mode, notes,
     } = req.body;
-
-    if (!items || items.length === 0) {
-      return res.status(400).json({ error: 'At least one item is required' });
-    }
 
     const saleResult = await client.query(
       `INSERT INTO sales (bill_number, customer_id, customer_name, customer_mobile, customer_address, customer_gst,
@@ -58,20 +89,22 @@ export async function createSale(req: AuthRequest, res: Response) {
       );
 
       if (item.product_id) {
-        const stockCheck = await client.query('SELECT current_stock FROM products WHERE id = $1', [item.product_id]);
-        const currentStock = parseFloat(stockCheck.rows[0]?.current_stock) || 0;
-        if (currentStock < item.quantity) {
+        const result = await client.query(
+          `UPDATE products SET current_stock = current_stock - $1 
+           WHERE id = $2 AND current_stock >= $3 
+           RETURNING current_stock`,
+          [item.quantity, item.product_id, item.quantity]
+        );
+        if (result.rows.length === 0) {
+          const stockCheck = await client.query('SELECT current_stock FROM products WHERE id = $1', [item.product_id]);
+          const currentStock = parseFloat(stockCheck.rows[0]?.current_stock) || 0;
           throw new Error(`Insufficient stock for ${item.product_name}: available ${currentStock}, required ${item.quantity}`);
         }
-        await client.query(
-          'UPDATE products SET current_stock = current_stock - $1 WHERE id = $2',
-          [item.quantity, item.product_id]
-        );
 
         await client.query(
           `INSERT INTO stock_transactions (product_id, transaction_type, reference_id, quantity, rate, balance_quantity, user_id)
-           VALUES ($1, 'sale', $2, $3, $4, (SELECT current_stock FROM products WHERE id = $1), $5)`,
-          [item.product_id, saleResult.rows[0].id, item.quantity, item.rate, req.user?.id]
+           VALUES ($1, 'sale', $2, $3, $4, $5, $6)`,
+          [item.product_id, saleResult.rows[0].id, item.quantity, item.rate, result.rows[0].current_stock, req.user?.id]
         );
       }
     }
@@ -88,7 +121,7 @@ export async function createSale(req: AuthRequest, res: Response) {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Create sale error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
   } finally {
     client.release();
   }
