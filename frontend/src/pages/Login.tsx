@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Store, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import { BACKEND_URL } from '../services/api';
+import api, { BACKEND_URL } from '../services/api';
 import toast from 'react-hot-toast';
 
 export function Login() {
@@ -11,9 +11,16 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [logoUrl, setLogoUrl] = useState('');
   const [logoError, setLogoError] = useState(false);
   const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.get('/settings/company').then(({ data }) => {
+      if (data.logo_url) setLogoUrl(data.logo_url);
+    }).catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,11 +45,11 @@ export function Login() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           <div className="text-center mb-8">
-            {!logoError ? (
+            {logoUrl && !logoError ? (
               <img
-                src={`${BACKEND_URL}/uploads/logo.jpeg`}
+                src={`${BACKEND_URL}${logoUrl}`}
                 alt="Logo"
-                className="w-20 h-20 object-contain mx-auto mb-4"
+                className="w-[120px] h-[120px] object-contain mx-auto mb-4"
                 onError={() => setLogoError(true)}
               />
             ) : (

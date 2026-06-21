@@ -6,9 +6,11 @@ import {
 import { authenticate, authorize } from '../middleware/auth';
 
 const router = Router();
-router.use(authenticate);
 
 router.get('/company', getCompanySettings);
+
+router.use(authenticate);
+
 router.put('/company', authorize('admin'), updateCompanySettings);
 router.get('/', getSettings);
 router.put('/', authorize('admin'), updateSetting);

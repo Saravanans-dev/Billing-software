@@ -57,6 +57,18 @@ export function Billing() {
     api.get('/products?limit=200').then(({ data }) => setProducts(data.products));
   }, []);
 
+  useEffect(() => {
+    const api_ = (window as any).electronAPI;
+    if (!api_?.onBarcodeScanned) return;
+    api_.onBarcodeScanned((barcode: string) => {
+      api.get(`/products?search=${barcode}&limit=5`).then(({ data }) => {
+        const p = data.products?.find((x: Product) => x.barcode === barcode && x.is_active !== false);
+        if (p) { addItem(p); toast.success(`Scanned: ${p.product_name}`); }
+        else toast.error(`Product not found: ${barcode}`);
+      });
+    });
+  }, [items.length]);
+
   const searchProducts = useCallback((term: string) => {
     setProductSearch(term);
     clearTimeout(productSearchTimer.current);

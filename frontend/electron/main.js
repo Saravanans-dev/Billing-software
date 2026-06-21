@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const isDev = process.env.ELECTRON_DEV === 'true';
 const RENDER_URL = 'https://free-frontend-u0kv.onrender.com';
 
 let mainWindow;

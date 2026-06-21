@@ -1,0 +1,290 @@
+==========================================================
+  STUDENT XEROX BILLING SOFTWARE - FULL PROJECT WORKFLOW
+==========================================================
+
+1. WHAT IS THIS?
+   Full-stack billing & inventory management software for Xerox/retail shops.
+   Developed by Saravanans-dev. Deployed on Render (free tier).
+   Also has Windows Desktop app (Electron wrapper).
+
+2. ARCHITECTURE (END-TO-END)
+
+   [User] ──▶ [Frontend React UI] ──▶ [Backend Express API] ──▶ [PostgreSQL DB]
+                  (Render)                 (Render)                  (Render)
+
+   All 3 components run on Render.com cloud.
+   Electron Desktop app just opens the Render URL in a window.
+
+3. COMPONENTS & WHAT THEY DO
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ A) FRONTEND (React + TypeScript + Vite + Tailwind CSS)                      │
+│    Hosted at: https://free-frontend-u0kv.onrender.com                        │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Pages (12):                                                                  │
+│   /login          - Authentication page                                      │
+│   /dashboard      - Sales stats, charts, top products, monthly revenue       │
+│   /billing        - POS billing (add items, discounts, GST, print)           │
+│   /products       - Product CRUD (add/edit/delete)                           │
+│   /purchases      - Purchase order management                                │
+│   /stock          - Inventory view with stock status (healthy/low/out)       │
+│   /customers      - Customer management with credit tracking                 │
+│   /suppliers      - Supplier management                                      │
+│   /reports        - Sales, stock, P&L, GST, Outstanding reports              │
+│   /pending-payments - Customers with outstanding balance                     │
+│   /settings       - Company info, users, bank details, UPI ID                │
+│   /receipt/:id    - Thermal receipt printable view                           │
+│   /invoice/:billNumber - Public invoice page (no login needed)               │
+│                                                                              │
+│ Key Libraries: React, Zustand (state), Axios (API), React Router,            │
+│   Recharts (charts), Lucide (icons), Radix UI (components),                  │
+│   react-hot-toast, QRCode, react-hook-form                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ B) BACKEND (Express + TypeScript + Node.js)                                  │
+│    Hosted at: https://free-backend-8c4h.onrender.com/api                     │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ API Endpoints (14 groups):                                                   │
+│                                                                              │
+│ POST   /api/auth/login          - Login (returns JWT token)                  │
+│ GET    /api/auth/verify         - Verify JWT token                           │
+│ POST   /api/auth/change-password - Change password                           │
+│                                                                              │
+│ GET    /api/customers           - List customers (search, pagination)        │
+│ POST   /api/customers           - Create customer                            │
+│ GET    /api/customers/:id       - Get single customer                        │
+│ PUT    /api/customers/:id       - Update customer                            │
+│ DELETE /api/customers/:id       - Soft-delete customer                       │
+│                                                                              │
+│ GET    /api/products            - List products (search, category filter)    │
+│ POST   /api/products            - Create product                             │
+│ GET    /api/products/:id        - Get single product                         │
+│ PUT    /api/products/:id        - Update product                             │
+│ DELETE /api/products/:id        - Soft-delete product                        │
+│ POST   /api/products/bulk-import - Bulk import products by barcode           │
+│                                                                              │
+│ GET    /api/sales               - List sales (search, date range)            │
+│ POST   /api/sales               - Create sale (deducts stock)                │
+│ GET    /api/sales/:id           - Get single sale with items                 │
+│ DELETE /api/sales/:id           - Delete sale (reverses stock)               │
+│ GET    /api/sales/today         - Today's sales summary                      │
+│                                                                              │
+│ GET    /api/purchases           - List purchases                             │
+│ POST   /api/purchases           - Create purchase (adds stock)               │
+│ DELETE /api/purchases/:id       - Delete purchase                            │
+│                                                                              │
+│ GET    /api/suppliers           - List suppliers                             │
+│ POST   /api/suppliers           - Create supplier                            │
+│ PUT    /api/suppliers/:id       - Update supplier                            │
+│ DELETE /api/suppliers/:id       - Delete supplier                            │
+│                                                                              │
+│ GET    /api/dashboard           - Dashboard stats (today/month/year sales)   │
+│                                                                              │
+│ GET    /api/reports/sales       - Sales report (daily/monthly/yearly)        │
+│ GET    /api/reports/stock       - Stock report with status                   │
+│ GET    /api/reports/profit-loss - Profit & loss report                       │
+│ GET    /api/reports/gst         - GST report by tax percentage               │
+│ GET    /api/reports/outstanding - Outstanding payments report                │
+│                                                                              │
+│ GET    /api/exports/sales-excel  - Export sales to Excel (.xlsx)             │
+│ GET    /api/exports/stock-excel  - Export stock to Excel                     │
+│ GET    /api/exports/products-excel - Export products to Excel                │
+│ GET    /api/exports/invoice/:id/pdf - Generate A5 invoice PDF with QR code  │
+│                                                                              │
+│ GET    /api/settings/company     - Get company settings                      │
+│ PUT    /api/settings/company     - Update company settings                   │
+│ GET    /api/settings             - Get all settings                          │
+│ PUT    /api/settings/:key        - Update a setting                          │
+│ GET    /api/settings/users       - List users (admin only)                   │
+│ POST   /api/settings/users       - Create user (admin only)                  │
+│ PUT    /api/settings/users/:id   - Update user (admin only)                  │
+│ DELETE /api/settings/users/:id   - Deactivate user (admin only)              │
+│                                                                              │
+│ POST   /api/upload/logo          - Upload company logo (admin only)          │
+│ GET    /api/invoice/:billNumber  - Public invoice view (no auth)             │
+│ GET    /api/payments/pending     - Get pending payments                      │
+│ POST   /api/payments             - Record a payment                          │
+│ GET    /api/payments/history     - Payment history                           │
+│ GET    /api/health               - Health check endpoint                     │
+│                                                                              │
+│ Security: JWT auth, role-based (admin/manager/operator), XSS sanitization,  │
+│   rate limiting (1000/15min), helmet headers, CORS restriction,             │
+│   bcrypt passwords, audit logging                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ C) DATABASE (PostgreSQL on Render)                                           │
+│    Database name: student_xerox_billing                                      │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Tables (16):                                                                 │
+│   users              - System users (admin, manager, operator)               │
+│   customers          - Customer records with credit limit                    │
+│   suppliers          - Supplier records                                      │
+│   products           - Products with rates, stock, GST, barcode              │
+│   bill_sequences     - Auto-incrementing bill/PO number sequences            │
+│   sales              - Sale/invoice headers                                  │
+│   sale_items         - Line items for each sale                              │
+│   purchases          - Purchase order headers                                │
+│   purchase_items     - Line items for each purchase                          │
+│   stock_transactions - Stock movement log (purchase/sale/adjustment/return)  │
+│   payments           - Payment records                                       │
+│   expenses           - Business expense tracking                             │
+│   settings           - Key-value application settings                        │
+│   company_settings   - Single row with company details                       │
+│   audit_logs         - User action audit trail                               │
+│   backups            - Backup file tracking                                  │
+│                                                                              │
+│ Default Login: admin / admin123                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+4. KEY BUSINESS FLOWS (HOW DATA MOVES)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ BILLING FLOW                                                                 │
+│                                                                              │
+│  1. User searches/selects products on Billing page                          │
+│  2. Enters quantity, rate, discount                                          │
+│  3. Clicks "Save Bill"                                                       │
+│  4. Frontend calls POST /api/sales                                           │
+│  5. Backend:                                                                 │
+│     a. Generates bill number (BT/YYYY-YY/XXXXXX)                             │
+│     b. Starts DB transaction                                                  │
+│     c. Inserts sale header (customer, totals, payment mode)                  │
+│     d. For each item: Insert sale_item, deduct stock, log stock_transaction  │
+│     e. If credit payment: update customer outstanding_amount                 │
+│     f. Commits transaction                                                    │
+│  6. Returns sale data to frontend                                             │
+│  7. Frontend shows success toast, optionally opens receipt                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PURCHASE FLOW                                                                │
+│                                                                              │
+│  1. User adds supplier & items on Purchases page                             │
+│  2. Clicks "Save Purchase"                                                   │
+│  3. POST /api/purchases                                                      │
+│  4. Backend:                                                                 │
+│     a. Generates PO number (PO/YYYY-YY/XXXXXX)                               │
+│     b. Starts transaction                                                     │
+│     c. Inserts purchase header                                                │
+│     d. For each item: Upserts product (adds stock, updates rates)            │
+│     e. Logs stock_transaction                                                 │
+│     f. Commits                                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PAYMENT FLOW                                                                 │
+│                                                                              │
+│  1. User selects customer with outstanding balance                            │
+│  2. Enters payment amount                                                    │
+│  3. POST /api/payments                                                       │
+│  4. Backend: Deducts from customer.outstanding_amount, inserts payment record│
+└──────────────────────────────────────────────────────────────────────────────┘
+
+5. FOLDER STRUCTURE
+
+   billing/
+   ├── backend/                     # Node.js/Express API (TypeScript)
+   │   ├── src/
+   │   │   ├── index.ts            # Entry point (port 5000)
+   │   │   ├── config/
+   │   │   │   ├── database.ts     # PostgreSQL pool + auto-migration
+   │   │   │   ├── jwt.ts          # JWT secret key
+   │   │   │   └── migrate.ts      # Standalone migration script
+   │   │   ├── controllers/        # 11 controllers (auth, customer, product, etc.)
+   │   │   ├── middleware/         # auth.ts, audit.ts, sanitize.ts
+   │   │   ├── routes/            # 13 route files
+   │   │   └── lib/
+   │   │       └── numberToWords.ts
+   │   ├── .env
+   │   ├── package.json
+   │   └── tsconfig.json
+   │
+   ├── frontend/                    # React SPA + Electron
+   │   ├── src/
+   │   │   ├── pages/             # 13 pages (Login, Billing, Products, etc.)
+   │   │   ├── components/        # layout/, invoice/, ui/ components
+   │   │   ├── services/api.ts    # Axios instance with JWT interceptor
+   │   │   ├── store/authStore.ts # Zustand auth store
+   │   │   └── types/             # TypeScript interfaces + electron.d.ts
+   │   ├── electron/
+   │   │   ├── main.js            # Electron main process (loads Render URL)
+   │   │   └── preload.cjs        # Exposes APIs to renderer
+   │   ├── public/                # icon.png, icon.ico
+   │   ├── scripts/               # generate-icon.mjs
+   │   ├── package.json
+   │   ├── vite.config.ts
+   │   └── tailwind.config.js
+   │
+   ├── database/
+   │   └── schema.sql             # PostgreSQL schema (16 tables)
+   │
+   ├── render.yaml                 # Render deployment config
+   ├── Dockerfile                  # Multi-stage Docker build
+   ├── docker-compose.yml          # Docker Compose (PG + Backend + Frontend)
+   └── how-it-works.txt            # This file
+
+6. DEPLOYMENT (Render.com)
+
+   render.yaml:
+     - free-backend: Web service on port 5000
+     - free-frontend: Static site serving frontend/dist
+     - free-db: PostgreSQL database
+
+   URLs:
+     Website:    https://free-frontend-u0kv.onrender.com
+     API:        https://free-backend-8c4h.onrender.com/api
+     Health:     https://free-backend-8c4h.onrender.com/api/health
+
+7. ELECTRON DESKTOP APP
+
+   To build Windows .exe installer:
+     cd frontend
+     npm install
+     npm run electron:build
+
+   Output: frontend/dist-electron/Student Xerox Billing-Setup-1.0.0.exe
+
+   What Electron app does:
+     - Opens https://free-frontend-u0kv.onrender.com in a native window
+     - Barcode scanner support (keyboard wedge capture)
+     - Thermal receipt printing (native print dialog)
+     - Full-screen POS mode (F11)
+     - Desktop shortcut + taskbar icon
+
+   Everything runs on Render. Electron is just a wrapper.
+
+8. SECURITY
+
+   - JWT authentication (24hr expiry)
+   - Role-based access: admin, manager, operator
+   - XSS input sanitization middleware
+   - Rate limiting (1000 requests per 15 min per IP)
+   - Helmet security headers (HSTS, nosniff, X-Frame-Options)
+   - CORS restricted to frontend origin
+   - bcrypt password hashing
+   - Audit logging for all CRUD operations
+   - File upload restricted to images (2MB max)
+   - Parameterized SQL queries (no SQL injection)
+
+9. PENTEST SUMMARY (20-Jun-2026)
+
+   Result: ✅ GO (No critical vulnerabilities)
+
+   All 18 security checks passed:
+   - Auth bypass: Blocked (401)
+   - SQL injection: Blocked (401/403)
+   - XSS: Blocked (400 - sanitized)
+   - JWT tampering: Blocked (401)
+   - CORS: Restricted
+   - Rate limiting: Active
+   - Directory listing: Disabled
+   - Info disclosure: None
+   - .env exposure: Blocked
+
+10. DEFAULT LOGIN
+    Username: admin
+    Password: admin123
+
+==========================================================
